@@ -1,0 +1,46 @@
+{% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/stream_overlay_1.css') }}"></link>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/stream_overlay_1.js') }}"></script>
+<script>
+    streamnode = '{{ node_id }}'
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="page-streamnode">
+    <!-- Popup on every new lap -->
+    <div id="popup-container">
+        <div class="lap-item lap-counter">
+            <p id="last_lap" class="text-object"></p>
+        </div>
+        <div id="lap-item-primary" class="lap-item">
+            <p id="lap-item-secondary" class="text-object">LAP <span class="laps">0</span></p>
+        </div>
+    </div>
+
+    <!-- Information on top of overlay -->
+    <div id="top-bar">
+        <!-- <div class="triangle triangle-top"></div> -->
+        <div class="position-container">
+            <span id="pilot_position"></span>
+            <sup id="pos_ordinal"></sup>
+        </div>
+    </div>
+
+    <!-- Information on bottom of overlay -->
+    <div id="bottom-bar">
+        <div class="row block-primary">
+            <div id="pilot_callsign"></div>
+            <div class="align-right" id="laps_stat">LAPS: <span class="laps">0</span></div>
+        </div>
+        <div class="row block-secondary">
+            <div class="laps-container">
+                <ul id="laps-scroll"></ul>
+            </div>
+            <div class="align-right" id="rank_stat">0:00.000</div>
+        </div>
+        <div class="triangle triangle-bottom"></div>
+    </div>
+</main>
+{% endblock %}
