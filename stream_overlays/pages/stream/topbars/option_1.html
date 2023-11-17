@@ -1,0 +1,18 @@
+{% extends 'layout-basic.html' %} {% block title %}{{ __('Stream') }}: {{ __('Current Race') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/stream_topbar_1.css') }}"></link>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/stream_topbar_1.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div id="obs_frame_topbar">
+    <div id="info_row" class="rectangle item">
+        <div></div>
+        <div id="heat_info"><span class="curr_heat_Title"></span><span style="margin: 0 10px;">|</span><span>DDS Racing</span></div>
+        <div></div>
+    </div>
+    <div id="timer" class="rectangle item timing-clock">
+        <span class="time-display">--:--</span>
+    </div>
+</div>
+{% endblock %}
