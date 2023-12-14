@@ -19,7 +19,7 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 1. Install the Stream Overlays RH Plugin like any other plugin ([RH Plugin Documentation][rh-plugin-docs])
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/tools/install.sh)"
 ```
 
 2. Restart RotorHazard
