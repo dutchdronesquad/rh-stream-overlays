@@ -55,5 +55,5 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 [rh-dev]: https://github.com/RotorHazard/RotorHazard/blob/main/doc/Development.md
 
 [license-shield]: https://img.shields.io/github/license/dutchdronesquad/rh-stream-overlays.svg
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2023.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2024.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
