@@ -1,6 +1,4 @@
 var data_dependencies = [
-  "all_languages",
-  "language",
   "leaderboard",
   "race_status",
   "result_data",
@@ -37,9 +35,9 @@ $(document).ready(function () {
     var server_oneway = server_delay ? server_delay / 2 : server_delay;
 
     var server_time_differential = {
-      differential: msg.pi_time_s * 1000 - response_time - server_oneway, // convert seconds (pi) to millis (JS)
-      response: parseFloat(server_delay),
-    };
+      'differential': (msg.pi_time_s * 1000) - response_time - server_oneway, // convert seconds (pi) to millis (JS)
+      'response': parseFloat(server_delay)
+    }
 
     // store sync sample
     rotorhazard.server_time_differential_samples.push(server_time_differential);
@@ -50,21 +48,12 @@ $(document).ready(function () {
     });
 
     // remove unusable samples
-    var diff_min =
-      rotorhazard.server_time_differential_samples[0].differential -
-      rotorhazard.server_time_differential_samples[0].response;
-    var diff_max =
-      rotorhazard.server_time_differential_samples[0].differential +
-      rotorhazard.server_time_differential_samples[0].response;
+    var diff_min = rotorhazard.server_time_differential_samples[0].differential - rotorhazard.server_time_differential_samples[0].response
+    var diff_max = rotorhazard.server_time_differential_samples[0].differential + rotorhazard.server_time_differential_samples[0].response
 
-    rotorhazard.server_time_differential_samples =
-      rotorhazard.server_time_differential_samples.filter(function (
-        value,
-        index,
-        array
-      ) {
-        return value.differential >= diff_min && value.differential <= diff_max;
-      });
+    rotorhazard.server_time_differential_samples = rotorhazard.server_time_differential_samples.filter(function (value, index, array) {
+      return value.differential >= diff_min && value.differential <= diff_max;
+    });
 
     // get filtered value
     var a = [];
@@ -90,13 +79,7 @@ $(document).ready(function () {
     for (var i in rotorhazard.server_time_differential_samples) {
       a = Math.min(a, rotorhazard.server_time_differential_samples[i].response);
     }
-    $("#server-lag").html(
-      "<p>Sync quality: within " +
-        a +
-        "ms (" +
-        rotorhazard.server_time_differential_samples.length +
-        " samples)</p>"
-    );
+    rotorhazard.sync_within = Math.ceil(a);
   });
 
   socket.on("race_scheduled", function (msg) {
@@ -151,15 +134,15 @@ $(document).ready(function () {
 
   socket.on("leaderboard", function (msg) {
     var race = msg.current;
-    var heatname;
+    var heatName;
 
     // Change the heat name
     if (race.heat == 0) {
-      heatname = __("Practice");
+      heatName = __("Practice");
     } else {
-      heatname = __("Heat") + " " + race.heat;
+      heatName = __("Heat") + " " + race.heat;
     }
-    $(".curr_heat_Title").text(heatname);
+    $(".curr_heat_Title").text(heatName);
   });
 
   socket.on("prestage_ready", function (msg) {
