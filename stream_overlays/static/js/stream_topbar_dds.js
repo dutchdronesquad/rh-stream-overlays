@@ -150,7 +150,6 @@ $(document).ready(function () {
   });
 
   socket.on("leaderboard", function (msg) {
-    console.log(msg);
     var race = msg.current;
     var heatname;
 
