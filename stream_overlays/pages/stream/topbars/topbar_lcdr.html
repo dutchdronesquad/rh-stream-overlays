@@ -1,0 +1,20 @@
+{% extends 'layout-basic.html' %} {% block title %}{{ __('Stream') }}: {{ __('Topbar - LCDR') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/stream_topbar_lcdr.css') }}">
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/main/stream_topbar.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div id="info-row" class="rectangle item">
+    <div id="heat-info">
+        <div style="margin-left: 250px;">
+            <span id="js--heat-title"></span>
+            <span style="margin: 0 10px;">|</span>
+            <span>LIGA COLOMBIANA DRONE RACING</span>
+        </div>
+    </div>
+    <div id="timer" class="rectangle item timing-clock">
+        <span class="time-display">--:--</span>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
+
+/* Styling for the pilot position - on top */
+.position-container {
+  color: #fff;
+  font-family: "Teko", sans-serif;
+  font-style: italic;
+  position: absolute;
+  top: 0;
+  left: 25px;
+}
+
+#pilot_position {
+  font-size: 6.5rem;
+}
+
+#pos_ordinal {
+  font-size: 2rem;
+  margin-left: 10px;
+  position: absolute;
+  top: 32px;
+}
+
+/* Styling for the bottom */
+.bottom-bar {
+  display: inline-flex;
+  height: 50px;
+  width: 100%;
+}
+
+/* Styling for the scrolling text */
+.laps-container {
+  margin-right: 10px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#pilot_lap-times {
+  list-style-type: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+
+  white-space: nowrap;
+}
+
+#pilot_lap-times > li {
+  animation: fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  margin-right: 20px;
+  opacity: 1;
+}
+
+.fastest_lap {
+	color: hsl(25, 85%, 55%);
+	color: var(--fast_lap_color);
+}
+
+.from_start {
+  color: #888;
+}
+
+.min-lap-warning {
+  color: red;
+}
+
+/* Styling for the left - bottom bar */
+.left-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  width: 35%;
+  background-color: var(--pilot_color);
+  color: white;
+}
+
+.nested-left {
+  margin-left: 10px;
+  font-size: 2rem;
+}
+
+.nested-right {
+  margin-right: 10px;
+}
+
+#laps_label {
+  font-family: "Teko", sans-serif;
+  font-size: 2rem;
+}
+
+/* Styling for the right - bottom bar */
+.right-bar {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  width: 65%;
+  background-color: white;
+
+  color: black;
+  font-size: 1.8rem
+}
+
+/* Styling for the lap time pop-up */
+#popup-container {
+  position: fixed;
+  bottom: 130px;
+  right: 0px; /* 400px; when full in screen */
+
+  /* Pop-up animication */
+  animation-duration: 0.5s;
+  animation-timing-function: ease;
+}
+
+.box {
+  position: absolute;
+}
+
+#popup-container > .laps {
+  width: 140px;
+  height: 80px;
+  background-color: var(--position_foreground_color);
+  /* left: calc(50% - 200px); */
+  z-index: 2;
+  border-radius: 15px 0 0 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+#popup-container > .time {
+  width: 400px;
+  height: 80px;
+  background-color: rgba(0, 0, 0, 1);
+  /* left: calc(50% - 200px); */
+  z-index: 1;
+  border-radius: 15px 0 0 0;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+/* Font styling for the pop-up */
+.box > p {
+  font-family: "Teko", sans-serif;
+  margin: auto;
+  font-size: 2.4rem;
+  line-height: 2.3;
+}
+
+#last_laptime {
+  padding-left: 140px;
+  color: #fff;
+}
+
+.laps > p {
+  color: var(--position_background_color);
+}
