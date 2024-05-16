@@ -1,21 +1,45 @@
 """DDS - RotorHazard Stream Overlay Plugin"""
+from eventmanager import Evt
 from flask import templating
 from flask.blueprints import Blueprint
 
 overlays: list = ["DDS", "LCDR"]
-nr_of_mocks: int = 8
+
+class StreamOverlays():
+    """Stream Overlays class."""
+
+    def __init__(self, rhapi):
+        """Initialize StreamOverlays.
+
+        Args:
+        -----
+            rhapi (RotorHazardAPI): RotorHazard API instance.
+        """
+        self._rhapi = rhapi
+        self._overlays = overlays
+
+    def create_panels(self, _args) -> None:
+        """Create the stream overlay panels.
+
+        Args:
+        -----
+            _args: Arguments passed to function.
+        """
+        num_nodes: int = len(self._rhapi.interface.seats)
+        for name in self._overlays:
+            # Register a panel for each overlay on the streams page
+            self._rhapi.ui.register_panel(f"stream_overlays_{name.lower()}", f"{name} - OBS Overlays", "streams")
+            # Generate link for the topbar
+            self._rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Topbar", f"/stream/overlay/{name.lower()}/topbar")
+            # Generate link for each node or mock the number of nodes
+            for i in range(num_nodes):
+                self._rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Node {i+1}", f"/stream/overlay/{name.lower()}/node/{i+1}")
 
 def initialize(rhapi):
-    nodes: int = rhapi.race.slots
+    stream_overlays = StreamOverlays(rhapi)
 
-    for name in overlays:
-        # Register a panel for each overlay on the streams page
-        rhapi.ui.register_panel(f"stream_overlays_{name.lower()}", f"{name} - OBS Overlays", "streams")
-        # Generate link for the topbar
-        rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Topbar", f"/stream/overlay/{name.lower()}/topbar")
-        # Generate link for each node or mock the number of nodes
-        for i in range(nodes if nodes > 0 else nr_of_mocks):
-            rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Node {i+1}", f"/stream/overlay/{name.lower()}/node/{i+1}")
+    # Hook into the startup event to create the panels
+    rhapi.events.on(Evt.STARTUP, stream_overlays.create_panels)
 
     bp = Blueprint(
         'stream_overlays',
