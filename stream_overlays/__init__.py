@@ -2,26 +2,20 @@
 from flask import templating
 from flask.blueprints import Blueprint
 
-class StreamOverlays():
-    """Stream Overlays plugin class."""
-
-    def __init__(self, rhapi):
-        """Initialize StreamOverlays.
-
-        Args:
-        -----
-            rhapi (RotorHazardAPI): RotorHazard API instance.
-        """
-        self._rhapi = rhapi
+overlays: list = ["DDS", "LCDR"]
+nr_of_mocks: int = 8
 
 def initialize(rhapi):
-    """Initialize the plugin.
+    nodes: int = rhapi.race.slots
 
-    Args:
-    -----
-        rhapi (RotorHazardAPI): RotorHazard API instance.
-    """
-    StreamOverlays(rhapi)
+    for name in overlays:
+        # Register a panel for each overlay on the streams page
+        rhapi.ui.register_panel(f"stream_overlays_{name.lower()}", f"{name} - OBS Overlays", "streams")
+        # Generate link for the topbar
+        rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Topbar", f"/stream/overlay/{name.lower()}/topbar")
+        # Generate link for each node or mock the number of nodes
+        for i in range(nodes if nodes > 0 else nr_of_mocks):
+            rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Node {i+1}", f"/stream/overlay/{name.lower()}/node/{i+1}")
 
     bp = Blueprint(
         'stream_overlays',
