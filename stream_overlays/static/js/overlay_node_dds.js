@@ -82,7 +82,7 @@ $(document).ready(function () {
         if (leaderboard[i].laps != previousLapCount && leaderboard[i].laps != 0) {
           $('#popup-container').animate({ top: '45%' }, 500);
           setTimeout(function() {
-            $('#popup-container').animate({ top: '-100%' }, 500); // 500ms animatietijd
+            $('#popup-container').animate({ top: '-50%' }, 500); // 500ms animatietijd
           }, 3000);
 
           // Update the previous lap count for the correct streamnode
@@ -93,8 +93,8 @@ $(document).ready(function () {
         $("#pos_ordinal").text(pilot_data.position ? getOrdinal(pilot_data.position) : "");
         $("#pilot_callsign").text(pilot_data.callsign);
 
-        $('#last_lap').text(pilot_data.last_lap ? pilot_data.last_lap : '00:00.000');
-        $('.laps').text(pilot_data.laps);
+        $('#last_laptime').text(pilot_data.last_lap ? pilot_data.last_lap : '00:00.000');
+        $('.lap_number').text(pilot_data.laps);
 
         if (primary_leaderboard == "by_fastest_lap") {
           rank_stat = pilot_data.fastest_lap;
@@ -104,7 +104,7 @@ $(document).ready(function () {
           rank_stat = pilot_data.total_time;
         }
 
-        $("#rank_stat").text(rank_stat);
+        $("#total_time").text(rank_stat);
         break;
       }
     }
@@ -112,8 +112,7 @@ $(document).ready(function () {
     if (!found_streamnode) {
       $("#pilot_position").text("");
       $("#pilot_callsign").html("");
-      $("#rank_stat").text("");
-      $("#current-laps").html("");
+      $("#total_time").text("");
     }
   });
 });
@@ -137,8 +136,7 @@ function show_current_laps() {
     var i = streamnode;
     var node_index = current_laps.node_index[streamnode];
 
-    $("#current-laps tr").remove();
-    $('#laps-scroll').empty();
+    $('#pilot_lap-times').empty();
 
     display_laps = node_index.laps;
     while (display_laps.length > 10) {
@@ -201,7 +199,7 @@ function show_current_laps() {
       // tr.appendTo("#current-laps");
 
       // Add to horizontal laps list
-      $('#laps-scroll').prepend(lapLi);
+      $('#pilot_lap-times').prepend(lapLi);
     });
 
     // var container = $('#laps-scroll');
@@ -217,12 +215,12 @@ function show_current_laps() {
 
 // Voeg deze functie toe om de lap-ticker te starten
 function startLapTicker() {
-  var container = $('#laps-scroll');
+  var container = $('#pilot_lap-times');
   container.addClass('scrolling-animation');
 }
 
 // Voeg deze functie toe om de lap-ticker te stoppen
 function stopLapTicker() {
-  var container = $('#laps-scroll');
+  var container = $('#pilot_lap-times');
   container.removeClass('scrolling-animation');
 }

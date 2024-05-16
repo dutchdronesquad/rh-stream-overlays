@@ -1,6 +1,7 @@
 {% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_dds.css') }}"></link>
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/node_overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_dds.css') }}">
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_dds.js') }}"></script>
 <script>
     streamnode = '{{ node_id }}'
@@ -11,17 +12,17 @@
 <main class="page-streamnode">
     <!-- Popup on every new lap -->
     <div id="popup-container">
-        <div class="lap-item lap-counter">
-            <p id="last_lap" class="text-object"></p>
+        <div class="box laps">
+            <p>LAP <span class="lap_number">0</span></p>
         </div>
-        <div id="lap-item-primary" class="lap-item">
-            <p id="lap-item-secondary" class="text-object">LAP <span class="laps">0</span></p>
+        <div class="box time">
+            <p id="last_laptime"></p>
         </div>
     </div>
 
     <!-- Information on top of overlay -->
-    <div id="top-bar">
-        <!-- <div class="triangle triangle-top"></div> -->
+    <div id="overlay-top">
+        <!-- <div class="triangle top"></div> -->
         <div class="position-container">
             <span id="pilot_position"></span>
             <sup id="pos_ordinal"></sup>
@@ -29,18 +30,18 @@
     </div>
 
     <!-- Information on bottom of overlay -->
-    <div id="bottom-bar">
-        <div class="row block-primary">
+    <div class="overlay-bottom">
+        <div class="row first-bar">
             <div id="pilot_callsign"></div>
-            <div class="align-right" id="laps_stat">LAPS: <span class="laps">0</span></div>
+            <div class="align-right" id="laps_label">LAPS: <span class="lap_number">0</span></div>
         </div>
-        <div class="row block-secondary">
+        <div class="row second-bar">
             <div class="laps-container">
-                <ul id="laps-scroll"></ul>
+                <ul id="pilot_lap-times"></ul>
             </div>
-            <div class="align-right" id="rank_stat">0:00.000</div>
+            <div class="align-right" id="total_time">0:00.000</div>
         </div>
-        <div class="triangle triangle-bottom"></div>
+        <div class="triangle bottom"></div>
     </div>
 </main>
 {% endblock %}
