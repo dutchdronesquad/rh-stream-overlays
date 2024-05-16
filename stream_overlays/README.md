@@ -10,7 +10,7 @@ This overlay is designed by the [Dutch Drone Squad](https://dutchdronesquad.nl) 
 
 URL to use: `RH-IP:5000/stream/overlay/dds/topbar`
 
-![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds.png)
+![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds_demo.mp4)
 
 URL to use: `RH-IP:5000/stream/overlay/dds/node/[NUMBER]`
 
