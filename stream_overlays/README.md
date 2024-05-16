@@ -10,7 +10,11 @@ This overlay is designed by the [Dutch Drone Squad](https://dutchdronesquad.nl) 
 
 URL to use: `RH-IP:5000/stream/overlay/dds/topbar`
 
-![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds_demo.mp4)
+![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds.png)
+
+[![Watch the video](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds.png)](https://youtu.be/nTQUwghvy5Q)
+
+<iframe width="1280" height="720" src="https://www.youtube.com/embed/ZpV0veJErvE?si=eh6rn9PBydVymZhv" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 URL to use: `RH-IP:5000/stream/overlay/dds/node/[NUMBER]`
 
