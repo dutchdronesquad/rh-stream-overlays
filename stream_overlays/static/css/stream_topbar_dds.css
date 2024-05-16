@@ -14,7 +14,8 @@ body {
   position: absolute;
 }
 
-#info_row {
+/* Styling for the info part */
+#info-row {
   width: 100%;
   height: var(--topbar-height);
   background: var(--topbar-background-color);
@@ -25,15 +26,14 @@ body {
   align-items: center;
 }
 
-#info_row > div {
+#info-row > div {
   flex: 1;
-  height: 100%;
-
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-#heat_info {
+#heat-info {
   font-family: "Teko", sans-serif;
   font-weight: bold;
   color: white;
@@ -43,10 +43,6 @@ body {
 }
 
 #timer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   top: 0;
   left: 0;
   width: 250px;

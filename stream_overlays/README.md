@@ -10,7 +10,8 @@ This overlay is designed by the [Dutch Drone Squad](https://dutchdronesquad.nl) 
 
 URL to use: `RH-IP:5000/stream/overlay/dds/topbar`
 
-![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds.png)
+[![Watch the video](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-dds.png)](https://www.youtube.com/watch?v=ZpV0veJErvE)
+_Click on the image to watch a video of the overlay in action_
 
 URL to use: `RH-IP:5000/stream/overlay/dds/node/[NUMBER]`
 
@@ -22,6 +23,7 @@ This overlay is designed by the [Liga Colombiana Drone Racing](https://ligacolom
 
 URL to use: `RH-IP:5000/stream/overlay/lcdr/topbar`
 
-![alt Screenshot of overlay](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-lcdr.png)
+[![Watch the video](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/node-lcdr.png)](https://www.youtube.com/watch?v=i46IejMjN_Q)
+_Click on the image to watch a video of the overlay in action_
 
 URL to use: `RH-IP:5000/stream/overlay/lcdr/node/[NUMBER]`
