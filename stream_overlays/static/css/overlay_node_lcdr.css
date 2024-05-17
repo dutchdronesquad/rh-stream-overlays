@@ -72,7 +72,7 @@
   padding: 10px;
   width: 35%;
   background-color: var(--pilot_color);
-  color: white;
+  color: var(--position_background_color);
 }
 
 .nested-left {
