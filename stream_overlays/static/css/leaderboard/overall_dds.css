@@ -1,0 +1,106 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
+
+/* Background image styling and blur effect */
+.bg-image {
+    background-image: url('/stream_overlays/static/img/background.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    z-index: -1;
+}
+
+.blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(10px);
+}
+
+/* General styling */
+.container {
+    margin: 15px 100px 0 100px;
+    width: 100%;
+}
+
+#header {
+    background-color: white;
+    color: black;
+    text-align: center;
+
+    height: 60px;
+    margin-bottom: 25px;
+
+    border-radius: 15px 15px 0 0;
+}
+
+#header>h1 {
+    font-family: "Teko", sans-serif;
+    font-size: 2.4rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Leaderboard styling */
+.leaderboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 30px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.entry {
+    background-color: rgba(0, 0, 0, 1);
+    color: white;
+    border-radius: 15px 0;
+    text-align: center;
+    width: 100%;
+    height: 60px;
+    margin-bottom: 15px;
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.55, 0, 0.1, 1), transform 0.8s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.entry.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.box {
+    position: absolute;
+}
+
+.entry>.position {
+    width: 65px;
+    height: 60px;
+    background-color: darkorange;
+    z-index: 2;
+    border-radius: 15px 0 15px 0;
+}
+
+/* Font styling for the entry */
+.box>p,
+.entry>p {
+    font-family: "Teko", sans-serif;
+    margin: auto;
+    font-size: 2.4rem;
+    line-height: 1.7;
+}
+
+#pilot_name {
+    padding-left: 80px;
+    text-align: left;
+
+    font-size: 1.8rem;
+    line-height: 2.2;
+}

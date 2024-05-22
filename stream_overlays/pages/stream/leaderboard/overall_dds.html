@@ -1,0 +1,23 @@
+{% extends "layout-basic.html" %} {% block title %}{{ __('Stream') }}: {{ __('Class') }}: {{ class_id or __('Current') }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/leaderboard/overall_dds.css') }}">
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/leaderboard/overall_dds.js') }}"></script>
+<script>
+    stream_class_id = '{{ class_id }}';
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="page-streamclass bg-image">
+    <div class="blur"></div>
+    <div class="container">
+        <div id="header">
+            <h1>{{ __('Loading...') }}</h1>
+        </div>
+
+        <div class="leaderboard" id="leaderboard"></div>
+    </div>
+</main>
+{% endblock %}
