@@ -16,9 +16,17 @@ body {
   margin: 0;
 }
 
+/* Page stream overlay styles */
 .page-streamnode {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
+  height: 100vh;
+}
+
+.page-streamclass {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
 }
