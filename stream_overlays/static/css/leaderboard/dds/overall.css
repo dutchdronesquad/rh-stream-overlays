@@ -1,30 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
 
-/* Background image styling and blur effect */
-.bg-image {
-    background-image: url('/stream_overlays/static/img/background.jpg');
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    z-index: -1;
-}
-
-.blur {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(10px);
-}
-
 /* General styling */
 .container {
-    margin: 15px 100px 0 100px;
     width: 100%;
 }
 
+/* Center the container in the screen */
+@media (max-height: 720px) {
+    .container {
+        margin: 20px 50px 0 50px;
+    }
+}
+
+@media (min-height: 1080px) {
+    .container {
+        margin: 160px 100px 0 100px;
+    }
+}
+
+/* Header styling */
 #header {
     background-color: white;
     color: black;
@@ -32,11 +26,10 @@
 
     height: 60px;
     margin-bottom: 25px;
-
     border-radius: 15px 15px 0 0;
 }
 
-#header>h1 {
+#header h1 {
     font-family: "Teko", sans-serif;
     font-size: 2.4rem;
     line-height: 1.6;

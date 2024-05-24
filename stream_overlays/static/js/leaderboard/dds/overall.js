@@ -8,7 +8,6 @@ rotorhazard.show_messages = false;
 var result_data;
 
 $(document).ready(function () {
-    console.log('stream_class_id:', stream_class_id);
     if (stream_class_id == 0) {
         socket.emit('load_data', {'load_types': [
             'current_heat',
@@ -46,18 +45,16 @@ function showNoResults() {
 
 function showResultsData(data) {
     if (!$.isEmptyObject(data.heats)) {
-        console.log(data);
         for (let class_id in data.heats_by_class) {
             if (class_id == stream_class_id) {
                 let current_class = data.classes[class_id];
                 let current_class_leaderboard = current_class.leaderboard[current_class.leaderboard.meta.primary_leaderboard];
-                console.log(current_class);
 
                 // If class is not empty
                 if (current_class) {
                     // Define class name
                     if (current_class.name) {
-                        class_name = current_class.name + ' - Overall Ranking'
+                        class_name = current_class.name + ' - Overall Ranking';
                     } else {
                         class_name = __('Class') + ' ' + current_class.id + ' - Overall Ranking';
                     }
@@ -100,7 +97,6 @@ function generateLeaderboard(data) {
         // Create an entry element
         var entry = document.createElement("div");
         entry.className = "entry";
-        entry.style.animationDelay = (i % 8) * 0.1 + "s";
 
         // Create a box for the position
         var positionBox = document.createElement("div");

@@ -1,9 +1,9 @@
-{% extends "layout-basic.html" %} {% block title %}{{ __('Stream') }}: {{ __('Class') }}: {{ class_id or __('Current') }}{% endblock %}
+{% extends "layout-basic.html" %} {% block title %}{{ __('Stream Leaderboard') }}: {{ __('Class') }}: {{ class_id or __('Current') }}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/leaderboard/overall_dds.css') }}">
-<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/leaderboard/overall_dds.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/leaderboard/dds/overall.css') }}">
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/leaderboard/dds/overall.js') }}"></script>
 <script>
     stream_class_id = '{{ class_id }}';
 </script>
