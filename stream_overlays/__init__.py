@@ -24,5 +24,10 @@ def initialize(rhapi):
     @bp.route('/stream/overlay/<string:name>/leaderboard/<int:class_id>/overall')
     def render_overall_class_overlay(name: str, class_id: int):
         """Render the overall class leaderboard overlay."""
-        return templating.render_template(f'stream/leaderboard/overall_{name}.html', serverInfo=None, getOption=rhapi.db.option, getConfig=rhapi.config.get_item, __=rhapi.__, class_id=class_id)
+
+    @bp.route('/stream/overlay/<string:name>/leaderboard/<int:class_id>/class')
+    def render_class_leaderboard_overlay(name: str, class_id: int):
+        """Render the class leaderboard overlay."""
+        return templating.render_template(f'stream/leaderboard/{name}/class.html', serverInfo=None, getOption=rhapi.db.option, getConfig=rhapi.config.get_item, __=rhapi.__, class_id=class_id)
+
     rhapi.ui.blueprint_add(bp)

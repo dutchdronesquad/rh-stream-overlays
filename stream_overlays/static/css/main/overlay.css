@@ -16,7 +16,7 @@ body {
   margin: 0;
 }
 
-/* Page stream overlay styles */
+/* Page stream node overlay styles */
 .page-streamnode {
   display: flex;
   justify-content: flex-end;
@@ -24,9 +24,29 @@ body {
   height: 100vh;
 }
 
+/* Page stream class overlay styles */
 .page-streamclass {
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
   height: 100vh;
+}
+
+/* Background image styling and blur effect */
+.bg-image {
+  background-image: url('/stream_overlays/static/img/background.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  z-index: -1;
+}
+
+.blur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(10px);
 }
