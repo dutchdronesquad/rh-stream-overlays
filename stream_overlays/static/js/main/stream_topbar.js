@@ -140,7 +140,7 @@ $(document).ready(function () {
     if (race.heat == 0) {
       heatName = __("Practice");
     } else {
-      heatName = __("Heat") + " " + race.heat;
+      heatName = race.displayname;
     }
     $("#js--heat-title").text(heatName);
   });
