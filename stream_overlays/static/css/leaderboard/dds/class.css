@@ -1,0 +1,164 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
+
+/* General styling */
+.container {
+    margin: 120px 120px 0 120px;
+    width: 100%;
+}
+
+/* Center the container in the screen */
+@media (max-height: 720px) {
+    .container {
+        margin-top: 30px;
+    }
+}
+
+@media (min-height: 1080px) {
+    .container {
+        margin-top: 120px;
+    }
+}
+
+/* Header styling */
+#header {
+    display: flex;
+    background-color: white;
+    align-items: center;
+    color: black;
+
+    height: 60px;
+    margin-bottom: 20px;
+    border-radius: 15px 15px 0 0;
+    padding: 0 20px;
+}
+
+#header .left {
+    flex: 2;
+    display: flex;
+    justify-content: flex-start;
+}
+
+#header .right {
+    flex: 1.3;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+}
+
+#header h1 {
+    font-family: "Teko", sans-serif;
+    font-size: 2rem;
+    line-height: 1;
+    margin: 0;
+}
+
+#header .label {
+    font-family: "Teko", sans-serif;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+/* Entry styling */
+.entry {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 1);
+    color: white;
+    border-radius: 15px 0;
+    text-align: center;
+    width: 100%;
+    height: 60px;
+    margin-bottom: 15px;
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.55, 0, 0.1, 1), transform 0.8s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.entry.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.entry.hide {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s, transform 0.5s;
+}
+
+.box {
+    position: absolute;
+}
+
+.entry>.position {
+    width: 65px;
+    height: 60px;
+    background-color: darkorange;
+    z-index: 2;
+    border-radius: 15px 0 15px 0;
+}
+
+/* Font styling for the entry */
+.box>p,
+.entry>p {
+    font-family: "Teko", sans-serif;
+    margin: auto;
+    font-size: 2.4rem;
+    line-height: 1.7;
+}
+
+/* Styling for the info container */
+.info {
+    display: flex;
+    justify-content: space-between; /* Space between left and right containers */
+    align-items: center; /* Center items vertically */
+    padding-left: 80px;
+    padding-right: 20px;
+    width: 100%;
+}
+
+.info .left {
+    flex: 1.2;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.info .right {
+    flex: 0.84;
+    display: grid;
+    gap: 10px;
+    justify-items: center;
+    align-items: center;
+}
+
+.info p {
+    margin: 0;
+    font-family: "Teko", sans-serif;
+    font-size: 1.8rem;
+    line-height: 2.2;
+}
+
+#pilot_name {
+    text-align: left;
+}
+
+#currentIndexIndicator {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+
+    font-family: "Teko", sans-serif;
+    font-size: 1.2rem;
+    color: white;
+}
+
+@media (min-height: 1080px) {
+    #currentIndexIndicator {
+        font-size: 1.8rem;
+        padding: 7px 15px;
+    }
+}

@@ -1,6 +1,6 @@
 {% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/node_overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_dds.css') }}">
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_dds.js') }}"></script>
 <script>
