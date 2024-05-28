@@ -8,6 +8,8 @@ This overlay is designed by the [Dutch Drone Squad](https://dutchdronesquad.nl) 
 
 ### Topbar
 
+The title in the top bar consists of a heat name and event name which dynamically adapts to what is set in RotorHazard.
+
 ![alt Screenshot of topbar](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/topbar-dds.png)
 
 URL to use: `RH-IP:5000/stream/overlay/dds/topbar`
@@ -40,6 +42,8 @@ URL to use: `RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/overall`
 This overlay is designed by the [Liga Colombiana Drone Racing](https://ligacolombianadroneracing.com) and consists of a top bar and a node overlay.
 
 ### Topbar
+
+The title in the top bar consists of a heat name that changes dynamically and the organization name of LCDR (static).
 
 ![alt Screenshot of topbar](https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/assets/overlays/topbar-lcdr.png)
 
