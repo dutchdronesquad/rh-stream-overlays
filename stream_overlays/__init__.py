@@ -1,6 +1,9 @@
 """DDS - RotorHazard Stream Overlay Plugin"""
+from eventmanager import Evt
 from flask import templating
 from flask.blueprints import Blueprint
+
+overlays: list = ["DDS", "LCDR"]
 
 class StreamOverlays():
     """Stream Overlays plugin class."""
@@ -13,6 +16,34 @@ class StreamOverlays():
             rhapi (RotorHazardAPI): RotorHazard API instance.
         """
         self._rhapi = rhapi
+        self._overlays = overlays
+
+    def create_panels(self, _args) -> None:
+        """Create the stream overlay panels.
+        Args:
+        -----
+            _args: Arguments passed to function.
+        """
+        num_nodes: int = len(self._rhapi.interface.seats)
+        for name in self._overlays:
+            markdown_block: str = ""
+            base_path: str = f"/stream/overlay/{name.lower()}"
+
+            # Register a panel for each overlay on the streams page
+            panel_id = f"stream_overlays_{name.lower()}"
+            self._rhapi.ui.register_panel(panel_id, f"{name} - OBS Overlays", "streams")
+
+            # Create header and link for the topbar
+            markdown_block += "## Topbar\n"
+            markdown_block += f"- <a href='{base_path}/topbar' target='_blank'>{name} Overlay - Topbar</a>\n"
+
+            # Create header and links for each node overlay (or mock nodes)
+            markdown_block += "## Nodes\n"
+            for i in range(num_nodes):
+                markdown_block += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{name} Overlay - Node {i+1}</a>\n"
+
+            # Register the markdown block
+            self._rhapi.ui.register_markdown(panel_id, f"{name}", markdown_block)
 
 def initialize(rhapi):
     """Initialize the plugin.
@@ -21,7 +52,10 @@ def initialize(rhapi):
     -----
         rhapi (RotorHazardAPI): RotorHazard API instance.
     """
-    StreamOverlays(rhapi)
+    stream_overlays = StreamOverlays(rhapi)
+
+    # Hook into the startup event to create the panels
+    rhapi.events.on(Evt.STARTUP, stream_overlays.create_panels)
 
     bp = Blueprint(
         'stream_overlays',
