@@ -1,6 +1,9 @@
 """DDS - RotorHazard Stream Overlay Plugin"""
+from eventmanager import Evt
 from flask import templating
 from flask.blueprints import Blueprint
+
+overlays: list = ["DDS", "LCDR"]
 
 class StreamOverlays():
     """Stream Overlays plugin class."""
@@ -13,6 +16,32 @@ class StreamOverlays():
             rhapi (RotorHazardAPI): RotorHazard API instance.
         """
         self._rhapi = rhapi
+        self._overlays = overlays
+
+    def create_panels(self, _args) -> None:
+        """Create the stream overlay panels.
+        Args:
+        -----
+            _args: Arguments passed to function.
+        """
+        num_nodes: int = len(self._rhapi.interface.seats)
+        for name in self._overlays:
+            base_path: str = f"/stream/overlay/{name.lower()}"
+
+            # Register a panel for each overlay on the streams page
+            panel_id = f"stream_overlays_{name.lower()}"
+            self._rhapi.ui.register_panel(panel_id, f"{name} - OBS Overlays", "streams")
+
+            # Create header, link and markdown block for the topbar
+            topbar_markdown: str = "## Topbar\n"
+            topbar_markdown += f"- <a href='{base_path}/topbar' target='_blank'>{name} Overlay - Topbar</a>\n"
+            self._rhapi.ui.register_markdown(panel_id, f"{name}-Topbar", topbar_markdown)
+
+            # Create header, links and markdown block for each node overlay (or mock nodes)
+            nodes_markdown: str = "## Nodes\n"
+            for i in range(num_nodes):
+                nodes_markdown += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{name} Overlay - Node {i+1}</a>\n"
+            self._rhapi.ui.register_markdown(panel_id, f"{name}-Nodes", nodes_markdown)
 
 def initialize(rhapi):
     """Initialize the plugin.
@@ -21,7 +50,10 @@ def initialize(rhapi):
     -----
         rhapi (RotorHazardAPI): RotorHazard API instance.
     """
-    StreamOverlays(rhapi)
+    stream_overlays = StreamOverlays(rhapi)
+
+    # Hook into the startup event to create the panels
+    rhapi.events.on(Evt.STARTUP, stream_overlays.create_panels)
 
     bp = Blueprint(
         'stream_overlays',
