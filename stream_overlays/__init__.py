@@ -6,7 +6,7 @@ from flask.blueprints import Blueprint
 overlays: list = ["DDS", "LCDR"]
 
 class StreamOverlays():
-    """Stream Overlays class."""
+    """Stream Overlays plugin class."""
 
     def __init__(self, rhapi):
         """Initialize StreamOverlays.
@@ -36,6 +36,12 @@ class StreamOverlays():
                 self._rhapi.ui.register_link(f"stream_overlays_{name.lower()}", f"{name} Overlay - Node {i+1}", f"/stream/overlay/{name.lower()}/node/{i+1}")
 
 def initialize(rhapi):
+    """Initialize the plugin.
+
+    Args:
+    -----
+        rhapi (RotorHazardAPI): RotorHazard API instance.
+    """
     stream_overlays = StreamOverlays(rhapi)
 
     # Hook into the startup event to create the panels
