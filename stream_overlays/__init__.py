@@ -2,7 +2,27 @@
 from flask import templating
 from flask.blueprints import Blueprint
 
+class StreamOverlays():
+    """Stream Overlays plugin class."""
+
+    def __init__(self, rhapi):
+        """Initialize StreamOverlays.
+
+        Args:
+        -----
+            rhapi (RotorHazardAPI): RotorHazard API instance.
+        """
+        self._rhapi = rhapi
+
 def initialize(rhapi):
+    """Initialize the plugin.
+
+    Args:
+    -----
+        rhapi (RotorHazardAPI): RotorHazard API instance.
+    """
+    StreamOverlays(rhapi)
+
     bp = Blueprint(
         'stream_overlays',
         __name__,
