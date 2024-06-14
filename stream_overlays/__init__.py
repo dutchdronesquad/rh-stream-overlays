@@ -30,7 +30,7 @@ class StreamOverlays():
 
             # Register a panel for each overlay on the streams page
             panel_id = f"stream_overlays_{name.lower()}"
-            self._rhapi.ui.register_panel(panel_id, f"{name} - OBS Overlays", "streams")
+            self._rhapi.ui.register_panel(panel_id, f"{name} - OBS Overlays", "streams", open=True)
 
             # Create header, link and markdown block for the topbar
             topbar_markdown: str = "## Topbar\n"
