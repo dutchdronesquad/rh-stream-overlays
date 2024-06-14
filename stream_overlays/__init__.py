@@ -25,23 +25,23 @@ class StreamOverlays():
             _args: Arguments passed to function.
         """
         num_nodes: int = len(self._rhapi.interface.seats)
-        for name in self._overlays:
-            base_path: str = f"/stream/overlay/{name.lower()}"
+        for overlay_name in self._overlays:
+            base_path: str = f"/stream/overlay/{overlay_name.lower()}"
 
             # Register a panel for each overlay on the streams page
-            panel_id = f"stream_overlays_{name.lower()}"
-            self._rhapi.ui.register_panel(panel_id, f"{name} - OBS Overlays", "streams")
+            panel_id = f"stream_overlays_{overlay_name.lower()}"
+            self._rhapi.ui.register_panel(panel_id, f"{overlay_name} - OBS Overlays", "streams")
 
             # Create header, link and markdown block for the topbar
             topbar_markdown: str = "## Topbar\n"
-            topbar_markdown += f"- <a href='{base_path}/topbar' target='_blank'>{name} Overlay - Topbar</a>\n"
-            self._rhapi.ui.register_markdown(panel_id, f"{name}-Topbar", topbar_markdown)
+            topbar_markdown += f"- <a href='{base_path}/topbar' target='_blank'>{overlay_name} Overlay - Topbar</a>\n"
+            self._rhapi.ui.register_markdown(panel_id, f"{overlay_name}-Topbar", topbar_markdown)
 
             # Create header, links and markdown block for each node overlay (or mock nodes)
             nodes_markdown: str = "## Nodes\n"
             for i in range(num_nodes):
-                nodes_markdown += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{name} Overlay - Node {i+1}</a>\n"
-            self._rhapi.ui.register_markdown(panel_id, f"{name}-Nodes", nodes_markdown)
+                nodes_markdown += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{overlay_name} Overlay - Node {i+1}</a>\n"
+            self._rhapi.ui.register_markdown(panel_id, f"{overlay_name}-Nodes", nodes_markdown)
 
 def initialize(rhapi):
     """Initialize the plugin.
