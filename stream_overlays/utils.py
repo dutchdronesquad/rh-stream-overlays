@@ -36,3 +36,30 @@ def create_nodes_markdown(overlay_name: str, base_path: str, num_nodes: int) -> 
         nodes_markdown += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{overlay_name} Overlay - Node {i+1}</a>\n"
     return nodes_markdown
 
+
+def create_leaderboard_markdown(
+    overlay_name: str,
+    base_path: str,
+    race_classes: list,
+) -> str:
+    """Create leaderboard markdown block.
+
+    Args:
+    -----
+        overlay_name (str): Name of the overlay.
+        base_path (str): Base path for the overlay.
+        race_clases (list): All available race classes.
+
+    Returns:
+    --------
+        str: Markdown block for the leaderboard.
+    """
+    leaderboard_markdown: str = "## Leaderboard / Class\n"
+    # Create links for overall and class leaderboards
+    leaderboard_markdown += f"- <a href='{base_path}/leaderboard/0/overall' target='_blank'>{overlay_name} Overlay - Current / Overall Leaderboard</a>\n"
+    leaderboard_markdown += f"- <a href='{base_path}/leaderboard/0/class' target='_blank'>{overlay_name} Overlay - Current Class</a>\n"
+
+    # Create link for specific class
+    for race_class in race_classes:
+        leaderboard_markdown += f"- <a href='{base_path}/leaderboard/{race_class.id}/class' target='_blank'>{overlay_name} Overlay - {race_class.name}</a>\n"
+    return leaderboard_markdown

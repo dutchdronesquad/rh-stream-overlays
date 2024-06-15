@@ -6,6 +6,7 @@ from flask.blueprints import Blueprint
 from .utils import (
     create_nodes_markdown,
     create_topbar_markdown,
+    create_leaderboard_markdown,
 )
 
 overlays: dict = {
@@ -34,6 +35,7 @@ class StreamOverlays:
             _args: Arguments passed to function.
         """
         num_nodes: int = len(self._rhapi.interface.seats)
+        race_classes: list = self._rhapi.db.raceclasses
 
         for overlay_name, features in self._overlays.items():
             base_path: str = f"/stream/overlay/{overlay_name.lower()}"
@@ -45,6 +47,13 @@ class StreamOverlays:
             )
 
             # Create and register markdown blocks based on the features
+            if features.get("leaderboard"):
+                leaderboard_markdown = create_leaderboard_markdown(overlay_name, base_path, race_classes)
+                self._rhapi.ui.register_markdown(
+                    panel_id,
+                    f"{overlay_name}-Leaderboard",
+                    leaderboard_markdown,
+                )
 
             if features.get("topbar"):
                 topbar_markdown = create_topbar_markdown(overlay_name, base_path)
