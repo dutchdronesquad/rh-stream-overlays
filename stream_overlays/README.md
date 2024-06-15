@@ -7,6 +7,9 @@ Links to the overlays:
 - [Dutch Drone Squad](#overlay---dutch-drone-squad)
 - [Liga Colombiana Drone Racing](#overlay---liga-colombiana-drone-racing)
 
+> [!TIP]
+> The plugin also generates overlay URLs on the **Stream displays** page in Rotorhazard, making it even easier to get started with the overlays.
+
 ## Overlay - Dutch Drone Squad
 
 This overlay is designed by the [Dutch Drone Squad](https://dutchdronesquad.nl) and consists of a top bar, node overlay and leaderboards for class and overall.
@@ -30,7 +33,7 @@ _Click on the image to watch a video of the overlay in action_
 
 ### Leaderboard - Class Ranking
 
-The leaderboard class overlay shows the ranking of the pilots in a specific class. The pilots are shown in sets of 8 and the next set or pilots are shown every 10 seconds.
+The leaderboard class overlay displays the rankings of pilots within a specific class, including some race data. Pilots are presented in groups of eight, with a new set of pilots shown every 10 seconds.
 
 The table adapts to the type of race format: **standard**, **fastest lap** or (top 3) **consecutive**. Replace `[CLASS ID]` with the class id you want to show or use `0` for the current class.
 
@@ -44,7 +47,7 @@ _Click on the image to watch a video of the overlay in action_
 
 ### Leaderboard - Overall Ranking
 
-The leaderboard overall overlay shows the overall ranking of the pilots, with a maximum of 32 pilots. Replace `[CLASS ID]` with the class id you want to show or use `0` for the current class.
+The leaderboard overall overlay displays the overall rankings of up to 32 pilots. Replace `[CLASS ID]` with the class id you want to show or use `0` for the current class.
 
 > [!IMPORTANT]
 > Currently you only see data if you use **Ranking: From Race Format**
