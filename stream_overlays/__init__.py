@@ -3,8 +3,15 @@
 from eventmanager import Evt
 from flask import templating
 from flask.blueprints import Blueprint
+from .utils import (
+    create_nodes_markdown,
+    create_topbar_markdown,
+)
 
-overlays: list = ["DDS", "LCDR"]
+overlays: dict = {
+    "DDS": {"node": True, "topbar": True, "leaderboard": True},
+    "LCDR": {"node": True, "topbar": True, "leaderboard": False},
+}
 
 
 class StreamOverlays:
@@ -27,7 +34,8 @@ class StreamOverlays:
             _args: Arguments passed to function.
         """
         num_nodes: int = len(self._rhapi.interface.seats)
-        for overlay_name in self._overlays:
+
+        for overlay_name, features in self._overlays.items():
             base_path: str = f"/stream/overlay/{overlay_name.lower()}"
 
             # Register a panel for each overlay on the streams page
@@ -36,20 +44,21 @@ class StreamOverlays:
                 panel_id, f"{overlay_name} - OBS Overlays", "streams"
             )
 
-            # Create header, link and markdown block for the topbar
-            topbar_markdown: str = "## Topbar\n"
-            topbar_markdown += f"- <a href='{base_path}/topbar' target='_blank'>{overlay_name} Overlay - Topbar</a>\n"
-            self._rhapi.ui.register_markdown(
-                panel_id, f"{overlay_name}-Topbar", topbar_markdown
-            )
+            # Create and register markdown blocks based on the features
 
-            # Create header, links and markdown block for each node overlay (or mock nodes)
-            nodes_markdown: str = "## Nodes\n"
-            for i in range(num_nodes):
-                nodes_markdown += f"- <a href='{base_path}/node/{i+1}' target='_blank'>{overlay_name} Overlay - Node {i+1}</a>\n"
-            self._rhapi.ui.register_markdown(
-                panel_id, f"{overlay_name}-Nodes", nodes_markdown
-            )
+            if features.get("topbar"):
+                topbar_markdown = create_topbar_markdown(overlay_name, base_path)
+                self._rhapi.ui.register_markdown(
+                    panel_id,
+                    f"{overlay_name}-Topbar",
+                    topbar_markdown,
+                )
+
+            if features.get("node"):
+                nodes_markdown = create_nodes_markdown(overlay_name, base_path, num_nodes)
+                self._rhapi.ui.register_markdown(
+                    panel_id, f"{overlay_name}-Nodes", nodes_markdown
+                )
 
 
 def initialize(rhapi):
