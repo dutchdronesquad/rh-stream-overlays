@@ -76,7 +76,7 @@ def initialize(rhapi):
     def render_node_overlay(name: str, node_id: int):
         """Render the node overlay."""
         return templating.render_template(
-            f"stream/overlays/node_{name}.html",
+            f"stream/nodes/node_{name}.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
