@@ -61,5 +61,5 @@ def create_leaderboard_markdown(
 
     # Create link for specific class
     for race_class in race_classes:
-        leaderboard_markdown += f"- <a href='{base_path}/leaderboard/{race_class.id}/class' target='_blank'>{overlay_name} Overlay - {race_class.name}</a>\n"
+        leaderboard_markdown += f"- <a href='{base_path}/leaderboard/{race_class.id}/class' target='_blank'>{overlay_name} Overlay - Class / {race_class.name}</a>\n"
     return leaderboard_markdown
