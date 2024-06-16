@@ -58,6 +58,14 @@
     line-height: 1;
 }
 
+/* Leaderboard styling */
+.leaderboard>p {
+    background: black;
+    color: white;
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+}
+
 /* Entry styling */
 .entry {
     display: flex;
@@ -97,13 +105,6 @@
     background-color: darkorange;
     z-index: 2;
     border-radius: 15px 0 15px 0;
-}
-
-.leaderboard>p {
-    background: black;
-    color: white;
-    padding: 15px;
-    border-radius: 0 0 15px 15px;
 }
 
 /* Font styling for the entry */

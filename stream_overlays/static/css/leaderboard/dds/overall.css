@@ -44,12 +44,20 @@
     grid-gap: 30px;
 }
 
+.leaderboard>p {
+    background: black;
+    color: white;
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+}
+
 .column {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+/* Entry styling */
 .entry {
     background-color: rgba(0, 0, 0, 1);
     color: white;
