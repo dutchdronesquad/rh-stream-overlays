@@ -16,11 +16,12 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 
 #### RotorHazard
 
-1. Install the Stream Overlays RH Plugin like any other plugin ([RH Plugin Documentation][rh-plugin-docs])
+1. Install the Stream Overlays RH Plugin with the following command:
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/tools/install.sh)"
 ```
+_This command will install the latest release of the plugin. To use the development version, you need to download the repository and manually put the files in the correct plugin folder._
 
 2. Restart RotorHazard
 
@@ -51,7 +52,6 @@ ln -s ~/rh-stream-overlays/stream_overlays/ ~/RotorHazard/src/server/plugins/str
 Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more information.
 
 <!-- LINKS -->
-[rh-plugin-docs]: https://github.com/RotorHazard/RotorHazard/blob/main/doc/Plugins.md#installing-and-running
 [rh-dev]: https://github.com/RotorHazard/RotorHazard/blob/main/doc/Development.md
 
 [license-shield]: https://img.shields.io/github/license/dutchdronesquad/rh-stream-overlays.svg
