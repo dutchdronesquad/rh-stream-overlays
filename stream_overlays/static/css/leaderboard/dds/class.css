@@ -99,6 +99,13 @@
     border-radius: 15px 0 15px 0;
 }
 
+.leaderboard>p {
+    background: black;
+    color: white;
+    padding: 15px;
+    border-radius: 0 0 15px 15px;
+}
+
 /* Font styling for the entry */
 .box>p,
 .entry>p {

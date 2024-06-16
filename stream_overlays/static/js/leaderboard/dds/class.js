@@ -66,7 +66,7 @@ function showResultsData(data) {
                     if (currentClass.ranking) {
                         console.log('Ranking:', currentClass.ranking);
                     } else if ([currentClassLeaderboard].length) {
-                        generateLeaderboard(currentClassLeaderboard, displayType, 10, true);
+                        generateLeaderboard(currentClassLeaderboard, displayType, intervalTime=10);
                     } else {
                         showNoResults();
                     }
@@ -82,13 +82,13 @@ let currentGroupIndex = 0;
 const itemsPerPage = 8;
 let intervalID;
 
-function generateLeaderboard(data, displayType, intervalTime, loop = false) {
+function generateLeaderboard(data, displayType, intervalTime) {
     console.log('leaderboard:', data);
     const groupedData = chunkArray(data, itemsPerPage);
     updateHeaderLabels(displayType);
     displayGroup(data, groupedData, displayType, currentGroupIndex);
 
-    if (loop) {
+    if (data.length > itemsPerPage) {
         clearInterval(intervalID);
         intervalID = setInterval(() => {
             currentGroupIndex = (currentGroupIndex + 1) % groupedData.length;
