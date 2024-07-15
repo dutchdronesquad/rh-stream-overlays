@@ -16,12 +16,15 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 
 #### RotorHazard
 
-1. Install the Stream Overlays RH Plugin with the following command:
+1. Install the Stream Overlays RotorHazard plugin, by running the following command in your terminal:
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/dutchdronesquad/rh-stream-overlays/main/tools/install.sh)"
+sh -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
 ```
-_This command will install the latest release of the plugin. To use the development version, you need to download the repository and manually put the files in the correct plugin folder._
+
+:::info
+This script automates the installation or update of the "Stream Overlays" plugin for RotorHazard. It fetches the latest stable release or development version from GitHub based on user choice, handles downloads, extracts files, and ensures cleanup of temporary data, simplifying the plugin installation process.
+:::
 
 2. Restart RotorHazard
 
@@ -33,19 +36,21 @@ _This command will install the latest release of the plugin. To use the developm
 4. Set the width and height to the resolution of your stream (e.g. 1280 x 720)
 5. Click `OK` to add the overlay to your scene
 
-### Development
+### Development environment
 
-To get started, you obviously need a working [development environment][rh-dev] from RotorHazard.
+If you would like to contribute to the project, you need a working [development environment][rh-dev] from RotorHazard. After setting up the development environment, you can follow the steps below to start developing the stream overlays.
 
-1. Fork / Clone the repository
-2. Create a symlink to the stream_overlays folder in the RotorHazard plugin folder
+1. **Fork** and **Clone** the repository to your local machine
+2. Create a [symlink] from the `stream_overlays` folder to the RotorHazard `plugin` folder
 
 ```bash
 ln -s ~/rh-stream-overlays/stream_overlays/ ~/RotorHazard/src/server/plugins/stream_overlays
 ```
 
 3. Start or restart RotorHazard
-4. Start developing 😄
+4. You can now start developing 😄
+
+_Are you not a coder? But would you like to share ideas for new features? Then join the [discussions] and we will work out some sketches together._
 
 ## License
 
@@ -53,6 +58,8 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 
 <!-- LINKS -->
 [rh-dev]: https://github.com/RotorHazard/RotorHazard/blob/main/doc/Development.md
+[symlink]: https://linuxize.com/post/how-to-create-symbolic-links-in-linux-using-the-ln-command
+[discussions]: https://github.com/dutchdronesquad/rh-stream-overlays/discussions
 
 [license-shield]: https://img.shields.io/github/license/dutchdronesquad/rh-stream-overlays.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2024.svg
