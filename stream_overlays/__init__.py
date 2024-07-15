@@ -43,7 +43,10 @@ class StreamOverlays:
             # Register a panel for each overlay on the streams page
             panel_id = f"stream_overlays_{overlay_name.lower()}"
             self._rhapi.ui.register_panel(
-                panel_id, f"{overlay_name} - OBS Overlays", "streams"
+                panel_id,
+                f"{overlay_name} - OBS Overlays",
+                "streams",
+                open=True,
             )
 
             # Create and register markdown blocks based on the features
