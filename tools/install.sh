@@ -32,16 +32,20 @@ download_and_extract() {
     mv ~/$folder_name/stream_overlays $target_dir
     if [ $? -ne 0 ]; then
         echo "Error: Failed to move the plugin directory."
-        rm -R ~/$folder_name
-        rm $temp_zip
+        cleanup
         exit 1
     fi
 
     echo "Cleaning up temporary files"
-    rm -R ~/$folder_name
-    rm $temp_zip
+    cleanup
 
     echo "Installation/update completed successfully!"
+}
+
+# Function to clean up temporary files
+cleanup() {
+    rm -R ~/$folder_name
+    rm $temp_zip
 }
 
 # Function to install/update the plugin to the latest stable release
