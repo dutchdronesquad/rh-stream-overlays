@@ -22,9 +22,8 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 sh -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
 ```
 
-:::info
-This script automates the installation or update of the "Stream Overlays" plugin for RotorHazard. It fetches the latest stable release or development version from GitHub based on user choice, handles downloads, extracts files, and ensures cleanup of temporary data, simplifying the plugin installation process.
-:::
+> [!NOTE]
+> This script automates the installation or update of the "Stream Overlays" plugin for RotorHazard. It fetches the latest stable release or development version from GitHub based on user choice, handles downloads, extracts files, and ensures cleanup of temporary data, simplifying the plugin installation process.
 
 2. Restart RotorHazard
 
