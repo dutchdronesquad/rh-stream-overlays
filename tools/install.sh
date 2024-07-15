@@ -1,4 +1,9 @@
 #!/bin/bash
+set -e
+set -u
+
+# Define paths
+readonly PLUGIN_DIR=~/RotorHazard/src/server/plugins
 
 # Function to download and extract a zip file
 download_and_extract() {
@@ -7,13 +12,13 @@ download_and_extract() {
     local folder_name
 
     echo "Downloading from $url..."
-    if ! wget $url -O $temp_zip; then
-        echo "Error: Failed to download the project."
+    if ! wget "$url" -O "$temp_zip"; then
+        echo "Error: Failed to download the project from $url."
         exit 1
     fi
 
     echo "Extracting the downloaded zip file..."
-    if ! unzip -q $temp_zip -d ~; then
+    if ! unzip -q "$temp_zip" -d ~; then
         echo "Error: Failed to unzip the files."
         rm $temp_zip
         exit 1
@@ -26,16 +31,16 @@ download_and_extract() {
         exit 1
     fi
 
-    local target_dir=~/RotorHazard/src/server/plugins
+    local target_dir=$PLUGIN_DIR
     echo "Moving the files to $target_dir"
     if ! mv ~/$folder_name/stream_overlays $target_dir; then
         echo "Error: Failed to move the plugin directory."
-        cleanup $folder_name $temp_zip
+        cleanup $temp_zip $folder_name
         exit 1
     fi
 
     echo "Cleaning up temporary files"
-    cleanup $folder_name $temp_zip
+    cleanup $temp_zip $folder_name
 
     echo "Installation/update completed successfully!"
 }
@@ -84,7 +89,7 @@ display_menu() {
     echo "2) Install the development version"
     echo "3) Cancel"
     echo "-------------------------------------------"
-    read -p "Enter your choice [1-3]: " menu_choice
+    read -rp "Enter your choice [1-3]: " menu_choice
     echo "-------------------------------------------"
 
     case "$menu_choice" in
@@ -96,9 +101,11 @@ display_menu() {
             ;;
         3)
             echo "Installation cancelled."
+            exit 0
             ;;
         *)
-            echo "Invalid choice. Installation/update cancelled."
+            echo "Error: Invalid choice. Please enter a number between 1 and 3."
+            display_menu
             ;;
     esac
 }
@@ -106,15 +113,14 @@ display_menu() {
 # Function to handle user's plugin choice
 handle_plugin_choice() {
     local plugin_type=$1
-    local plugin_dir=~/RotorHazard/src/server/plugins/stream_overlays
 
-    if [ -d "$plugin_dir" ]; then
+    if [ -d "$PLUGIN_DIR/stream_overlays" ]; then
         echo "The plugin already exists in RotorHazard."
-        read -p "Do you want to update it? (y/n): " update_choice
+        read -rp "Do you want to update it? (y/n): " update_choice
         case "$update_choice" in
             y|Y)
                 echo "Removing the existing plugin directory..."
-                rm -rf $plugin_dir
+                rm -rf "$PLUGIN_DIR/stream_overlays"
                 if [ "$plugin_type" == "stable" ]; then
                     install_or_update_plugin
                 elif [ "$plugin_type" == "development" ]; then
