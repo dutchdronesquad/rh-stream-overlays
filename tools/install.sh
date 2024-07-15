@@ -117,29 +117,33 @@ handle_plugin_choice() {
     if [ -d "$PLUGIN_DIR/stream_overlays" ]; then
         echo "The plugin already exists in RotorHazard."
         read -rp "Do you want to update it? (y/n): " update_choice
+
         case "$update_choice" in
             y|Y)
                 echo "Removing the existing plugin directory..."
-                rm -rf "$PLUGIN_DIR/stream_overlays"
-                if [ "$plugin_type" == "stable" ]; then
-                    install_or_update_plugin
-                elif [ "$plugin_type" == "development" ]; then
-                    install_development_plugin
+                if rm -rf "$PLUGIN_DIR/stream_overlays"; then
+                    echo "Plugin directory removed successfully."
+                else
+                    echo "Failed to remove plugin directory."
+                    return 1
                 fi
                 ;;
             n|N)
                 echo "Update cancelled."
+                return
                 ;;
             *)
                 echo "Invalid choice. Update cancelled."
+                return
                 ;;
         esac
-    else
-        if [ "$plugin_type" == "stable" ]; then
-            install_or_update_plugin
-        elif [ "$plugin_type" == "development" ]; then
-            install_development_plugin
-        fi
+    fi
+
+    # Install or update based on plugin type
+    if [ "$plugin_type" == "stable" ]; then
+        install_or_update_plugin
+    elif [ "$plugin_type" == "development" ]; then
+        install_development_plugin
     fi
 }
 
