@@ -1,5 +1,5 @@
 ---
-name: Deploy MKDocs to GitHub Pages
+name: Deployment
 
 # yamllint disable-line rule:truthy
 on:
