@@ -1,0 +1,54 @@
+# Project
+site_name: Stream Overlays
+site_url: https://overlays.dutchdronesquad.nl
+site_author: Klaas Schoute
+site_description: >-
+  A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software.
+
+# Repository
+repo_name: rh-stream-overlays
+repo_url: https://github.com/dutchdronesquad/rh-stream-overlays
+edit_uri: edit/main/docs/
+
+# Configuration
+theme:
+  name: material
+  icon:
+    logo: fontawesome/solid/display
+  palette:
+    primary: blue
+    accent: orange
+  features:
+    - content.action.edit
+    - content.action.view
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.top
+nav:
+  - Home: index.md
+plugins:
+  - blog
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+nav:
+  - Home: index.md
+  - Blog:
+      - blog/index.md
+
+# Extra
+extra:
+  status:
+    new: Recently added
+    deprecated: Deprecated
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/dutchdronesquad
+    - icon: fontawesome/brands/instagram
+      link: https://instagram.com/dutchdronesquad
+    - icon: fontawesome/brands/youtube
+      link: https://youtube.com/@dutchdronesquad
+    - icon: fontawesome/brands/facebook
+      link: https://facebook.com/dutchdronesquad
+  version:
+    provider: mike

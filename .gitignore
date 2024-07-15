@@ -1,2 +1,6 @@
 # Folders to ignore
 __pycache__
+.cache
+
+# Files to ignore
+.python-version

@@ -1,0 +1,56 @@
+---
+name: Deploy MKDocs to GitHub Pages
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - klaas-2024-*
+
+env:
+  DEFAULT_PYTHON: "3.11"
+
+jobs:
+  build-docs:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v4.1.7
+      - name: 🏗 Set up Poetry
+        run: pipx install poetry
+      - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
+        id: python
+        uses: actions/setup-python@v5.1.1
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          cache: "poetry"
+      - name: 🏗 Install workflow dependencies
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+      - name: 🏗 Install dependencies
+        run: poetry install --no-interaction
+      - name: 🏗 Build the site
+        run: poetry run mkdocs build
+      - name: ⬆️ Upload pages artifacts
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-docs
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 🏗️ Setup Github Pages
+        uses: actions/configure-pages@v5.0.0
+      - name: 🚀 Deploy to Github Pages
+        uses: actions/deploy-pages@v4.0.5
+        id: deployment

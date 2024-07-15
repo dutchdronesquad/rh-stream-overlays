@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "rh-stream-overlays"
+package-mode=false
+description = "A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software."
+authors = ["Klaas Schoute <info@dutchdronesquad.nl>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mkdocs = "^1.6.0"
+mkdocs-material = "^9.5.29"
+mike = "^2.1.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
