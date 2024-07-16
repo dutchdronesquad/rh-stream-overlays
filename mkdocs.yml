@@ -5,6 +5,10 @@ site_author: Klaas Schoute
 site_description: >-
   A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software.
 
+# Copyright
+copyright: |
+  &copy; 2024 <a href="https://dutchdronesquad.nl" target="_blank" rel="noopener">Dutch Drone Squad</a>
+
 # Repository
 repo_name: rh-stream-overlays
 repo_url: https://github.com/dutchdronesquad/rh-stream-overlays
@@ -16,14 +20,30 @@ theme:
   icon:
     logo: fontawesome/solid/display
   palette:
-    primary: blue
-    accent: orange
+    # Palette toggle for light mode
+    - scheme: default
+      primary: blue
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  language: en
   features:
     - content.action.edit
     - content.action.view
+    - navigation.footer
     - navigation.indexes
     - navigation.tabs
     - navigation.top
+    - navigation.tracking
+    # - toc.integrate
 nav:
   - Home: index.md
 plugins:
@@ -33,8 +53,25 @@ plugins:
 
 nav:
   - Home: index.md
+  - Getting Started:
+      - Installation: getting-started.md
+  - Showcase: showcase.md
   - Blog:
       - blog/index.md
+
+# Markdown extensions
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - admonition
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.mark
+  - attr_list
 
 # Extra
 extra:
