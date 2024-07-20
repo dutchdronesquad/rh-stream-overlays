@@ -18,7 +18,7 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   icon:
-    logo: fontawesome/solid/display
+    logo: fontawesome/solid/clapperboard
   palette:
     # Palette toggle for light mode
     - scheme: default
@@ -38,12 +38,18 @@ theme:
   features:
     - content.action.edit
     - content.action.view
+    - content.code.annotate
+    - content.code.copy
     - navigation.footer
     - navigation.indexes
+    - navigation.path
+    - navigation.sections
     - navigation.tabs
     - navigation.top
     - navigation.tracking
+    - toc.follow
     # - toc.integrate
+
 nav:
   - Home: index.md
 plugins:
@@ -53,25 +59,34 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting Started:
-      - Installation: getting-started.md
-  - Showcase: showcase.md
+  - Getting started:
+      - Installation: installation/index.md
+      - OBS setup: installation/obs_setup.md
+  - Overlays:
+    - overlays/index.md
+    - overlays/dds.md
+    - overlays/lcdr.md
   - Blog:
       - blog/index.md
 
 # Markdown extensions
 markdown_extensions:
-  - pymdownx.highlight:
-      anchor_linenums: true
+  - attr_list
+  - md_in_html
+  - admonition
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.mark
-  - attr_list
+  - toc:
+      permalink: true
 
 # Extra
 extra:
