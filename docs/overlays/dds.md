@@ -38,7 +38,7 @@ _Click on the image to watch a video of the overlay in action_
 
 The leaderboard class overlay displays the rankings of pilots within a specific class, including some race data. Pilots are presented in groups of eight, with a new set of pilots shown every 10 seconds.
 
-The table adapts to the type of race format: **standard**, **fastest lap** or (top 3) **consecutive**. Replace `[CLASS ID]` with the class id you want to show or use `0` for the current class.
+The table adapts to the type of the race format: **standard**, **fastest lap** or (top 3) **consecutive**. Replace `[CLASS ID]` with the class id you want to show or use `0` for the current class.
 
 !!! warning
     Currently you only see data if you use **Ranking: From Race Format**

@@ -14,7 +14,7 @@ I'm happy to announce the release of v1.1.0 of the Stream Overlays! This release
 
 ## Documentation site
 
-The Stream Overlays plugin now have a dedicated documentation site. This site contains all the information you need to get started with the RotorHazard plugin, including installation instructions, configuration options, and an overview of all available overlays.
+The Stream Overlays plugin now has a dedicated documentation site. This site contains all the information you need to get started with the RotorHazard plugin, including installation instructions, configuration options, and an overview of all available overlays.
 
 ## Overlay for leaderboard rankings
 

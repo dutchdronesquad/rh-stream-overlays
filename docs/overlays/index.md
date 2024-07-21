@@ -5,7 +5,7 @@ description: Overview of all available overlays for the Stream Overlays plugin f
 
 # Overview
 
-The plugin offers the overlays in the form of "themes" that you can choose from. For each theme you can see on a separate page which overlays are available and what they look like.
+The plugin offers the overlays in the form of "themes" that you can choose from. For each theme, you can see on a separate page which overlays are available and what they look like.
 
 Links to the specific theme overlays:
 
