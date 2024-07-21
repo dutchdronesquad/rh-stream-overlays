@@ -1,0 +1,107 @@
+# Project
+site_name: Stream Overlays
+site_url: https://overlays.dutchdronesquad.nl
+site_author: Klaas Schoute
+site_description: >-
+  A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software.
+
+# Copyright
+copyright: |
+  &copy; 2024 <a href="https://dutchdronesquad.nl" target="_blank" rel="noopener">Dutch Drone Squad</a>
+
+# Repository
+repo_name: rh-stream-overlays
+repo_url: https://github.com/dutchdronesquad/rh-stream-overlays
+edit_uri: edit/main/docs/
+
+# Configuration
+theme:
+  name: material
+  favicon: assets/favicon.ico
+  icon:
+    logo: fontawesome/solid/clapperboard
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      primary: blue
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  language: en
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - navigation.footer
+    - navigation.indexes
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    # - toc.integrate
+
+plugins:
+  - blog
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+# Navigation
+nav:
+  - Home: index.md
+  - Installation:
+    - installation/index.md
+    - OBS setup: installation/obs_setup.md
+    - Development: installation/development.md
+  - Overlays:
+    - overlays/index.md
+    - overlays/dds.md
+    - overlays/lcdr.md
+  - Blog:
+    - blog/index.md
+
+# Markdown extensions
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.mark
+  - toc:
+      permalink: true
+
+# Extra
+extra:
+  status:
+    new: Recently added
+    deprecated: Deprecated
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/dutchdronesquad
+    - icon: fontawesome/brands/instagram
+      link: https://instagram.com/dutchdronesquad
+    - icon: fontawesome/brands/youtube
+      link: https://youtube.com/@dutchdronesquad
+    - icon: fontawesome/brands/facebook
+      link: https://facebook.com/dutchdronesquad
+  version:
+    provider: mike
