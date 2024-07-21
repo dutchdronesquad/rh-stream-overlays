@@ -48,24 +48,3 @@ jobs:
           MINOR_VERSION=$(echo $VERSION | awk -F. '{print $1 ".x"}')
           poetry run mike deploy --push --update-aliases latest $VERSION
           poetry run mike alias --push latest $MINOR_VERSION
-      - name: ⬆️ Upload pages artifacts
-        uses: actions/upload-pages-artifact@v3.0.1
-        with:
-          path: site
-
-  deploy:
-    name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: build-docs
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: 🏗️ Setup Github Pages
-        uses: actions/configure-pages@v5.0.0
-      - name: 🚀 Deploy to Github Pages
-        uses: actions/deploy-pages@v4.0.5
-        id: deployment
