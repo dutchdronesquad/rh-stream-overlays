@@ -1,11 +1,17 @@
 ---
+# This workflow will build and deploy the documentation to GitHub Pages
 name: Deployment
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    branches:
-      - klaas-2024-*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version
+        required: true
+        type: string
+  release:
+    types: [published]
 
 env:
   DEFAULT_PYTHON: "3.11"
@@ -31,8 +37,13 @@ jobs:
           poetry config virtualenvs.in-project true
       - name: 🏗 Install dependencies
         run: poetry install --no-interaction
-      - name: 🏗 Build the site
-        run: poetry run mkdocs build
+      - name: 🏗 Deploy new version with Mike
+        run: |
+          VERSION=${{ github.event.release.tag_name || github.event.inputs.version }}
+          VERSION=${VERSION#v}  # Verwijder de 'v' prefix
+          MINOR_VERSION=$(echo $VERSION | awk -F. '{print $1 ".x"}')
+          poetry run mike deploy --push --update-aliases latest $VERSION
+          poetry run mike alias --push latest $MINOR_VERSION
       - name: ⬆️ Upload pages artifacts
         uses: actions/upload-pages-artifact@v3.0.1
         with:
