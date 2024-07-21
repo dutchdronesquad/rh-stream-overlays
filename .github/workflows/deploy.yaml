@@ -37,13 +37,8 @@ jobs:
           poetry config virtualenvs.in-project true
       - name: 🏗 Install dependencies
         run: poetry install --no-interaction
-      - name: 🏗 Deploy new version with Mike
-        run: |
-          VERSION=${{ github.event.release.tag_name || github.event.inputs.version }}
-          VERSION=${VERSION#v}  # Verwijder de 'v' prefix
-          MINOR_VERSION=$(echo $VERSION | awk -F. '{print $1 ".x"}')
-          poetry run mike deploy --push --update-aliases latest $VERSION
-          poetry run mike alias --push latest $MINOR_VERSION
+      - name: 🏗 Build documentation
+        run: poetry run mkdocs build
       - name: ⬆️ Upload pages artifacts
         uses: actions/upload-pages-artifact@v3.0.1
         with:
