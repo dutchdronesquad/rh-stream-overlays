@@ -37,6 +37,10 @@ jobs:
           poetry config virtualenvs.in-project true
       - name: 🏗 Install dependencies
         run: poetry install --no-interaction
+      - name: 🏗 Configure Git
+        run: |
+          git config --global user.name "${{ secrets.GIT_COMMITTER_NAME }}"
+          git config --global user.email "${{ secrets.GIT_COMMITTER_EMAIL }}"
       - name: 🏗 Deploy new version with Mike
         run: |
           VERSION=${{ github.event.release.tag_name || github.event.inputs.version }}
