@@ -1,3 +1,8 @@
+---
+title: Overlays
+description: Overview of all available overlays for the Stream Overlays plugin for RotorHazard.
+---
+
 # Overview
 
 Here you will find an overview of all available overlays. The plugin will automatically create panels for each overlay on the stream page in RotorHazard, so you can easily find the urls to use.
