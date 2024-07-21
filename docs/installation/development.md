@@ -36,7 +36,7 @@ poetry run mkdocs serve
 ```
 
 4. Open the application in your browser
-```
+```bash
 http://localhost:8000
 ```
 

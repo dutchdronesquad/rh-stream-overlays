@@ -51,25 +51,24 @@ theme:
     - toc.follow
     # - toc.integrate
 
-nav:
-  - Home: index.md
 plugins:
   - blog
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
 
+# Navigation
 nav:
   - Home: index.md
   - Installation:
-      - installation/index.md
-      - OBS setup: installation/obs_setup.md
-      - Development: installation/development.md
+    - installation/index.md
+    - OBS setup: installation/obs_setup.md
+    - Development: installation/development.md
   - Overlays:
     - overlays/index.md
     - overlays/dds.md
     - overlays/lcdr.md
   - Blog:
-      - blog/index.md
+    - blog/index.md
 
 # Markdown extensions
 markdown_extensions:
