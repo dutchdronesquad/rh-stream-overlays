@@ -17,6 +17,7 @@ edit_uri: edit/main/docs/
 # Configuration
 theme:
   name: material
+  favicon: assets/favicon.ico
   icon:
     logo: fontawesome/solid/clapperboard
   palette:
@@ -59,9 +60,10 @@ plugins:
 
 nav:
   - Home: index.md
-  - Getting started:
-      - Installation: installation/index.md
+  - Installation:
+      - installation/index.md
       - OBS setup: installation/obs_setup.md
+      - Development: installation/development.md
   - Overlays:
     - overlays/index.md
     - overlays/dds.md
