@@ -140,9 +140,9 @@ handle_plugin_choice() {
     fi
 
     # Install or update based on plugin type
-    if [ "$plugin_type" == "stable" ]; then
+    if [ "$plugin_type" = "stable" ]; then
         install_or_update_plugin
-    elif [ "$plugin_type" == "development" ]; then
+    elif [ "$plugin_type" = "development" ]; then
         install_development_plugin
     fi
 }
