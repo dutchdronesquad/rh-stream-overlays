@@ -22,6 +22,9 @@ sh -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
 
 ## Stream displays
 
+!!! warning
+    Currently this only works with the dev branch of RotorHazard, it will be available in the next stable release (v4.2.x).
+
 After installing the plugin, you can find the overlays on the **Stream Displays** page in RotorHazard. The plugin will automatically create panels for each overlay, so you can easily find the URLs.
 
 ![alt stream displays](../assets/img/stream_overlays-page.png){ style="border-radius: 5px;" }
