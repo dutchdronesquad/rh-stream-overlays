@@ -91,6 +91,9 @@ markdown_extensions:
 
 # Extra
 extra:
+  analytics:
+    provider: google
+    property: G-SD7964ETPQ
   status:
     new: Recently added
     deprecated: Deprecated
