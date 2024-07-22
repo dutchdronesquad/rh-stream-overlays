@@ -1,6 +1,6 @@
 ---
-title: Stream Overlays
-description: About the Stream Overlays plugin for RotorHazard
+title: Home
+description: A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software.
 ---
 
 # Stream Overlays plugin for RotorHazard

@@ -1,11 +1,11 @@
 ---
 title: DDS
-description: Dutch Drone Squad overlay for RotorHazard
+description: Dutch Drone Squad overlay theme for RotorHazard
 ---
 
 # Dutch Drone Squad
 
-This overlay is designed by the <a href="https://dutchdronesquad.nl" target="_blank">Dutch Drone Squad</a> and consists of a top bar, node overlay and leaderboards for class and overall.
+This theme is designed by the <a href="https://dutchdronesquad.nl" target="_blank">Dutch Drone Squad</a> and consists of a top bar, node overlay and leaderboards for class and overall.
 
 ## Topbar
 

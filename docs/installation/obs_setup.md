@@ -1,6 +1,6 @@
 ---
 title: OBS Setup
-description: How to use the overlays in OBS
+description: Instructions to set up the overlays in OBS Studio.
 ---
 
 # OBS Setup
