@@ -1,6 +1,6 @@
 ---
 title: Development
-description: Development instructions for the Stream Overlays plugin for RotorHazard.
+description: Instructions to set up a development environment for the stream overlays plugin.
 ---
 
 # Development environment

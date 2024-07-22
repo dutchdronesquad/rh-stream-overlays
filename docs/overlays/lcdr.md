@@ -1,11 +1,11 @@
 ---
 title: LCDR
-description: Liga Colombiana Drone Racing overlay for RotorHazard
+description: Liga Colombiana Drone Racing overlay theme for RotorHazard
 ---
 
 # Liga Colombiana Drone Racing
 
-This overlay is designed by the <a href="https://ligacolombianadroneracing.com" target="_blank">Liga Colombiana Drone Racing</a> and consists of a top bar and a node overlay.
+This theme is designed by the <a href="https://ligacolombianadroneracing.com" target="_blank">Liga Colombiana Drone Racing</a> and consists of a top bar and a node overlay.
 
 ## Topbar
 
