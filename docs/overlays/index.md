@@ -15,5 +15,5 @@ Links to the specific theme overlays:
 !!! question "Ideas for new themes?"
     If you have ideas for a new overlay theme, you can always start a topic in the [discussions](https://github.com/dutchdronesquad/rh-stream-overlays/discussions) forum with some sketches or example images.
 
-!!! tip "Did you know?"
-    The stream overlays plugin also generates overlay URLs on the **Stream Displays** page in Rotorhazard, making it even easier to get the right URL for your overlay and use it in OBS 😉
+<!-- !!! tip "Did you know?"
+    The stream overlays plugin also generates overlay URLs on the **Stream Displays** page in Rotorhazard, making it even easier to get the right URL for your overlay and use it in OBS 😉 -->
