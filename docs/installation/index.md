@@ -11,7 +11,7 @@ Follow the steps below to install the Stream Overlays plugin for RotorHazard.
 
 1. Install the **Stream Overlays** RotorHazard plugin, by running the following command in your terminal at the device where RotorHazard is installed:
 ``` bash
-sh -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
+bash -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
 ```
 
 2. Choose for **stable** or **development** version and press enter.
