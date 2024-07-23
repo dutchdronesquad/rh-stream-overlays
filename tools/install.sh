@@ -53,20 +53,67 @@ cleanup() {
     rm $temp_zip
 }
 
-# Function to install/update the plugin to the latest stable release
-install_or_update_plugin() {
-    echo "Fetching the latest stable release version..."
+# Function to fetch the latest releases
+fetch_latest_releases() {
     local repo="dutchdronesquad/rh-stream-overlays"
-    local latest_release
+    local releases_json
+    mapfile -t releases_json < <(curl -s "https://api.github.com/repos/$repo/releases" | jq -r '.[].tag_name' | head -n 5)
+    printf "%s\n" "${releases_json[@]}"
+}
 
-    latest_release=$(curl -s "https://api.github.com/repos/$repo/releases/latest" | grep "tag_name" | cut -d '"' -f 4)
-    if [ -z "$latest_release" ]; then
-        echo "Error: Unable to fetch the latest release version."
+# Function to ask if the user wants to update the existing plugin
+check_update_permission() {
+    if [ -d "$PLUGIN_DIR/stream_overlays" ]; then
+        echo "The plugin already exists in RotorHazard."
+        read -rp "Do you want to update it? (y/n): " update_choice
+
+        case "$update_choice" in
+            y|Y)
+                echo "Removing the existing plugin directory..."
+                if rm -rf "$PLUGIN_DIR/stream_overlays"; then
+                    echo "Plugin directory removed successfully."
+                else
+                    echo "Failed to remove plugin directory."
+                    exit 1
+                fi
+                ;;
+            n|N)
+                echo "Update cancelled."
+                exit 0
+                ;;
+            *)
+                echo "Invalid choice. Please enter y or n."
+                check_update_permission
+                ;;
+        esac
+    fi
+}
+
+# Function to install/update the plugin to the specified release
+install_stable_plugin() {
+    echo "Fetching the latest stable release versions..."
+    local repo="dutchdronesquad/rh-stream-overlays"
+    local latest_releases
+    mapfile -t latest_releases < <(fetch_latest_releases)
+
+    if [ ${#latest_releases[@]} -eq 0 ]; then
+        echo "Error: Unable to fetch the latest release versions."
         exit 1
     fi
 
-    echo "Latest release version is $latest_release."
-    local download_url="https://codeload.github.com/$repo/zip/refs/tags/$latest_release"
+    echo "Select a release version to install:"
+    PS3="Enter your choice [1-${#latest_releases[@]}]: "
+    select release_version in "${latest_releases[@]}"; do
+        if [[ " ${latest_releases[*]} " =~ ${release_version} ]]; then
+            local download_url="https://codeload.github.com/$repo/zip/refs/tags/$release_version"
+            break
+        else
+            echo "Invalid selection. Please try again."
+        fi
+    done
+
+    # Check if the plugin already exists and ask for update permission
+    check_update_permission
     download_and_extract $download_url
 }
 
@@ -74,6 +121,9 @@ install_or_update_plugin() {
 install_development_plugin() {
     local repo="dutchdronesquad/rh-stream-overlays"
     local download_url="https://codeload.github.com/$repo/zip/refs/heads/main"
+
+    # Check if the plugin already exists and ask for update permission
+    check_update_permission
     download_and_extract $download_url
 }
 
@@ -114,34 +164,9 @@ display_menu() {
 handle_plugin_choice() {
     local plugin_type=$1
 
-    if [ -d "$PLUGIN_DIR/stream_overlays" ]; then
-        echo "The plugin already exists in RotorHazard."
-        read -rp "Do you want to update it? (y/n): " update_choice
-
-        case "$update_choice" in
-            y|Y)
-                echo "Removing the existing plugin directory..."
-                if rm -rf "$PLUGIN_DIR/stream_overlays"; then
-                    echo "Plugin directory removed successfully."
-                else
-                    echo "Failed to remove plugin directory."
-                    return 1
-                fi
-                ;;
-            n|N)
-                echo "Update cancelled."
-                return
-                ;;
-            *)
-                echo "Invalid choice. Update cancelled."
-                return
-                ;;
-        esac
-    fi
-
     # Install or update based on plugin type
     if [ "$plugin_type" = "stable" ]; then
-        install_or_update_plugin
+        install_stable_plugin
     elif [ "$plugin_type" = "development" ]; then
         install_development_plugin
     fi
