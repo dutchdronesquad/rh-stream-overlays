@@ -14,11 +14,19 @@ Follow the steps below to install the Stream Overlays plugin for RotorHazard.
 bash -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plugin)"
 ```
 
-2. Choose for **stable** or **development** version and press enter.
-3. When the installation is finished, restart RotorHazard.
+2. You'll be prompted to choose between **stable** or **development**:
+    - **stable**: Choose this option if you want to install a stable release.
+        - The script will fetch the last 5 stable releases from GitHub.
+        - Choose the version you want to install and press enter.
+    - **development**: Choose this option if you want to install the latest development version.
+        - The script will fetch the main branch from GitHub.
+5. If the plugin is already in RotorHazard, you'll be prompted to update it.
+    - Choose **y (yes)** to update the plugin.
+    - Choose **n (no)** to exit the script.
+6. When the installation is finished, restart RotorHazard.
 
 !!! note
-    This script automates the installation or update of the "Stream Overlays" plugin for RotorHazard. It fetches the latest stable release or development version from GitHub based on user choice, handles downloads, extracts files, and ensures cleanup of temporary data, simplifying the plugin installation process.
+    This script automates the installation or update of the "Stream Overlays" plugin for RotorHazard. It fetches the last 5 stable release or development branch from GitHub based on user choice, handles downloads, extracts files, and ensures cleanup of temporary data, simplifying the plugin installation process.
 
 ## Stream displays
 
