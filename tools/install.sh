@@ -57,9 +57,8 @@ cleanup() {
 fetch_latest_releases() {
     local repo="dutchdronesquad/rh-stream-overlays"
     local releases_json
-    releases_json=$(curl -s "https://api.github.com/repos/$repo/releases")
-
-    echo "$releases_json" | jq -r '.[].tag_name' | head -n 5
+    mapfile -t releases_json < <(curl -s "https://api.github.com/repos/$repo/releases" | jq -r '.[].tag_name' | head -n 5)
+    printf "%s\n" "${releases_json[@]}"
 }
 
 # Function to ask if the user wants to update the existing plugin
@@ -83,8 +82,8 @@ check_update_permission() {
                 exit 0
                 ;;
             *)
-                echo "Invalid choice. Update cancelled."
-                exit 1
+                echo "Invalid choice. Please enter y or n."
+                check_update_permission
                 ;;
         esac
     fi
@@ -95,7 +94,7 @@ install_stable_plugin() {
     echo "Fetching the latest stable release versions..."
     local repo="dutchdronesquad/rh-stream-overlays"
     local latest_releases
-    latest_releases=($(fetch_latest_releases))
+    mapfile -t latest_releases < <(fetch_latest_releases)
 
     if [ ${#latest_releases[@]} -eq 0 ]; then
         echo "Error: Unable to fetch the latest release versions."
@@ -105,7 +104,7 @@ install_stable_plugin() {
     echo "Select a release version to install:"
     PS3="Enter your choice [1-${#latest_releases[@]}]: "
     select release_version in "${latest_releases[@]}"; do
-        if [[ " ${latest_releases[@]} " =~ " ${release_version} " ]]; then
+        if [[ " ${latest_releases[*]} " =~ ${release_version} ]]; then
             local download_url="https://codeload.github.com/$repo/zip/refs/tags/$release_version"
             break
         else
