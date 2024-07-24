@@ -120,7 +120,8 @@ install_stable_plugin() {
 # Function to install/update the plugin to the development version
 install_development_plugin() {
     local repo="dutchdronesquad/rh-stream-overlays"
-    local download_url="https://codeload.github.com/$repo/zip/refs/heads/main"
+    local branch="develop"
+    local download_url="https://codeload.github.com/$repo/zip/refs/heads/$branch"
 
     # Check if the plugin already exists and ask for update permission
     check_update_permission
