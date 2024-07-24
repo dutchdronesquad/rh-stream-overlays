@@ -15,7 +15,7 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 ## Documentation
 
 > [!IMPORTANT]
-> Please note, the default branch shows development code and may be ahead of the released version. For the latest stable version, switch to the [release branch][release-branch] or use the installation instructions on the documentation [website].
+> Please note, the default branch shows development code and may be ahead of the released version. For the latest stable version, switch to the [release branch][release-branch] or use the installation instructions on the [website].
 
 The full documentation can be found at [overlays.dutchdronesquad.nl][website]. Where you can find all the information about the overlays, how to install them and how to use them in [OBS](https://obsproject.com).
 
