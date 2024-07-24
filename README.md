@@ -14,7 +14,10 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 
 ## Documentation
 
-The full documentation can be found at [overlays.dutchdronesquad.nl](https://overlays.dutchdronesquad.nl). Where you can find all the information about the overlays, how to install them and how to use them in OBS.
+> [!IMPORTANT]
+> Please note, the default branch shows development code and may be ahead of the released version. For the latest stable version, switch to the [release branch][release-branch] or use the install instructions on the documentation [website].
+
+The full documentation can be found at [overlays.dutchdronesquad.nl][website]. Where you can find all the information about the overlays, how to install them and how to use them in [OBS](https://obsproject.com).
 
 ## License
 
@@ -24,3 +27,6 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 [license-shield]: https://img.shields.io/github/license/dutchdronesquad/rh-stream-overlays.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2024.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
+
+[release-branch]: https://github.com/dutchdronesquad/rh-stream-overlays/branches/all?query=release
+[website]: https://overlays.dutchdronesquad.nl
