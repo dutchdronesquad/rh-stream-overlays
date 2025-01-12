@@ -1,15 +1,39 @@
-[tool.poetry]
+[project]
 name = "rh-stream-overlays"
-package-mode=false
 description = "A RotorHazard plugin with collection of stream overlays to use with OBS Studio or similar software."
-authors = ["Klaas Schoute <info@dutchdronesquad.nl>"]
-readme = "README.md"
+authors = [{ name="Klaas Schoute", email="<hello@student-techlife.com>"}]
+license = "MIT"
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[tool.poetry]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
 mkdocs = "^1.6.0"
 mkdocs-material = "^9.5.29"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "0.9.1"
+pre-commit = "4.0.1"
+pre-commit-hooks = "5.0.0"
+
+[tool.ruff]
+target-version = "py311"
+lint.select = ["ALL"]
+lint.ignore = [
+  "ANN401",  # Opinioated warning on disallowing dynamically typed expressions
+  "D203",    # Conflicts with other rules
+  "D213",    # Conflicts with other rules
+  "D417",    # False positives in some occasions
+  "PLR2004", # Just annoying, not really useful
+  "SLOT000", # Has a bug with enums: https://github.com/astral-sh/ruff/issues/5748
+
+  # Conflicts with the Ruff formatter
+  "COM812",
+  "ISC001",
+]
 
 [build-system]
 requires = ["poetry-core"]
