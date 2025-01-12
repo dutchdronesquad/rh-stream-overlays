@@ -1,12 +1,13 @@
-"""DDS - RotorHazard Stream Overlay Plugin"""
+"""DDS - RotorHazard Stream Overlay Plugin."""
 
 from eventmanager import Evt
 from flask import templating
 from flask.blueprints import Blueprint
+
 from .utils import (
+    create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
-    create_leaderboard_markdown,
 )
 
 overlays: dict = {
@@ -18,21 +19,24 @@ overlays: dict = {
 class StreamOverlays:
     """Stream Overlays plugin class."""
 
-    def __init__(self, rhapi):
+    def __init__(self, rhapi: object) -> None:
         """Initialize StreamOverlays.
 
         Args:
-        -----
+        ----
             rhapi (RotorHazardAPI): RotorHazard API instance.
+
         """
         self._rhapi = rhapi
         self._overlays = overlays
 
-    def create_panels(self, _args) -> None:
+    def create_panels(self, _args: dict) -> None:
         """Create the stream overlay panels.
+
         Args:
-        -----
+        ----
             _args: Arguments passed to function.
+
         """
         num_nodes: int = len(self._rhapi.interface.seats)
         race_classes: list = self._rhapi.db.raceclasses
@@ -51,7 +55,9 @@ class StreamOverlays:
 
             # Create and register markdown blocks based on the features
             if features.get("leaderboard"):
-                leaderboard_markdown = create_leaderboard_markdown(overlay_name, base_path, race_classes)
+                leaderboard_markdown = create_leaderboard_markdown(
+                    overlay_name, base_path, race_classes
+                )
                 self._rhapi.ui.register_markdown(
                     panel_id,
                     f"{overlay_name}-Leaderboard",
@@ -67,18 +73,21 @@ class StreamOverlays:
                 )
 
             if features.get("node"):
-                nodes_markdown = create_nodes_markdown(overlay_name, base_path, num_nodes)
+                nodes_markdown = create_nodes_markdown(
+                    overlay_name, base_path, num_nodes
+                )
                 self._rhapi.ui.register_markdown(
                     panel_id, f"{overlay_name}-Nodes", nodes_markdown
                 )
 
 
-def initialize(rhapi):
+def initialize(rhapi: object) -> None:
     """Initialize the plugin.
 
     Args:
-    -----
+    ----
         rhapi (RotorHazardAPI): RotorHazard API instance.
+
     """
     stream_overlays = StreamOverlays(rhapi)
 
@@ -94,7 +103,7 @@ def initialize(rhapi):
     )
 
     @bp.route("/stream/overlay/<string:name>/node/<int:node_id>")
-    def render_node_overlay(name: str, node_id: int):
+    def render_node_overlay(name: str, node_id: int) -> str:
         """Render the node overlay."""
         return templating.render_template(
             f"stream/nodes/node_{name}.html",
@@ -106,7 +115,7 @@ def initialize(rhapi):
         )
 
     @bp.route("/stream/overlay/<string:name>/topbar")
-    def render_topbar_overlay(name: str):
+    def render_topbar_overlay(name: str) -> str:
         """Render the topbar overlay."""
         return templating.render_template(
             f"stream/topbars/topbar_{name}.html",
@@ -117,7 +126,7 @@ def initialize(rhapi):
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/overall")
-    def render_overall_class_overlay(name: str, class_id: int):
+    def render_overall_class_overlay(name: str, class_id: int) -> str:
         """Render the overall class leaderboard overlay."""
         return templating.render_template(
             f"stream/leaderboard/{name}/overall.html",
@@ -129,7 +138,7 @@ def initialize(rhapi):
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/class")
-    def render_class_leaderboard_overlay(name: str, class_id: int):
+    def render_class_leaderboard_overlay(name: str, class_id: int) -> str:
         """Render the class leaderboard overlay."""
         return templating.render_template(
             f"stream/leaderboard/{name}/class.html",
