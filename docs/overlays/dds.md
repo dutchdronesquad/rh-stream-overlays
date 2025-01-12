@@ -32,7 +32,7 @@ RH-IP:5000/stream/overlay/dds/node/[NUMBER]
 [![Watch the video](../assets/img/overlays/dds/node-dds.png)](https://www.youtube.com/watch?v=ZpV0veJErvE)
 _Click on the image to watch a video of the overlay in action_
 
-## Leaderboard 
+## Leaderboard
 
 ### Class Ranking
 
