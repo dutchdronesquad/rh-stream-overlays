@@ -1,0 +1,9 @@
+{
+    "domain": "stream_overlays",
+    "name": "Stream Overlays",
+    "codeowners": ["@dutchdronesquad"],
+    "description": "Add new designed stream overlays to RotorHazard, which can be used in OBS (Open Broadcaster Software).",
+    "documentation": "https://overlays.dutchdronesquad.nl",
+    "required_rhapi_version": "1.2",
+    "version": "1.2.2"
+}
