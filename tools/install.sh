@@ -4,6 +4,8 @@ set -u
 
 # Define paths
 readonly PLUGIN_DIR=~/RotorHazard/src/server/plugins
+readonly PLUGIN_DOMAIN="stream_overlays"
+readonly REPOSITORY="dutchdronesquad/rh-stream-overlays"
 
 # Function to download and extract a zip file
 download_and_extract() {
@@ -33,7 +35,7 @@ download_and_extract() {
 
     local target_dir=$PLUGIN_DIR
     echo "Moving the files to $target_dir"
-    if ! mv ~/$folder_name/stream_overlays $target_dir; then
+    if ! mv ~/$folder_name/custom_plugins/$PLUGIN_DOMAIN $target_dir; then
         echo "Error: Failed to move the plugin directory."
         cleanup $temp_zip $folder_name
         exit 1
@@ -55,22 +57,21 @@ cleanup() {
 
 # Function to fetch the latest releases
 fetch_latest_releases() {
-    local repo="dutchdronesquad/rh-stream-overlays"
     local releases_json
-    mapfile -t releases_json < <(curl -s "https://api.github.com/repos/$repo/releases" | jq -r '.[].tag_name' | head -n 5)
+    mapfile -t releases_json < <(curl -s "https://api.github.com/repos/$REPOSITORY/releases" | jq -r '.[].tag_name' | head -n 5)
     printf "%s\n" "${releases_json[@]}"
 }
 
 # Function to ask if the user wants to update the existing plugin
 check_update_permission() {
-    if [ -d "$PLUGIN_DIR/stream_overlays" ]; then
+    if [ -d "$PLUGIN_DIR/$PLUGIN_DOMAIN" ]; then
         echo "The plugin already exists in RotorHazard."
         read -rp "Do you want to update it? (y/n): " update_choice
 
         case "$update_choice" in
             y|Y)
                 echo "Removing the existing plugin directory..."
-                if rm -rf "$PLUGIN_DIR/stream_overlays"; then
+                if rm -rf "$PLUGIN_DIR/$PLUGIN_DOMAIN"; then
                     echo "Plugin directory removed successfully."
                 else
                     echo "Failed to remove plugin directory."
@@ -92,7 +93,6 @@ check_update_permission() {
 # Function to install/update the plugin to the specified release
 install_stable_plugin() {
     echo "Fetching the latest stable release versions..."
-    local repo="dutchdronesquad/rh-stream-overlays"
     local latest_releases
     mapfile -t latest_releases < <(fetch_latest_releases)
 
@@ -105,7 +105,7 @@ install_stable_plugin() {
     PS3="Enter your choice [1-${#latest_releases[@]}]: "
     select release_version in "${latest_releases[@]}"; do
         if [[ " ${latest_releases[*]} " =~ ${release_version} ]]; then
-            local download_url="https://codeload.github.com/$repo/zip/refs/tags/$release_version"
+            local download_url="https://codeload.github.com/$REPOSITORY/zip/refs/tags/$release_version"
             break
         else
             echo "Invalid selection. Please try again."
@@ -119,9 +119,8 @@ install_stable_plugin() {
 
 # Function to install/update the plugin to the development version
 install_development_plugin() {
-    local repo="dutchdronesquad/rh-stream-overlays"
     local branch="develop"
-    local download_url="https://codeload.github.com/$repo/zip/refs/heads/$branch"
+    local download_url="https://codeload.github.com/$REPOSITORY/zip/refs/heads/$branch"
 
     # Check if the plugin already exists and ask for update permission
     check_update_permission
