@@ -5,6 +5,7 @@
 ![Project Stage][project-stage-shield]
 ![Project Maintenance][maintenance-shield]
 [![License][license-shield]](LICENSE)
+[![RHFest][rhfest-shield]][rhfest-url]
 
 ## About
 
@@ -62,6 +63,8 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 [license-shield]: https://img.shields.io/github/license/dutchdronesquad/rh-stream-overlays.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
+[rhfest-shield]: https://github.com/dutchdronesquad/rh-stream-overlays/actions/workflows/rhfest.yaml/badge.svg
+[rhfest-url]: https://github.com/dutchdronesquad/rh-stream-overlays/actions/workflows/rhfest.yaml
 
 [release-branch]: https://github.com/dutchdronesquad/rh-stream-overlays/branches/all?query=release
 [website]: https://overlays.dutchdronesquad.nl

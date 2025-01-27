@@ -71,3 +71,7 @@ repos:
         types: [text]
         entry: poetry run trailing-whitespace-fixer
         stages: [pre-commit, pre-push, manual]
+      - id: rhfest
+        name: 🎉 Check RHFest
+        language: docker_image
+        entry: ghcr.io/dutchdronesquad/rhfest-action:latest
