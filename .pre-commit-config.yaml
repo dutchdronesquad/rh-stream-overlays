@@ -74,4 +74,4 @@ repos:
       - id: rhfest
         name: 🎉 Check RHFest
         language: docker_image
-        entry: ghcr.io/dutchdronesquad/rhfest-action:latest
+        entry: ghcr.io/rotorhazard/rhfest-action:latest
