@@ -1,0 +1,45 @@
+{% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_lcdr.css') }}">
+<script type="text/javascript" charset="utf-8"
+    src="{{ url_for('stream_overlays.static', filename='js/overlay_node_lcdr.js') }}"></script>
+<script>
+    streamnode = '{{ node_id }}'
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="page-streamnode">
+    <!-- Popup on every new lap -->
+    <div id="popup-container">
+        <div class="box laps">
+            <p>LAP <span class="lap_number">0</span></p>
+        </div>
+        <div class="box time">
+            <p id="last_laptime"></p>
+        </div>
+    </div>
+
+    <!-- Information on top of overlay -->
+    <div id="top-bar">
+        <div class="position-container">
+            <span id="pilot_position"></span>
+            <sup id="pos_ordinal"></sup>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="left-bar">
+            <div id="pilot_callsign" class="nested-left"></div>
+            <div class="nested-right" id="laps_label">LAPS: <span class="lap_number">0</span></div>
+        </div>
+        <div class="right-bar">
+            <div id="total_time">0:00.000</div>
+            <div class="laps-container">
+                <ul id="pilot_lap-times"></ul>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
