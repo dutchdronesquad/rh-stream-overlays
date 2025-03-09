@@ -73,5 +73,7 @@ repos:
         stages: [pre-commit, pre-push, manual]
       - id: rhfest
         name: 🎉 Check RHFest
-        language: docker_image
-        entry: ghcr.io/rotorhazard/rhfest-action:latest
+        language: system
+        entry: docker
+        args: ["run", "--rm", "--pull=always", "-v", ".:/repo", "ghcr.io/rotorhazard/rhfest-action:latest"]
+        pass_filenames: false
