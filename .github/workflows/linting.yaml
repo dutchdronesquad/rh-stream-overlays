@@ -17,24 +17,16 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v4.2.2
-      - name: 🏗 Set up Poetry
-        run: pipx install poetry
-      - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
-        id: python
-        uses: actions/setup-python@v5.5.0
+      - name: 🏗 Set up UV
+        uses: astral-sh/setup-uv@v5.4.2
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
-          cache: "poetry"
-      - name: 🏗 Install workflow dependencies
-        run: |
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-      - name: 🏗 Install Python dependencies
-        run: poetry install --no-interaction
+          enable-cache: true
+      - name: 🏗 Install project dependencies
+        run: uv sync --all-extras --dev
       - name: 🚀 Run ruff linter
-        run: poetry run ruff check --output-format=github .
+        run: uv run ruff check --output-format=github .
       - name: 🚀 Run ruff formatter
-        run: poetry run ruff format --check .
+        run: uv run ruff format --check .
 
   pre-commit-hooks:
     name: pre-commit-hooks
@@ -42,33 +34,25 @@ jobs:
     steps:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v4.2.2
-      - name: 🏗 Set up Poetry
-        run: pipx install poetry
-      - name: 🏗 Set up Python ${{ env.DEFAULT_PYTHON }}
-        id: python
-        uses: actions/setup-python@v5.5.0
+      - name: 🏗 Set up UV
+        uses: astral-sh/setup-uv@v5.4.2
         with:
-          python-version: ${{ env.DEFAULT_PYTHON }}
-          cache: "poetry"
-      - name: 🏗 Install workflow dependencies
-        run: |
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-      - name: 🏗 Install Python dependencies
-        run: poetry install --no-interaction
+          enable-cache: true
+      - name: 🏗 Install project dependencies
+        run: uv sync --all-extras --dev
       - name: 🚀 Check Python AST
-        run: poetry run pre-commit run check-ast --all-files
+        run: uv run pre-commit run check-ast --all-files
       - name: 🚀 Check for case conflicts
-        run: poetry run pre-commit run check-case-conflict --all-files
+        run: uv run pre-commit run check-case-conflict --all-files
       - name: 🚀 Check docstring is first
-        run: poetry run pre-commit run check-docstring-first --all-files
+        run: uv run pre-commit run check-docstring-first --all-files
       - name: 🚀 Check JSON files
-        run: poetry run pre-commit run check-json --all-files
+        run: uv run pre-commit run check-json --all-files
       - name: 🚀 Check YAML files
-        run: poetry run pre-commit run check-yaml --all-files
+        run: uv run pre-commit run check-yaml --all-files
       - name: 🚀 Detect Private Keys
-        run: poetry run pre-commit run detect-private-key --all-files
+        run: uv run pre-commit run detect-private-key --all-files
       - name: 🚀 Check End of Files
-        run: poetry run pre-commit run end-of-file-fixer --all-files
+        run: uv run pre-commit run end-of-file-fixer --all-files
       - name: 🚀 Trim Trailing Whitespace
-        run: poetry run pre-commit run trailing-whitespace --all-files
+        run: uv run pre-commit run trailing-whitespace --all-files
