@@ -1,8 +1,10 @@
-# Folders to ignore
-__pycache__
-.cache
-site
-.ruff_cache
+# Ignore files
+.env
 
-# Files to ignore
-.python-version
+# Ignore folders
+node_modules
+site
+.venv
+.cache
+.ruff_cache
+__pycache__

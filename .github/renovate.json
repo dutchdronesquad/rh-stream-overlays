@@ -12,8 +12,13 @@
   "commitMessagePrefix": "⬆️",
   "packageRules": [
     {
-      "matchManagers": ["poetry"],
+      "matchManagers": ["pep621"],
       "addLabels": ["python"]
+    },
+    {
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["tool.uv.dependency-groups"],
+      "rangeStrategy": "pin"
     },
     {
       "matchManagers": ["github-actions"],
@@ -23,7 +28,7 @@
       "versioning": "regex:^v(?<major>\\d+)(\\.(?<minor>\\d+)\\.(?<patch>\\d+))?$"
     },
     {
-      "matchManagers": ["github-actions", "poetry"],
+      "matchManagers": ["github-actions", "pep621"],
       "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     }

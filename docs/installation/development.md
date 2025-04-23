@@ -22,17 +22,19 @@ ln -s ~/rh-stream-overlays/stream_overlays/ ~/RotorHazard/src/server/plugins/str
 
 ## Documentation
 
-Make sure you have installed [Poetry](https://python-poetry.org/docs/#installation) to manage the dependencies of the project.
+The documentation is built with [MkDocs](https://www.mkdocs.org/) and hosted on [GitHub Pages](https://pages.github.com/). The documentation is written in Markdown and can be found in the `docs` folder. This Python project relies on [UV](https://docs.astral.sh/uv/) as its dependency manager, providing comprehensive management and control over project dependencies.
+
+To make changes to the documentation, you need to set up a local development environment. This will allow you to preview your changes before pushing them to the repository.
 
 1. **Fork** and **Clone** the repository to your local machine
 2. Run the following commands to install the dependencies
 ```bash
-poetry install
+uv sync --all-groups
 ```
 
 3. Start the documentation server
 ```bash
-poetry run mkdocs serve
+uv run mkdocs serve
 ```
 
 4. Open the application in your browser
