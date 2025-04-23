@@ -24,37 +24,44 @@ The full documentation can be found at [overlays.dutchdronesquad.nl][website]. W
 
 ## Setting up development environment
 
-This Python project relies on [Poetry][poetry] as its dependency manager,
+This Python project relies on [UV] as its dependency manager,
 providing comprehensive management and control over project dependencies.
 
-You need at least:
+You need the following tools to get started:
 
-- Python 3.11+
-- [Poetry][poetry-install]
+- [UV] - A python virtual environment/package manager
+- [Python] 3.11 (or higher) - The programming language
 
 ### Installation
 
-Install all packages, including all development requirements:
+1. Clone the repository
+2. Install all dependencies with UV. This will create a virtual environment and install all dependencies
 
 ```bash
-poetry install
+uv sync --all-groups
 ```
 
-_Poetry creates by default an virtual environment where it installs all necessary pip packages_.
+### Pre-commit check
 
-### Pre-commit
+As this repository uses the [pre-commit][pre-commit] framework, all changes
+are linted and tested with each commit.
 
-This repository uses the [pre-commit][pre-commit] framework, all changes
-are linted and tested with each commit. To setup the pre-commit check, run:
+To install the pre-commit check, run:
 
 ```bash
-poetry run pre-commit install
+uv run pre-commit install
 ```
 
-And to run all checks and tests manually, use the following command:
+To run all checks and tests manually, use the following command:
 
 ```bash
-poetry run pre-commit run --all-files
+uv run pre-commit run --all-files
+```
+
+To manual run only on the staged files, use the following command:
+
+```bash
+uv run pre-commit run
 ```
 
 ## License
@@ -72,6 +79,6 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 [release-branch]: https://github.com/dutchdronesquad/rh-stream-overlays/branches/all?query=release
 [website]: https://overlays.dutchdronesquad.nl
 
-[poetry-install]: https://python-poetry.org/docs/#installation
-[poetry]: https://python-poetry.org
+[UV]: https://docs.astral.sh/uv/
+[Python]: https://www.python.org/
 [pre-commit]: https://pre-commit.com
