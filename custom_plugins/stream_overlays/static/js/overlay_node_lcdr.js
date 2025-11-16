@@ -146,7 +146,7 @@ function show_current_laps() {
     $.each(display_laps, function (j, lap) {
       // j is loop num, lap is json object
       var tr = "";
-      var lapTime = lap.lap_time;
+      var lapTime = lap.lap_time_formatted || lap.lap_time;
       if (lap.splits.length > 0) {
         lapTime += " (";
         for (k = 0; k < lap.splits.length; k++) {
@@ -154,7 +154,7 @@ function show_current_laps() {
           if (k > 0) {
             lapTime += ", ";
           }
-          lapTime += split.split_time;
+          lapTime += split.split_time_formatted || split.split_time;
           if (split.split_speed) {
             lapTime += "/" + split.split_speed;
           }
@@ -166,7 +166,7 @@ function show_current_laps() {
 
       // Time between start and race timer
       if (lap.lap_number == 0) {
-        lapLi.text("HS: " + lap.lap_time);
+        lapLi.text("HS: " + (lap.lap_time_formatted || lap.lap_time));
         lapLi.addClass("from_start");
       }
 
