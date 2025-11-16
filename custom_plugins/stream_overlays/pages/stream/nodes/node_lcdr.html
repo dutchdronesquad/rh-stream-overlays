@@ -5,10 +5,8 @@
 <script>
     streamnode = '{{ node_id }}'
 </script>
-<script type="text/javascript" charset="utf-8"
-    src="{{ url_for('stream_overlays.static', filename='js/overlay_node_shared.js') }}"></script>
-<script type="text/javascript" charset="utf-8"
-    src="{{ url_for('stream_overlays.static', filename='js/overlay_node_lcdr.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_shared.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_lcdr.js') }}"></script>
 {% endblock %}
 
 {% block content %}
