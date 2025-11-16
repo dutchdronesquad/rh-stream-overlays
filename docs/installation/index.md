@@ -5,9 +5,23 @@ description: Installation instructions for the Stream Overlays plugin for RotorH
 
 # Installation
 
-Follow the steps below to install the Stream Overlays plugin for RotorHazard.
+Follow the steps below to install the Stream Overlays plugin for RotorHazard. There are two methods to install the plugin: using the RotorHazard web interface or using a command line script.
 
-## RotorHazard
+## Community Plugins (GUI)
+
+_This method is the easiest way to install the plugin._
+
+The **Stream Overlays** plugin is available as a [community plugin](https://rotorhazard.github.io/community-plugins/) for RotorHazard. You can install it directly from the RotorHazard web interface.
+
+1. Go to the **Settings** page in RotorHazard.
+2. Click on the **Plugins** tab and click on the **Browse Community Plugins (online only)** button.
+3. Search for **Stream Overlays** in the list of available plugins.
+4. Click on the **Install** button to install the plugin.
+5. After the installation is complete, restart RotorHazard to load the plugin.
+
+## Install script (CLI)
+
+_This method is for more advanced users who are comfortable with the command line._
 
 1. Install the **Stream Overlays** RotorHazard plugin, by running the following command in your terminal at the device where RotorHazard is installed:
 ``` bash

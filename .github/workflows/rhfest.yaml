@@ -9,13 +9,15 @@ on:
   schedule:
     - cron: "0 0 * * *" # Every day at midnight
 
+permissions:
+  contents: read
+
 jobs:
   validation:
     name: Validation
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.2.2
-
+        uses: actions/checkout@v5.0.0
       - name: 🚀 Run RHFest validation
-        uses: docker://ghcr.io/rotorhazard/rhfest-action:v2.0.0
+        uses: docker://ghcr.io/rotorhazard/rhfest-action:v3.0.0
