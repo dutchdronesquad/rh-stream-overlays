@@ -2,6 +2,35 @@
 (function (window, $) {
   "use strict";
 
+  function initSocketWarningWatcher() {
+    if (window.__overlaySocketWarningWatcher) {
+      return;
+    }
+    window.__overlaySocketWarningWatcher = true;
+
+    function toggleWarning(isConnected) {
+      var $warning = $(".socket-warning");
+      if (!$warning.length) {
+        return;
+      }
+      if (isConnected) {
+        $warning.stop(true, true).slideUp();
+      } else {
+        $warning.stop(true, true).slideDown();
+      }
+    }
+
+    if (typeof socket !== "undefined") {
+      socket.on("connect", function () {
+        toggleWarning(true);
+      });
+      socket.on("disconnect", function () {
+        toggleWarning(false);
+      });
+      toggleWarning(socket.connected);
+    }
+  }
+
   var DEFAULT_SELECTORS = {
     position: "#pilot_position",
     ordinal: "#pos_ordinal",
@@ -38,6 +67,7 @@
   NodeOverlay.prototype.init = function () {
     var self = this;
     $(document).ready(function () {
+      initSocketWarningWatcher();
       rotorhazard.show_messages = false;
       self.cacheDom();
       self.registerSocketHandlers();
