@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_dds.css') }}">
 <script>
     streamnode = '{{ node_id }}'
+    document.documentElement.classList.add('dds-theme-page');
 </script>
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_shared.js') }}"></script>
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_dds.js') }}"></script>
