@@ -1,0 +1,243 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+
+/* CSS Variables for Apex topbar theme */
+:root {
+  --apex-bg-glass: rgba(0, 0, 0, 0.92);
+  --apex-bg-dark: rgba(0, 0, 0, 1);
+  --apex-text-primary: #ffffff;
+  --apex-text-secondary: rgba(255, 255, 255, 0.7);
+  --apex-text-muted: rgba(255, 255, 255, 0.5);
+  --apex-accent: #00d9ff;
+  --apex-accent-glow: rgba(0, 217, 255, 0.3);
+  --apex-border: rgba(255, 255, 255, 0.15);
+  --apex-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --apex-blur: blur(12px);
+  --topbar-height: 100px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Hide all error/info messages in topbar */
+#banner-msg,
+.priority-message-interrupt,
+.mfp-bg,
+.mfp-wrap,
+.popup,
+.alert,
+.message-box {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.apex-topbar {
+  width: 100%;
+  animation: slideInTop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInTop {
+  from {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Main topbar container */
+.topbar-container {
+  position: relative;
+  width: 100%;
+  height: var(--topbar-height);
+  background: var(--apex-bg-glass);
+  backdrop-filter: var(--apex-blur);
+  -webkit-backdrop-filter: var(--apex-blur);
+  border-bottom: 2px solid var(--apex-border);
+  box-shadow: var(--apex-card-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Timer section - left side */
+.timer-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 280px;
+  height: 100%;
+  background: var(--apex-bg-dark);
+  border-right: 2px solid var(--apex-accent);
+  padding: 0 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-section::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--apex-accent);
+  box-shadow: 0 0 20px var(--apex-accent-glow);
+}
+
+.time-display {
+  font-family: "Orbitron", sans-serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+  color: var(--apex-text-primary);
+  letter-spacing: 2px;
+  line-height: 1;
+}
+
+/* Heat info section - center */
+.heat-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  font-family: "Rajdhani", sans-serif;
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--apex-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0 40px;
+}
+
+#js--heat-title {
+  color: var(--apex-accent);
+  font-weight: 800;
+  font-size: 2.8rem;
+}
+
+.separator {
+  color: var(--apex-text-muted);
+  font-weight: 400;
+  font-size: 2.2rem;
+}
+
+.event-name {
+  color: var(--apex-text-secondary);
+  font-weight: 700;
+}
+
+/* Race status color changes */
+.race-running .timer-section {
+  background: linear-gradient(135deg,
+    rgba(40, 167, 69, 0.3) 0%,
+    var(--apex-bg-dark) 100%);
+  border-right-color: #28a745;
+}
+
+.race-running .timer-section::after {
+  background: #28a745;
+  box-shadow: 0 0 20px rgba(40, 167, 69, 0.5);
+}
+
+.race-running .time-display {
+  color: #4ade80;
+}
+
+.race-stopped .timer-section {
+  background: linear-gradient(135deg,
+    rgba(220, 53, 69, 0.3) 0%,
+    var(--apex-bg-dark) 100%);
+  border-right-color: #dc3545;
+}
+
+.race-stopped .timer-section::after {
+  background: #dc3545;
+  box-shadow: 0 0 20px rgba(220, 53, 69, 0.5);
+}
+
+.race-stopped .time-display {
+  color: #f87171;
+}
+
+.timer-section.staging {
+  background: linear-gradient(135deg,
+    rgba(255, 165, 0, 0.3) 0%,
+    var(--apex-bg-dark) 100%);
+  border-right-color: #ff9500;
+}
+
+.timer-section.staging::after {
+  background: #ff9500;
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+  animation: stagingPulse 1s ease-in-out infinite;
+}
+
+.timer-section.staging .time-display {
+  color: #fbbf24;
+}
+
+@keyframes stagingPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1920px) {
+  .timer-section {
+    min-width: 240px;
+    padding: 0 25px;
+  }
+
+  .time-display {
+    font-size: 2.8rem;
+  }
+
+  .heat-section {
+    font-size: 2.2rem;
+    gap: 20px;
+  }
+
+  #js--heat-title {
+    font-size: 2.4rem;
+  }
+
+  .separator {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  .timer-section {
+    min-width: 220px;
+    padding: 0 20px;
+  }
+
+  .time-display {
+    font-size: 2.4rem;
+  }
+
+  .heat-section {
+    font-size: 1.8rem;
+    gap: 15px;
+    padding: 0 30px;
+  }
+
+  #js--heat-title {
+    font-size: 2rem;
+  }
+
+  .separator {
+    font-size: 1.5rem;
+  }
+}

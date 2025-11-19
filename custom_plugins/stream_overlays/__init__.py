@@ -11,8 +11,7 @@ from .utils import (
 )
 
 overlays: dict = {
-    "DDS": {"node": True, "topbar": True, "leaderboard": True},
-    "LCDR": {"node": True, "topbar": True, "leaderboard": False},
+    "APEX": {"node": True, "topbar": True, "leaderboard": False, "heat": False},
 }
 
 

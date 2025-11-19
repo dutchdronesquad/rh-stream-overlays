@@ -1,0 +1,555 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+
+/* CSS Variables for Apex theme */
+:root {
+  --apex-bg-glass: rgba(10, 15, 30, 0.75);
+  --apex-bg-dark: rgba(5, 8, 15, 0.92);
+  --apex-text-primary: #ffffff;
+  --apex-text-secondary: rgba(255, 255, 255, 0.7);
+  --apex-text-muted: rgba(255, 255, 255, 0.5);
+  --apex-accent: #00d9ff;
+  --apex-accent-glow: rgba(0, 217, 255, 0.3);
+  --apex-border: rgba(255, 255, 255, 0.15);
+  --apex-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --apex-blur: blur(12px);
+}
+
+/* Hide all error/info messages in Apex theme */
+.apex-theme #banner-msg,
+.apex-theme .priority-message-interrupt,
+.apex-theme .mfp-bg,
+.apex-theme .mfp-wrap,
+.apex-theme .popup,
+.apex-theme .alert,
+.apex-theme .message-box {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Socket warning styling */
+html.apex-theme-page aside {
+  position: fixed;
+  top: 24px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 300;
+}
+
+html.apex-theme-page .socket-warning {
+  position: relative;
+  width: fit-content;
+  max-width: min(90vw, 560px);
+  margin: 0;
+  padding: 0.85rem 2.85rem 0.85rem 3.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--apex-border);
+  color: var(--apex-text-primary);
+  background: linear-gradient(130deg, rgba(5, 7, 14, 0.98), rgba(10, 16, 30, 0.9));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55), 0 0 25px var(--apex-accent-glow);
+  backdrop-filter: var(--apex-blur);
+  -webkit-backdrop-filter: var(--apex-blur);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  line-height: 1.2;
+  pointer-events: none;
+  animation: apexSocketDrop 0.4s ease;
+}
+
+html.apex-theme-page .socket-warning::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 1.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.8), 0 0 20px rgba(255, 107, 107, 0.4);
+  transform: translateY(-50%);
+  animation: apexSocketPulse 1.3s ease-in-out infinite;
+}
+
+html.apex-theme-page .socket-warning::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  html.apex-theme-page aside {
+    top: 16px;
+  }
+
+  html.apex-theme-page .socket-warning {
+    padding: 0.75rem 2rem 0.75rem 2.8rem;
+    letter-spacing: 0.2em;
+    font-size: 0.85rem;
+  }
+
+  html.apex-theme-page .socket-warning::before {
+    left: 1rem;
+  }
+}
+
+@keyframes apexSocketDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes apexSocketPulse {
+  0% {
+    transform: translateY(-50%) scale(0.8);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-50%) scale(0.8);
+    opacity: 0.4;
+  }
+}
+
+/* Position badge - positioned separately in top left corner */
+.apex-theme .position-badge {
+  position: fixed;
+  top: 30px;
+  left: 30px;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(3.8rem, 6.5vw, 9.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--apex-text-primary);
+  text-align: left;
+  padding: 5px 15px 5px 5px;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.9);
+  letter-spacing: -3px;
+  animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Main container - positioned in bottom right corner */
+.apex-theme .apex-overlay-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "Rajdhani", sans-serif;
+  animation: slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.apex-theme .position-number {
+  position: relative;
+  z-index: 1;
+  line-height: 0.85;
+}
+
+.apex-theme .position-ordinal {
+  font-size: clamp(1.5rem, 2.2vw, 3rem);
+  font-weight: 800;
+  opacity: 0.95;
+  line-height: 0.85;
+  margin-top: 0.15em;
+}
+
+/* Main info card - glassmorphism effect */
+.apex-theme .info-card {
+  background: var(--apex-bg-glass);
+  backdrop-filter: var(--apex-blur);
+  -webkit-backdrop-filter: var(--apex-blur);
+  border: 1px solid var(--apex-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--apex-card-shadow);
+  min-width: 320px;
+  max-width: 380px;
+}
+
+/* Pilot info header */
+.apex-theme .pilot-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--apex-bg-dark);
+  border-bottom: 2px solid var(--pilot_color, var(--apex-accent));
+}
+
+.apex-theme .pilot-callsign {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--apex-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.apex-theme .pilot-laps {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: "Orbitron", sans-serif;
+}
+
+.apex-theme .lap-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--apex-text-primary);
+  letter-spacing: 1px;
+}
+
+.apex-theme .pilot-laps .lap_number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--pilot_color, var(--apex-accent));
+  min-width: 24px;
+  text-align: right;
+}
+
+/* Time display - prominent */
+.apex-theme .time-display {
+  padding: 16px;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%);
+  border-bottom: 1px solid var(--apex-border);
+}
+
+.apex-theme .total-time {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--apex-text-primary);
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Recent laps section */
+.apex-theme .laps-section {
+  padding: 12px 16px;
+}
+
+.apex-theme .laps-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+}
+
+.apex-theme .laps-list li {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  transition: all 0.2s ease;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.apex-theme .laps-list li.new-lap {
+  animation: slideInLap 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideInLap {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.apex-theme .lap-num-box {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--apex-text-primary);
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.apex-theme .lap-time-box {
+  font-family: "Orbitron", sans-serif;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--apex-text-primary);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 52px;
+  letter-spacing: 0.5px;
+}
+
+.apex-theme .laps-list li:hover .lap-num-box {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.apex-theme .laps-list li:hover .lap-time-box {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Fastest lap highlight - uses pilot color */
+.apex-theme .laps-list li.fastest-lap .lap-num-box {
+  background: var(--pilot_color, var(--apex-accent));
+  color: var(--contrast_pilot_color, #000);
+  font-weight: 800;
+}
+
+.apex-theme .laps-list li.fastest-lap .lap-time-box {
+  background: var(--pilot_color, var(--apex-accent));
+  color: var(--contrast_pilot_color, #000);
+  font-weight: 600;
+}
+
+/* Accent bar at bottom */
+.apex-theme .accent-bar {
+  height: 4px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--pilot_color, var(--apex-accent)) 50%,
+    transparent 100%);
+  border-radius: 2px;
+  box-shadow: 0 0 10px var(--pilot_color, var(--apex-accent-glow));
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Popup animation for new laps - zoom and glow from center */
+.apex-theme #popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.apex-theme #popup-container.show {
+  animation: zoomInGlow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+             zoomOutGlow 0.3s ease-in 2.2s forwards;
+}
+
+@keyframes zoomInGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomOutGlow {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
+}
+
+.apex-theme .popup-content {
+  background: linear-gradient(135deg,
+    var(--apex-bg-dark) 0%,
+    rgba(5, 8, 15, 0.95) 100%);
+  backdrop-filter: var(--apex-blur);
+  -webkit-backdrop-filter: var(--apex-blur);
+  border: 3px solid var(--pilot_color, var(--apex-accent));
+  border-radius: 16px;
+  padding: 20px 40px;
+  box-shadow:
+    0 0 60px rgba(0, 0, 0, 0.9),
+    0 0 100px var(--pilot_color, var(--apex-accent-glow)),
+    inset 0 0 40px rgba(0, 217, 255, 0.1);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.apex-theme .popup-content::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    var(--pilot_color, var(--apex-accent)) 50%,
+    transparent 70%
+  );
+  opacity: 0.1;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    transform: translateX(-50%) translateY(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateX(50%) translateY(50%) rotate(180deg);
+  }
+}
+
+.apex-theme .popup-lap {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--apex-text-primary);
+  letter-spacing: 3px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.apex-theme .popup-lap .lap_number {
+  color: var(--pilot_color, var(--apex-accent));
+  font-size: 2rem;
+  font-weight: 900;
+  margin-left: 8px;
+  text-shadow: 0 0 20px var(--pilot_color, var(--apex-accent-glow));
+}
+
+.apex-theme .popup-time {
+  font-family: "Orbitron", sans-serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--apex-text-primary);
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 30px var(--pilot_color, var(--apex-accent-glow)),
+    0 0 60px var(--pilot_color, var(--apex-accent-glow)),
+    0 6px 12px rgba(0, 0, 0, 0.8);
+  position: relative;
+  z-index: 1;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 30px var(--pilot_color, var(--apex-accent-glow)),
+      0 0 60px var(--pilot_color, var(--apex-accent-glow)),
+      0 6px 12px rgba(0, 0, 0, 0.8);
+  }
+  50% {
+    text-shadow:
+      0 0 40px var(--pilot_color, var(--apex-accent-glow)),
+      0 0 80px var(--pilot_color, var(--apex-accent-glow)),
+      0 6px 12px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1920px) {
+  .apex-theme .info-card {
+    min-width: 280px;
+    max-width: 320px;
+  }
+
+  .apex-theme .popup-time {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 1280px) {
+  .apex-theme .pilot-callsign {
+    font-size: 1.5rem;
+  }
+
+  .apex-theme .total-time {
+    font-size: 2rem;
+  }
+
+  .apex-theme .popup-time {
+    font-size: 2.4rem;
+  }
+}

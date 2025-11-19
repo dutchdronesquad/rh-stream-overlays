@@ -65,6 +65,7 @@ nav:
     - Development: installation/development.md
   - Overlays:
     - overlays/index.md
+    - overlays/apex.md
     - overlays/dds.md
     - overlays/lcdr.md
   - Blog:
