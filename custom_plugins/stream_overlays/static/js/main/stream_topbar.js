@@ -25,6 +25,9 @@ function race_kickoff(msg) {
 }
 
 $(document).ready(function () {
+  // Topbar overlays have their own error handling; remove the global warning bar
+  $(".socket-warning").remove();
+
   // get pi time
   rotorhazard.pi_time_request = window.performance.now();
   socket.emit("get_pi_time");

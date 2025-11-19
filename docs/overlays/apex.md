@@ -1,0 +1,42 @@
+---
+title: Apex
+description: Apex overlay theme for RotorHazard streams with a floating position badge.
+---
+
+# Apex
+
+Apex is a high-contrast, glassy theme inspired by esports broadcasts. It focuses on bold typography, a floating position badge, and a compact lap history so single-pilot cameras can look premium without complicated scene setup. Apex works particularly well for streams where each pilot gets their own scene and you want the overlay to feel like part of the graphics package rather than an afterthought.
+
+## Theme highlights
+
+- **Floating rank badge**: A standalone position banner anchors to the top-left corner and scales with your canvas. The ordinal suffix mirrors the same glow so the badge stays readable on ultrawide crops.
+- **Glassmorphism cards**: Lap data and totals live inside frosted cards with accent lighting that inherits each pilot color. This creates depth without adding heavy gradients to your OBS layout.
+- **Animated lap feed**: New laps slide in with motion + highlighting, and fastest laps stay pinned with color cues. The animation is subtle enough for long races but gives the audience clear feedback.
+- **Minimal setup**: With only two overlay URLs (topbar + node), Apex is a quick drop-in for events that need a cohesive look without configuring leaderboards or extra scenes.
+
+!!! note "Available overlays"
+    Apex currently ships with a **topbar** and a **node overlay**. Heat and leaderboard layouts are on the backlog;
+
+## Topbar
+
+The Apex topbar mirrors broadcast tickers, showing the active heat, event name, and timer information inside a single metallic strip.
+
+URL to use:
+
+```bash
+RH-IP:5000/stream/overlay/apex/topbar
+```
+
+![Apex topbar overlay preview showing the timer animation and metallic strip](../assets/img/overlays/apex/apex-topbar.gif)
+
+## Node
+
+The node overlay combines the floating position badge, pilot info card, and animated lap list. The accent bar at the base pulses with the pilot color to keep OBS scenes lively even during longer heats. Replace `[NUMBER]` with the node id you want to show.
+
+URL to use:
+
+```bash
+RH-IP:5000/stream/overlay/apex/node/[NUMBER]
+```
+
+![Apex node overlay preview with floating badge and lap animation](../assets/img/overlays/apex/apex-node.gif)
