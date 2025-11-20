@@ -7,7 +7,7 @@ description: Solutions to common problems with Stream Overlays.
 
 Solutions to common problems and error messages.
 
-### Overlay shows blank or 'waiting for race'
+## Overlay shows blank or 'waiting for race'
 
 This is normal when:
 
@@ -17,7 +17,7 @@ This is normal when:
 
 **Solution:** Load and stage a heat in RotorHazard.
 
-### Lap times don't update
+## Lap times don't update
 
 Check the Socket.IO connection:
 
@@ -26,7 +26,7 @@ Check the Socket.IO connection:
 3. Verify RotorHazard version is 4.0.x or newer
 4. Check network latency if streaming remotely
 
-### Wrong pilot name or color appears
+## Wrong pilot name or color appears
 
 The node number in the URL must match the seat number in RotorHazard.
 
@@ -34,7 +34,7 @@ Example: `.../node/2` displays data for seat 2.
 
 Verify the heat is loaded with pilots assigned to the correct seats.
 
-### Overlay loads slowly
+## Overlay loads slowly
 
 Common causes:
 
@@ -45,7 +45,7 @@ Common causes:
 
 Enable **Shutdown source when not visible** to keep overlays in memory.
 
-### Overlay freezes during race
+## Overlay freezes during race
 
 Possible issues:
 
@@ -55,7 +55,7 @@ Possible issues:
 
 Try lowering browser source FPS to 30.
 
-### Can't access overlays over network
+## Can't access overlays over network
 
 Check these:
 
@@ -64,7 +64,7 @@ Check these:
 3. Streaming computer can ping RotorHazard IP
 4. No VPN blocking local network access
 
-### Overlay elements misaligned
+## Overlay elements misaligned
 
 Ensure browser source dimensions match your OBS canvas exactly:
 
@@ -73,7 +73,7 @@ Ensure browser source dimensions match your OBS canvas exactly:
 
 Don't scale or crop the browser source.
 
-### RotorHazard crashes after installing plugin
+## RotorHazard crashes after installing plugin
 
 This is rare. Try:
 
@@ -84,7 +84,7 @@ This is rare. Try:
 
 Report persistent crashes as an [issue](https://github.com/dutchdronesquad/rh-stream-overlays/issues).
 
-### Overlay shows '404 Not Found'
+## Overlay shows '404 Not Found'
 
 The URL is incorrect. Check:
 
@@ -93,7 +93,7 @@ The URL is incorrect. Check:
 - Node number is valid (1-8)
 - Port is 5000
 
-### Browser console shows errors
+## Browser console shows errors
 
 Common errors and fixes:
 
@@ -103,7 +103,7 @@ Common errors and fixes:
 
 **CORS errors:** Accessing from wrong domain, use RotorHazard IP
 
-### Overlay works in browser but not OBS
+## Overlay works in browser but not OBS
 
 Try:
 

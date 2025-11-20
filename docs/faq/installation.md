@@ -7,7 +7,7 @@ description: Common questions about installing Stream Overlays.
 
 Common questions about installing and updating Stream Overlays.
 
-### How do I install Stream Overlays?
+## How do I install Stream Overlays?
 
 The easiest method is through RotorHazard's Community Plugins:
 
@@ -19,26 +19,26 @@ The easiest method is through RotorHazard's Community Plugins:
 
 See the [Installation Guide](../getting-started/installation.md) for alternative methods.
 
-### Where do I find overlay URLs?
+## Where do I find overlay URLs?
 
 **Option 1:** Navigate to the **Streams** page in RotorHazard (4.2.x+) and click any overlay link.
 
 **Option 2:** Construct URLs manually:
-```
+```text
 http://[RH-IP]:5000/stream/overlay/[theme]/[type]/[node]
 ```
 
 See the [Overlay Catalog](../overlays/index.md) for all URLs.
 
-### How do I update the plugin?
+## How do I update the plugin?
 
 Use the same method you used to install. The Community Plugins interface shows an **Update** button when a new version is available.
 
-### Can I install on older RotorHazard versions?
+## Can I install on older RotorHazard versions?
 
 Stream Overlays requires RotorHazard 4.0.x or newer. Some features like Stream Displays need 4.2.x+.
 
-### The install script fails
+## The install script fails
 
 Check these common issues:
 
@@ -55,17 +55,17 @@ sudo bash -c "$(curl -fsSL https://short.dutchdronesquad.nl/install-overlays-plu
 **Wrong RotorHazard path:**
 The script looks for `/home/pi/RotorHazard/` or `~/RotorHazard/`
 
-### How do I verify installation worked?
+## How do I verify installation worked?
 
 1. Go to **Settings** → **Plugins** and check if Stream Overlays is listed
 2. Navigate to **Streams** page and look for overlay panels
 3. Click an overlay link to test it in your browser
 
-### Can I install multiple versions?
+## Can I install multiple versions?
 
 No. Only one version can be active at a time. Updating replaces the existing installation.
 
-### How do I uninstall?
+## How do I uninstall?
 
 **Via Interface:**
 

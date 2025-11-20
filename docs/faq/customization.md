@@ -7,7 +7,7 @@ description: Common questions about customizing overlay appearance.
 
 Common questions about changing colors, fonts, and creating custom themes.
 
-### Can I change colors or fonts?
+## Can I change colors or fonts?
 
 Each theme has its own design system. To customize:
 
@@ -15,11 +15,11 @@ Each theme has its own design system. To customize:
 
 **Option B:** Request a custom theme in [GitHub Discussions](https://github.com/dutchdronesquad/rh-stream-overlays/discussions) with your palette or sponsor kit
 
-### Can I hide specific overlay elements?
+## Can I hide specific overlay elements?
 
 Not through settings. To hide elements, you would need to edit the theme's HTML/CSS files directly in your installation.
 
-### How do I create a custom theme?
+## How do I create a custom theme?
 
 1. Fork the [GitHub repository](https://github.com/dutchdronesquad/rh-stream-overlays)
 2. Copy an existing theme folder (e.g., `apex`)
@@ -29,7 +29,7 @@ Not through settings. To hide elements, you would need to edit the theme's HTML/
 
 See the [Development Guide](../installation/development.md) for details.
 
-### Can I use my team logo in overlays?
+## Can I use my team logo in overlays?
 
 Yes, but requires custom development. You'll need to:
 
@@ -38,15 +38,15 @@ Yes, but requires custom development. You'll need to:
 - Modify the HTML to display it
 - Install your custom version
 
-### Are there more themes coming?
+## Are there more themes coming?
 
 Yes! Theme requests are welcome in [Discussions](https://github.com/dutchdronesquad/rh-stream-overlays/discussions). Share your palette or mockups and we'll consider it.
 
-### Can I mix elements from different themes?
+## Can I mix elements from different themes?
 
 Not directly. Each theme is designed as a cohesive package. For custom combinations, you'll need to fork the repository and create your own theme.
 
-### How do I match my stream branding?
+## How do I match my stream branding?
 
 The best approach:
 
@@ -56,15 +56,15 @@ The best approach:
 4. Replace fonts if needed (update CSS font-family)
 5. Test and deploy your custom version
 
-### Can I change the overlay layout?
+## Can I change the overlay layout?
 
 Yes, but requires HTML/CSS knowledge. The layout is defined in each theme's template files. Fork the repository to make structural changes.
 
-### Do overlays support custom pilot colors?
+## Do overlays support custom pilot colors?
 
 Yes! Overlays automatically use the pilot colors configured in RotorHazard. No customization needed.
 
-### Can I add sponsor logos to overlays?
+## Can I add sponsor logos to overlays?
 
 Yes, but requires custom development:
 
