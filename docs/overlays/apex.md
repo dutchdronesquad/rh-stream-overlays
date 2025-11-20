@@ -31,11 +31,12 @@ RH-IP:5000/stream/overlay/apex/topbar
 
 ## Upcoming heat
 
-Want a true broadcast slate that floats above whatever background or camera feed you throw at it? The new Apex upcoming heat layout keeps everything in a single glass panel: headline + chips on top, then portrait seat cards inspired by DDR’s “Next Up” board. Drop it over venue photos, jib shots, or animated loops — the gradient glass keeps text readable without forcing a specific backplate.
+Shows the current active heat with pilot lineup and channel assignments. The overlay uses a glass panel with backdrop blur that works on any background.
 
-- Glass board with subtle blur so any background/video works behind it (scaled to fit 720p/1080p canvases)
-- Seat cards line up to four columns, each with a circular seat badge, pilot name, and channel block for fast scanning
-- Meta chips collapse automatically if you don’t have class/round info
+- Displays heat name, class, round, and format information
+- Seat cards show pilot callsign, name, and frequency/channel
+- Automatically scales to fit 720p/1080p canvases
+- Grid layout adapts from 1 to 4 columns depending on seat count
 
 URL to use:
 
@@ -43,7 +44,7 @@ URL to use:
 RH-IP:5000/stream/overlay/apex/heat/upcoming
 ```
 
-Use it as a projector scene, a mini picture-in-picture overlay, or a standby card before the green flag.
+![Apex heat overlay preview](../assets/img/overlays/apex/apex-heat-upcoming.gif)
 
 ## Node
 
