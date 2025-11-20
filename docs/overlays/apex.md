@@ -15,7 +15,7 @@ Apex is a high-contrast, glassy theme inspired by esports broadcasts. It focuses
 - **Minimal setup**: With only two overlay URLs (topbar + node), Apex is a quick drop-in for events that need a cohesive look without configuring leaderboards or extra scenes.
 
 !!! note "Available overlays"
-    Apex currently ships with a **topbar** and a **node overlay**. Heat and leaderboard layouts are on the backlog;
+    Apex currently ships with a **node overlay**, **topbar**, and a matching **upcoming heat** board. Leaderboard layouts are still on the backlog.
 
 ## Topbar
 
@@ -27,7 +27,23 @@ URL to use:
 RH-IP:5000/stream/overlay/apex/topbar
 ```
 
-![Apex topbar overlay preview showing the timer animation and metallic strip](../assets/img/overlays/apex/apex-topbar.gif)
+![Apex topbar overlay preview](../assets/img/overlays/apex/apex-topbar.gif)
+
+## Upcoming heat
+
+Want a true broadcast slate that floats above whatever background or camera feed you throw at it? The new Apex upcoming heat layout keeps everything in a single glass panel: headline + chips on top, then portrait seat cards inspired by DDR’s “Next Up” board. Drop it over venue photos, jib shots, or animated loops — the gradient glass keeps text readable without forcing a specific backplate.
+
+- Glass board with subtle blur so any background/video works behind it (scaled to fit 720p/1080p canvases)
+- Seat cards line up to four columns, each with a circular seat badge, pilot name, and channel block for fast scanning
+- Meta chips collapse automatically if you don’t have class/round info
+
+URL to use:
+
+```bash
+RH-IP:5000/stream/overlay/apex/heat/upcoming
+```
+
+Use it as a projector scene, a mini picture-in-picture overlay, or a standby card before the green flag.
 
 ## Node
 
@@ -39,4 +55,4 @@ URL to use:
 RH-IP:5000/stream/overlay/apex/node/[NUMBER]
 ```
 
-![Apex node overlay preview with floating badge and lap animation](../assets/img/overlays/apex/apex-node.gif)
+![Apex node overlay preview](../assets/img/overlays/apex/apex-node.gif)
