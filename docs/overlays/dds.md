@@ -24,7 +24,7 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/topbar
 ```
 
-![Screenshot of topbar](../assets/img/overlays/dds/topbar-dds.png)
+![DDS topbar overlay preview](../assets/img/overlays/dds/dds-topbar.gif)
 
 ## Node
 
@@ -36,8 +36,7 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/node/[NUMBER]
 ```
 
-[![Watch the video](../assets/img/overlays/dds/node-dds.png)](https://www.youtube.com/watch?v=ZpV0veJErvE)
-_Click on the image to watch a video of the overlay in action_
+![DDS node overlay preview](../assets/img/overlays/dds/dds-node.gif)
 
 ## Leaderboard
 

@@ -24,11 +24,11 @@ URL to use:
 RH-IP:5000/stream/overlay/lcdr/topbar
 ```
 
-![Screenshot of topbar](../assets/img/overlays/lcdr/topbar-lcdr.png)
+![LCDR topbar overlay preview](../assets/img/overlays/lcdr/lcdr-topbar.gif)
 
 ## Node
 
-The node overlay shows the pilot name, lap time, total time and lap number. The color of the node changes based on what is set in RotorHazard for each pilot. Replace `[NUMBER]` with the node id you want to show. The LCDR logotype remains visible even when no laps are recorded yet, which helps when showcasing sponsors.
+The node overlay shows the pilot name, lap time, total time and lap number. The color of the node changes based on what is set in RotorHazard for each pilot. Replace `[NUMBER]` with the node id you want to show.
 
 URL to use:
 
@@ -36,5 +36,4 @@ URL to use:
 RH-IP:5000/stream/overlay/lcdr/node/[NUMBER]
 ```
 
-[![Watch the video](../assets/img/overlays/lcdr/node-lcdr.png)](https://www.youtube.com/watch?v=i46IejMjN_Q)
-_Click on the image to watch a video of the overlay in action_
+![LCDR node overlay preview](../assets/img/overlays/lcdr/lcdr-node.gif)
