@@ -1,0 +1,50 @@
+{% extends 'layout-basic.html' %}
+{% set theme_name = theme_name | default('dds') %}
+{% block title %}{{ __('Stream') }}: {{ __('Upcoming Heat') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_heat.css') }}">
+{% block heat_theme_css %}{% endblock %}
+<script>
+	window.heatOverlayConfig = {{ {
+		"theme": theme_name,
+		"num_nodes": num_nodes,
+		"labels": {
+			"upNext": __('Up Next'),
+			"practiceMode": __('Practice Mode'),
+			"practiceNotice": __('Profile layout - frequencies only'),
+			"emptySlot": __('Awaiting Assignment'),
+			"classFallback": __('Unclassified'),
+			"formatFallback": __('Format TBD'),
+			"pilotTBD": __('TBD'),
+			"heatLocked": __('Heat Locked'),
+			"seedingInProgress": __('Auto-assign enabled'),
+			"noHeat": __('Waiting for heat...'),
+			"rankLabel": __('Rank'),
+			"roundLabel": __('Round'),
+			"seatLabel": __('Seat'),
+			"noSeats": __('Waiting for pilots')
+		}
+	} | tojson }};
+</script>
+<script type="text/javascript" charset="utf-8"
+	src="{{ url_for('stream_overlays.static', filename='js/overlay_heat.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<main class="page-streamheat theme-{{ theme_name }}">
+	<div class="heat-wrapper">
+		<div class="heat-header">
+			<p class="label" id="heat_lead">{{ __('Up Next') }}</p>
+			<h1 id="heat_name">{{ __('Waiting for heat...') }}</h1>
+			<div class="heat-meta">
+				<span id="class_name"></span>
+				<span id="round_info"></span>
+				<span id="format_name"></span>
+			</div>
+		</div>
+		<div id="heat_slots" class="heat-grid"></div>
+		<div class="heat-footnote" id="heat_notice"></div>
+	</div>
+</main>
+{% endblock %}

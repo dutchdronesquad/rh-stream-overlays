@@ -1,0 +1,299 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@600;700;800;900&display=swap");
+
+/* CSS Variables for Apex theme */
+:root {
+  --apex-bg: rgba(25, 30, 40, 0.85);
+  --apex-text-primary: #ffffff;
+  --apex-text-secondary: rgba(255, 255, 255, 0.75);
+  --apex-text-muted: rgba(255, 255, 255, 0.5);
+  --apex-accent: #00d9ff;
+  --apex-divider: rgba(255, 255, 255, 0.12);
+}
+
+.page-streamheat.theme-apex {
+  min-height: 100vh;
+  padding: 2rem;
+  margin: 0;
+  background: transparent;
+  font-family: "Rajdhani", sans-serif;
+  color: var(--apex-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-streamheat.theme-apex::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 12% 10%, rgba(0, 217, 255, 0.15), transparent 50%),
+    radial-gradient(circle at 88% 90%, rgba(50, 120, 255, 0.12), transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.apex-canvas {
+  width: min(1600px, 96vw);
+  background: var(--apex-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 8px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Header */
+.apex-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--apex-accent);
+}
+
+.apex-header__primary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.apex-header .lead-label {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 1.1rem;
+  color: var(--apex-accent);
+  font-weight: 600;
+}
+
+.apex-header h1 {
+  margin: 0;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--apex-text-primary);
+  line-height: 1;
+}
+
+.apex-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 1.1rem;
+  color: var(--apex-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.meta-chip {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.meta-chip:empty {
+  display: none;
+}
+
+.meta-chip:not(:last-child)::after {
+  content: "•";
+  margin-left: 1rem;
+  color: var(--apex-text-muted);
+}
+
+/* Body */
+.apex-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.apex-body__label {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-size: 1rem;
+  color: var(--apex-text-secondary);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.apex-body__label .label-dot {
+  display: none;
+}
+
+/* Grid - cleaner layout */
+.heat-grid.apex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Slot cards - simplified */
+.theme-apex .slot-card {
+  background: rgba(0, 10, 25, 0.8);
+  border-left: 3px solid var(--apex-accent);
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: none;
+  animation: cardFadeIn 0.8s ease-out backwards;
+}
+
+/* Stagger animation for each card */
+.theme-apex .slot-card:nth-child(1) { animation-delay: 0.1s; }
+.theme-apex .slot-card:nth-child(2) { animation-delay: 0.2s; }
+.theme-apex .slot-card:nth-child(3) { animation-delay: 0.3s; }
+.theme-apex .slot-card:nth-child(4) { animation-delay: 0.4s; }
+.theme-apex .slot-card:nth-child(5) { animation-delay: 0.5s; }
+.theme-apex .slot-card:nth-child(6) { animation-delay: 0.6s; }
+.theme-apex .slot-card:nth-child(7) { animation-delay: 0.7s; }
+.theme-apex .slot-card:nth-child(8) { animation-delay: 0.8s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-apex .slot-card::before {
+  display: none;
+}
+
+.theme-apex .slot-card:hover {
+  transform: none;
+  border-color: var(--apex-accent);
+  box-shadow: none;
+}
+
+/* Seat number - prominent but simple */
+.theme-apex .seat-chip {
+  align-self: flex-start;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--apex-accent);
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  background: rgba(0, 217, 255, 0.15);
+  border-radius: 4px;
+}
+
+/* Pilot info */
+.theme-apex .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.theme-apex .card-body .callsign {
+  margin: 0;
+  font-family: "Orbitron", sans-serif;
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--apex-text-primary);
+  line-height: 1.1;
+}
+
+.theme-apex .card-body .pilot-name {
+  margin: 0;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  color: var(--apex-text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.theme-apex .card-body .slot-note {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  color: var(--apex-accent);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+
+/* Channel info - inline */
+.theme-apex .channel-block {
+  display: flex;
+  gap: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--apex-divider);
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--apex-text-secondary);
+  letter-spacing: 0.1em;
+}
+
+.theme-apex .channel-block .ch,
+.theme-apex .channel-block .fr {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.theme-apex .channel-block .ch::before,
+.theme-apex .channel-block .fr::before {
+  font-size: 0.8rem;
+  color: var(--apex-text-muted);
+  font-weight: 600;
+}
+
+.theme-apex .channel-block .ch::before {
+  content: "CH";
+}
+
+.theme-apex .channel-block .fr::before {
+  content: "FREQ";
+}
+
+/* Footer */
+.apex-foot {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .apex-canvas {
+    padding: 1.5rem;
+  }
+
+  .heat-grid.apex-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .theme-apex .slot-card {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .apex-canvas {
+    padding: 1rem;
+  }
+
+  .apex-header__meta {
+    font-size: 0.85rem;
+  }
+
+  .theme-apex .channel-block {
+    gap: 1.5rem;
+    font-size: 0.8rem;
+  }
+}
