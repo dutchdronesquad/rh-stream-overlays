@@ -81,3 +81,24 @@ def create_leaderboard_markdown(
             f"target='_blank'>{overlay_name} Overlay - Class / {race_class.name}</a>\n"
         )
     return leaderboard_markdown
+
+
+def create_heat_markdown(overlay_name: str, base_path: str) -> str:
+    """Create markdown link for the upcoming heat overlay.
+
+    Args:
+    ----
+        overlay_name (str): Name of the overlay.
+        base_path (str): Base path for the overlay.
+
+    Returns:
+    -------
+        str: Markdown block containing the heat overlay link.
+
+    """
+    heat_markdown: str = "## Heat / Upcoming\n"
+    heat_markdown += (
+        f"- <a href='{base_path}/heat/upcoming' target='_blank'>"
+        f"{overlay_name} Overlay - Upcoming Heat</a>\n"
+    )
+    return heat_markdown

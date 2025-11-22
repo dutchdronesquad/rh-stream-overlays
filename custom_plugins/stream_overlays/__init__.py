@@ -5,14 +5,16 @@ from flask import templating
 from flask.blueprints import Blueprint
 
 from .utils import (
+    create_heat_markdown,
     create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
 )
 
 overlays: dict = {
-    "DDS": {"node": True, "topbar": True, "leaderboard": True},
-    "LCDR": {"node": True, "topbar": True, "leaderboard": False},
+    "DDS": {"node": True, "topbar": True, "leaderboard": True, "heat": True},
+    "LCDR": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
+    "APEX": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
 }
 
 
@@ -50,7 +52,7 @@ class StreamOverlays:
                 panel_id,
                 f"{overlay_name} - OBS Overlays",
                 "streams",
-                open=True,
+                open=False,
             )
 
             # Create and register markdown blocks based on the features
@@ -78,6 +80,12 @@ class StreamOverlays:
                 )
                 self._rhapi.ui.register_markdown(
                     panel_id, f"{overlay_name}-Nodes", nodes_markdown
+                )
+
+            if features.get("heat"):
+                heat_markdown = create_heat_markdown(overlay_name, base_path)
+                self._rhapi.ui.register_markdown(
+                    panel_id, f"{overlay_name}-Heat", heat_markdown
                 )
 
 
@@ -147,6 +155,18 @@ def initialize(rhapi: object) -> None:
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
             class_id=class_id,
+        )
+
+    @bp.route("/stream/overlay/<string:name>/heat/upcoming")
+    def render_heat_overlay(name: str) -> str:
+        """Render the upcoming heat overlay."""
+        return templating.render_template(
+            f"stream/heat/heat_{name}.html",
+            serverInfo=None,
+            getOption=rhapi.db.option,
+            getConfig=rhapi.config.get_item,
+            __=rhapi.__,
+            num_nodes=len(rhapi.interface.seats),
         )
 
     rhapi.ui.blueprint_add(bp)

@@ -1,9 +1,10 @@
 {% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_lcdr.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/lcdr/node.css') }}">
 <script>
     streamnode = '{{ node_id }}'
+    document.documentElement.classList.add('lcdr-theme-page');
 </script>
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_shared.js') }}"></script>
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/overlay_node_lcdr.js') }}"></script>

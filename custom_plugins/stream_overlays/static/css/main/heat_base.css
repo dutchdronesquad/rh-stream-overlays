@@ -1,0 +1,187 @@
+/* Minimal shared base for upcoming heat overlays.
+ * Themes should override colors, typography, spacing, and layout details.
+ */
+
+.page-streamheat {
+  --heat-accent: #999;
+  --heat-text: #fff;
+  --heat-muted: rgba(255, 255, 255, 0.7);
+  --heat-border: rgba(255, 255, 255, 0.08);
+  margin: 0;
+  padding: 2vh 2vw;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  background: transparent;
+  color: var(--heat-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heat-wrapper {
+  width: min(1400px, 96vw);
+  padding: 1rem;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+/* Header */
+.heat-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+}
+
+.heat-header .label {
+  margin: 0;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--heat-muted);
+}
+
+.heat-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.heat-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  color: var(--heat-muted);
+}
+
+.heat-meta span {
+  position: relative;
+  padding-right: 1rem;
+}
+
+.heat-meta span::after {
+  content: "";
+  position: absolute;
+  right: 0.2rem;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--heat-muted);
+  transform: translateY(-50%);
+  opacity: 0.6;
+}
+
+.heat-meta span:last-child::after {
+  display: none;
+}
+
+/* Grid */
+.heat-grid {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.slot-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  border: 1px solid var(--heat-border);
+  border-radius: 8px;
+  background: transparent;
+}
+
+.seat-chip {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--heat-muted);
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-body .callsign {
+  margin: 0;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  text-transform: uppercase;
+}
+
+.card-body .pilot-name {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--heat-muted);
+}
+
+.card-body .slot-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--heat-accent);
+}
+
+.channel-block {
+  display: inline-flex;
+  gap: 0.8rem;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--heat-muted);
+}
+
+.channel-block .ch,
+.channel-block .fr {
+  min-width: 40px;
+}
+
+.heat-footnote {
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.85rem;
+  color: var(--heat-muted);
+}
+
+.heat-footnote:empty {
+  display: none;
+}
+
+.heat-empty {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--heat-border);
+  border-radius: 8px;
+  padding: 1.6rem 1rem;
+  text-align: center;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: var(--heat-muted);
+}
+
+@media (max-width: 768px) {
+  .page-streamheat {
+    padding: 2vh 1rem;
+  }
+
+  .heat-meta {
+    gap: 0.35rem;
+  }
+
+  .heat-grid {
+    grid-template-columns: 1fr;
+  }
+}

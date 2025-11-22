@@ -40,6 +40,7 @@ repos:
         language: system
         types: [yaml]
         entry: uv run check-yaml
+        exclude: ^mkdocs\.yml$
       - id: detect-private-key
         name: 🕵️  Detect Private Keys
         language: system
