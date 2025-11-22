@@ -2,8 +2,8 @@
 {% set theme_name = theme_name | default('dds') %}
 {% block title %}{{ __('Stream') }}: {{ __('Upcoming Heat') }}{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_heat.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/heat_base.css') }}">
 {% block heat_theme_css %}{% endblock %}
 <script>
 	window.heatOverlayConfig = {{ {
