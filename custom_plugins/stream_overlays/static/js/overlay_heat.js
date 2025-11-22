@@ -210,6 +210,9 @@ function renderHeat() {
   for (var i = 0; i < slots.length; i++) {
     var slot = slots[i];
     var $card = $("<article>").addClass("slot-card");
+    if (slot.placeholder) {
+      $card.addClass("placeholder");
+    }
 
     $("<span>")
       .addClass("seat-chip")

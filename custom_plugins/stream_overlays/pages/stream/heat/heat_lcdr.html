@@ -1,0 +1,37 @@
+{% extends 'stream/heat/heat_base.html' %}
+{% set theme_name = 'lcdr' %}
+{% block heat_theme_css %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_heat_lcdr.css') }}">
+{% endblock %}
+{% block content %}
+<main class="page-streamheat theme-{{ theme_name }}">
+	<div class="lcdr-shell">
+		<header class="lcdr-header">
+			<div class="lcdr-header__top">
+				<p class="lead" id="heat_lead">{{ __('Up Next') }}</p>
+				<span class="event-chip">{{ getOption('eventName') }}</span>
+			</div>
+			<div class="lcdr-header__main">
+				<h1 id="heat_name">{{ __('Waiting for heat...') }}</h1>
+				<div class="meta-line">
+					<span id="class_name"></span>
+					<span id="round_info"></span>
+					<span id="format_name"></span>
+				</div>
+			</div>
+		</header>
+
+		<section class="lcdr-body">
+			<div class="body-label">
+				<span class="accent-bar"></span>
+				<span>{{ __('Seat lineup') }}</span>
+			</div>
+			<div id="heat_slots" class="heat-grid lcdr-grid"></div>
+		</section>
+
+		<footer class="lcdr-foot">
+			<span id="heat_notice"></span>
+		</footer>
+	</div>
+</main>
+{% endblock %}
