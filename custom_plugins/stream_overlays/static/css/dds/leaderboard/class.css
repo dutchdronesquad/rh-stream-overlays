@@ -114,6 +114,7 @@
     margin: auto;
     font-size: 2.4rem;
     line-height: 1.7;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Styling for the info container */
@@ -145,6 +146,7 @@
     font-family: "Teko", sans-serif;
     font-size: 1.8rem;
     line-height: 2.2;
+    font-variant-numeric: tabular-nums;
 }
 
 #pilot_name {
@@ -162,11 +164,13 @@
     font-family: "Teko", sans-serif;
     font-size: 1.2rem;
     color: white;
+    font-variant-numeric: tabular-nums;
 }
 
 @media (min-height: 1080px) {
     #currentIndexIndicator {
         font-size: 1.8rem;
         padding: 7px 15px;
+        font-variant-numeric: tabular-nums;
     }
 }

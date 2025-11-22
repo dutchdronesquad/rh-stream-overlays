@@ -97,6 +97,7 @@
     margin: auto;
     font-size: 2.4rem;
     line-height: 1.7;
+    font-variant-numeric: tabular-nums;
 }
 
 #pilot_name {

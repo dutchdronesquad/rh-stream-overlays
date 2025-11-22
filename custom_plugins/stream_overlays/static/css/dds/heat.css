@@ -269,6 +269,7 @@
   color: var(--dds-text);
   border: 1px solid rgba(255, 122, 24, 0.4);
   width: fit-content;
+  font-variant-numeric: tabular-nums;
 }
 
 .theme-dds .card-body {
@@ -323,6 +324,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .theme-dds .channel-block .ch::before,
