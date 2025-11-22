@@ -290,9 +290,8 @@ function updateHeader(heat, isPractice) {
   }
   $("#format_name").text(formatLabel || "");
 
-  notice = heat.locked
-    ? getLabel("heatLocked", "Heat Locked")
-    : getLabel("seedingInProgress", "");
+  // No auto-assign or lock notice in the UI for a cleaner presentation
+  notice = "";
   $("#heat_notice").text(notice);
   return notice;
 }
