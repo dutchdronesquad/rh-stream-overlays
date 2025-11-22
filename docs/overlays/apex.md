@@ -46,6 +46,9 @@ RH-IP:5000/stream/overlay/apex/heat/upcoming
 
 ![Apex heat overlay preview](../assets/img/overlays/apex/apex-heat-upcoming.gif)
 
+!!! note "Background transparency"
+    The background visible in the preview GIF is not part of the overlay. You can configure your own background color or image in OBS to match your stream design.
+
 ## Node
 
 The node overlay combines the floating position badge, pilot info card, and animated lap list. The accent bar at the base pulses with the pilot color to keep OBS scenes lively even during longer heats. Replace `[NUMBER]` with the node id you want to show.

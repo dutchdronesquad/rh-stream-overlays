@@ -26,6 +26,26 @@ RH-IP:5000/stream/overlay/dds/topbar
 
 ![DDS topbar overlay preview](../assets/img/overlays/dds/dds-topbar.gif)
 
+## Upcoming heat
+
+Shows the current active heat with pilot lineup and channel assignments. Perfect for pre-heat announcements or during breaks between races.
+
+- Displays heat name and event information
+- Seat cards show pilot callsign and frequency/channel
+- Automatically scales to fit 720p/1080p canvases
+- Grid layout adapts based on seat count
+
+URL to use:
+
+```bash
+RH-IP:5000/stream/overlay/dds/heat/upcoming
+```
+
+![DDS upcoming heat overlay preview](../assets/img/overlays/dds/dds-heat-upcoming.gif)
+
+!!! note "Background transparency"
+    The background visible in the preview GIF is not part of the overlay. You can configure your own background color or image in OBS to match your stream design.
+
 ## Node
 
 The node overlay shows the pilot name, lap time, total time and lap number. The color of the node changes based on what is set in RotorHazard for each pilot. Replace `[NUMBER]` with the node id you want to show. Use it in a solo scene or stack multiple nodes in a grid for “all pilots” views.
