@@ -150,6 +150,7 @@ html.apex-theme-page .socket-warning::after {
   display: flex;
   align-items: flex-start;
   gap: 3px;
+  font-variant-numeric: tabular-nums;
 }
 
 @keyframes slideInLeft {
@@ -255,6 +256,7 @@ html.apex-theme-page .socket-warning::after {
   color: var(--pilot_color, var(--apex-accent));
   min-width: 24px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Time display - prominent */
@@ -274,6 +276,7 @@ html.apex-theme-page .socket-warning::after {
   text-align: center;
   letter-spacing: 2px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Recent laps section */
@@ -334,6 +337,7 @@ html.apex-theme-page .socket-warning::after {
   flex-shrink: 0;
   transition: all 0.2s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  font-variant-numeric: tabular-nums;
 }
 
 .apex-theme .lap-time-box {
@@ -350,6 +354,7 @@ html.apex-theme-page .socket-warning::after {
   border: 1px solid rgba(255, 255, 255, 0.1);
   height: 52px;
   letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
 }
 
 .apex-theme .laps-list li:hover .lap-num-box {
@@ -496,6 +501,7 @@ html.apex-theme-page .socket-warning::after {
   font-weight: 900;
   margin-left: 8px;
   text-shadow: 0 0 20px var(--pilot_color, var(--apex-accent-glow));
+  font-variant-numeric: tabular-nums;
 }
 
 .apex-theme .popup-time {
@@ -511,6 +517,7 @@ html.apex-theme-page .socket-warning::after {
   position: relative;
   z-index: 1;
   animation: pulseGlow 2s ease-in-out infinite;
+  font-variant-numeric: tabular-nums;
 }
 
 @keyframes pulseGlow {

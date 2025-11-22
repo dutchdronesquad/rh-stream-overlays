@@ -1,9 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
 
+:root {
+    --dds-numeric-features: "tnum" 1, "lnum" 1;
+}
+
 /* General styling */
 .container {
     margin: 120px 120px 0 120px;
     width: 100%;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 /* Center the container in the screen */
@@ -105,6 +111,9 @@
     background-color: darkorange;
     z-index: 2;
     border-radius: 15px 0 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Font styling for the entry */
@@ -113,7 +122,13 @@
     font-family: "Teko", sans-serif;
     margin: auto;
     font-size: 2.4rem;
-    line-height: 1.7;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 /* Styling for the info container */
@@ -144,7 +159,11 @@
     margin: 0;
     font-family: "Teko", sans-serif;
     font-size: 1.8rem;
-    line-height: 2.2;
+    line-height: 1.2;
+    display: flex;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 #pilot_name {
@@ -162,11 +181,15 @@
     font-family: "Teko", sans-serif;
     font-size: 1.2rem;
     color: white;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 @media (min-height: 1080px) {
     #currentIndexIndicator {
         font-size: 1.8rem;
         padding: 7px 15px;
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: var(--dds-numeric-features);
     }
 }

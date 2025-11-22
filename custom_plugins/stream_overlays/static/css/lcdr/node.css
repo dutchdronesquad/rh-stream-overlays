@@ -114,6 +114,7 @@ html.lcdr-theme-page .socket-warning::after {
 
 #pilot_position {
   font-size: 6.5rem;
+  font-variant-numeric: tabular-nums;
 }
 
 #pos_ordinal {
@@ -189,6 +190,7 @@ html.lcdr-theme-page .socket-warning::after {
 #laps_label {
   font-family: "Teko", sans-serif;
   font-size: 2rem;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Styling for the right - bottom bar */
@@ -250,6 +252,7 @@ html.lcdr-theme-page .socket-warning::after {
   margin: auto;
   font-size: 2.4rem;
   line-height: 2.3;
+  font-variant-numeric: tabular-nums;
 }
 
 #last_laptime {
