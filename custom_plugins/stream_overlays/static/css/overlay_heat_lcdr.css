@@ -48,6 +48,7 @@
 
 .page-streamheat.theme-lcdr::after {
   content: "";
+  position: fixed;
   inset: -26%;
   background: linear-gradient(120deg, rgba(56, 208, 255, 0.05), transparent 45%),
     linear-gradient(300deg, rgba(255, 93, 177, 0.06), transparent 40%);
