@@ -13,7 +13,7 @@ from .utils import (
 
 overlays: dict = {
     "DDS": {"node": True, "topbar": True, "leaderboard": True, "heat": True},
-    "LCDR": {"node": True, "topbar": True, "leaderboard": False, "heat": False},
+    "LCDR": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
     "APEX": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
 }
 
