@@ -1,7 +1,7 @@
 {% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/overlay.css') }}">
-<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/overlay_node_apex.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/apex/node.css') }}">
 <script>
     streamnode = '{{ node_id }}'
     document.documentElement.classList.add('apex-theme-page');
