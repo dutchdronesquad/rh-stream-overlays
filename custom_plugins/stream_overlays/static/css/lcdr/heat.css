@@ -289,6 +289,7 @@
   color: var(--lcdr-text);
   border-right: 1px solid rgba(56, 208, 255, 0.32);
   border-radius: 10px 0 0 10px;
+  font-variant-numeric: tabular-nums;
 }
 
 .theme-lcdr .card-body {
@@ -350,6 +351,7 @@
   display: flex;
   align-items: baseline;
   gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .theme-lcdr .channel-block .ch::before,

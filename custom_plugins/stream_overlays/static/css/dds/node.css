@@ -114,6 +114,7 @@ html.dds-theme-page .socket-warning::after {
 
 #pilot_position {
   font-size: 6.5rem;
+  font-variant-numeric: tabular-nums;
 }
 
 #pos_ordinal {
@@ -164,6 +165,7 @@ html.dds-theme-page .socket-warning::after {
   font-family: "Teko", sans-serif;
   font-size: 2.1rem;
   line-height: 1.7;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Triangle styling */
@@ -287,6 +289,7 @@ html.dds-theme-page .socket-warning::after {
   margin: auto;
   font-size: 2.4rem;
   line-height: 2.3;
+  font-variant-numeric: tabular-nums;
 }
 
 #last_laptime {

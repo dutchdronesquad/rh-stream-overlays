@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Oxanium:wght@600;700&display=swap");
 
 /* CSS Variables for Apex topbar theme */
 :root {
@@ -92,12 +92,21 @@ body {
 }
 
 .time-display {
-  font-family: "Orbitron", sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Oxanium", "Orbitron", sans-serif;
   font-size: 3.2rem;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--apex-text-primary);
-  letter-spacing: 2px;
+  letter-spacing: 0.015em;
   line-height: 1;
+  min-width: 8ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-kerning: none;
+  font-variant-ligatures: none;
 }
 
 /* Heat info section - center */
@@ -201,6 +210,7 @@ body {
 
   .time-display {
     font-size: 2.8rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .heat-section {
@@ -225,6 +235,7 @@ body {
 
   .time-display {
     font-size: 2.4rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .heat-section {

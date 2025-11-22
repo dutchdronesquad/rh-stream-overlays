@@ -193,6 +193,7 @@
   background: rgba(0, 217, 255, 0.15);
   border-radius: 4px;
   border: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Pilot info */
@@ -251,6 +252,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: baseline;
+  font-variant-numeric: tabular-nums;
 }
 
 .theme-apex .channel-block .ch::before,

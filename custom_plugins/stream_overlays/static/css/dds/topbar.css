@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@300;400;500;600;700&family=Rajdhani:wght@600;700&family=Oxanium:wght@600;700&display=swap");
 
 :root {
   --topbar-height: 100px;
@@ -53,16 +53,33 @@ body {
 .timing-clock {
   background-color: white;
   color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Oxanium", "Teko", sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-kerning: none;
+  font-variant-ligatures: none;
 }
 
 .time-display {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  font-size: 3.2rem;
+  font-size: 3.3rem;
   margin: 0;
-  margin-top: 5px;
+  margin-top: 4px;
+  width: 8ch;
 
-  font-family: "Teko", sans-serif;
-  font-weight: bold;
+  font-family: "Oxanium", "Teko", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-kerning: none;
+  font-variant-ligatures: none;
 }
 
 .race-running .timing-clock {
