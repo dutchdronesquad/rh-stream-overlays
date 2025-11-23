@@ -75,9 +75,7 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/class
 ```
 
-
-[![Watch the video](../assets/img/overlays/dds/ranking_class-dds.png)](https://youtu.be/xqIuBfLjtJE)
-_Click on the image to watch a video of the overlay in action_
+![DDS class leaderboard overlay preview](../assets/img/overlays/dds/dds-leaderboard-class.gif)
 
 ### Overall ranking
 
@@ -92,5 +90,4 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/overall
 ```
 
-[![Watch the video](../assets/img/overlays/dds/ranking_overall-dds.png)](https://youtu.be/kTtoHACqsg0)
-_Click on the image to watch a video of the overlay in action_
+![DDS overall leaderboard overlay preview](../assets/img/overlays/dds/dds-leaderboard-overall.gif)
