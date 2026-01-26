@@ -9,7 +9,7 @@ dependencies = []
 [dependency-groups]
 dev = [
   "pre-commit-hooks==6.0.0",
-  "prek==0.2.30",
+  "prek==0.3.0",
   "ruff==0.14.14",
 ]
 docs = [
