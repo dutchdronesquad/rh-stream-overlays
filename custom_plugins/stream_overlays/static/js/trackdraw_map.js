@@ -473,7 +473,6 @@
   }
 
   function registerSocketHandlers() {
-    if (typeof socket === "undefined") return;
     socket.on("current_heat", handleHeat);
     socket.on("race_status", handleRaceStatus);
     socket.on("current_laps", handleCurrentLaps);
@@ -482,10 +481,6 @@
   function loadTrack() {
     var url = getTrackJsonUrl();
     showMessage("Loading TrackDraw map...", "Loading");
-
-    // Register socket handlers immediately so we don't miss events that
-    // arrive while the track.json fetch is in flight.
-    registerSocketHandlers();
 
     fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" })
       .then(function (r) {
@@ -518,5 +513,8 @@
       });
   }
 
-  document.addEventListener("DOMContentLoaded", loadTrack);
+  $(document).ready(function () {
+    loadTrack();
+    registerSocketHandlers();
+  });
 })(window, document);
