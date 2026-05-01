@@ -8,7 +8,6 @@ from RHUI import UIField, UIFieldType
 from .trackdraw import (
     API_KEY_OPTION,
     PROJECT_ID_OPTION,
-    SPLIT_MAP_OPTION,
     TrackDrawOverlayStore,
 )
 from .utils import (
@@ -88,19 +87,6 @@ class StreamOverlays:
                 "TrackDraw API key",
                 UIFieldType.PASSWORD,
                 desc="Stored only in RotorHazard and never sent to OBS overlays.",
-            ),
-            panel=panel_id,
-        )
-        self._rhapi.fields.register_option(
-            UIField(
-                SPLIT_MAP_OPTION,
-                "Split map",
-                UIFieldType.TEXT,
-                desc=(
-                    "Optional JSON map from RotorHazard zero-based split_id "
-                    'to TrackDraw timing_id, for example {"0":"split-a"}.'
-                ),
-                placeholder='{"0":"split-a"}',
             ),
             panel=panel_id,
         )

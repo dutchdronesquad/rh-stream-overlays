@@ -12,7 +12,6 @@ TRACKDRAW_CACHE_TTL_SECONDS = 24 * 60 * 60
 
 PROJECT_ID_OPTION = "stream_overlays_trackdraw_project_id"
 API_KEY_OPTION = "stream_overlays_trackdraw_api_key"
-SPLIT_MAP_OPTION = "stream_overlays_trackdraw_split_map"
 CACHE_OPTION = "stream_overlays_trackdraw_cache_v1"
 
 logger = logging.getLogger(__name__)
@@ -91,6 +90,37 @@ def validate_overlay_package(payload: Any) -> dict:
     return package
 
 
+def derive_split_map(package: dict | None) -> dict[str, str]:
+    """Derive RotorHazard split_id to TrackDraw timing_id mapping."""
+    if not isinstance(package, dict):
+        return {}
+
+    readiness = package.get("readiness")
+    if not isinstance(readiness, dict):
+        return {}
+
+    timing_points = readiness.get("timing_points")
+    if not isinstance(timing_points, list):
+        return {}
+
+    split_map: dict[str, str] = {}
+
+    for point in timing_points:
+        if (
+            not isinstance(point, dict)
+            or point.get("role") != "split"
+            or not isinstance(point.get("timing_id"), str)
+            or not point["timing_id"].strip()
+        ):
+            continue
+
+        split_index = point.get("split_index")
+        if isinstance(split_index, int) and not isinstance(split_index, bool):
+            split_map[str(split_index)] = point["timing_id"].strip()
+
+    return split_map
+
+
 class TrackDrawOverlayStore:
     """Fetch and cache a TrackDraw overlay package through RotorHazard options."""
 
@@ -106,10 +136,6 @@ class TrackDrawOverlayStore:
     def get_api_key(self) -> str:
         """Return the configured TrackDraw API key."""
         return normalize_option(self._rhapi.db.option(API_KEY_OPTION, ""))
-
-    def get_split_map(self) -> str:
-        """Return the configured RotorHazard split map."""
-        return normalize_option(self._rhapi.db.option(SPLIT_MAP_OPTION, ""))
 
     def load_cache(self) -> dict | None:
         """Load the last-good-ready TrackDraw cache from RotorHazard options."""
@@ -223,7 +249,7 @@ class TrackDrawOverlayStore:
             "state": "fresh",
             "track": package,
             "cache": self.get_cache_state(cache),
-            "split_map": self.get_split_map(),
+            "split_map": derive_split_map(package),
         }
 
     def get_payload(self, *, force_refresh: bool = False) -> dict:
@@ -245,7 +271,7 @@ class TrackDrawOverlayStore:
                             "state": exc.state,
                             "message": exc.message,
                         },
-                        "split_map": self.get_split_map(),
+                        "split_map": derive_split_map(cache["package"]),
                     }
 
                 return {
@@ -254,7 +280,7 @@ class TrackDrawOverlayStore:
                     "track": exc.package,
                     "cache": None,
                     "error": exc.message,
-                    "split_map": self.get_split_map(),
+                    "split_map": derive_split_map(exc.package),
                 }
 
         cache_state = self.get_cache_state(cache)
@@ -263,5 +289,5 @@ class TrackDrawOverlayStore:
             "state": cache_state["status"],
             "track": cache["package"],
             "cache": cache_state,
-            "split_map": self.get_split_map(),
+            "split_map": derive_split_map(cache["package"]),
         }
