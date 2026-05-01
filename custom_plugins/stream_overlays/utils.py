@@ -104,8 +104,8 @@ def create_heat_markdown(overlay_name: str, base_path: str) -> str:
     return heat_markdown
 
 
-def create_trackdraw_minimap_markdown(overlay_name: str, base_path: str) -> str:
-    """Create markdown link for the TrackDraw minimap overlay.
+def create_trackdraw_map_markdown(overlay_name: str, base_path: str) -> str:
+    """Create markdown link for the TrackDraw map overlay.
 
     Args:
     ----
@@ -114,12 +114,12 @@ def create_trackdraw_minimap_markdown(overlay_name: str, base_path: str) -> str:
 
     Returns:
     -------
-        str: Markdown block containing the minimap overlay link.
+        str: Markdown block containing the map overlay link.
 
     """
-    minimap_markdown: str = "## TrackDraw / Minimap\n"
-    minimap_markdown += (
-        f"- <a href='{base_path}/trackdraw/minimap' target='_blank'>"
+    map_markdown: str = "## TrackDraw / Map\n"
+    map_markdown += (
+        f"- <a href='{base_path}/trackdraw/map' target='_blank'>"
         f"{overlay_name} Overlay - TrackDraw Minimap</a>\n"
     )
-    return minimap_markdown
+    return map_markdown

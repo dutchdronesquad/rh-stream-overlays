@@ -1,0 +1,15 @@
+.trackdraw-map[data-theme="apex"] {
+  --trackdraw-accent: #ff4f9a;
+  --trackdraw-accent-bar-h: 3px;
+  --trackdraw-field-bg: transparent;
+  --trackdraw-field-stroke: rgb(255 79 154 / 18%);
+  --trackdraw-label-stroke: rgb(6 4 10 / 94%);
+  --trackdraw-muted: rgb(255 220 238 / 60%);
+  --trackdraw-obstacle: #ff4f9a;
+  --trackdraw-obstacle-bg: rgb(8 4 12 / 90%);
+  --trackdraw-panel-bg: rgb(8 4 14 / 84%);
+  --trackdraw-panel-border: rgb(255 79 154 / 36%);
+  --trackdraw-route: #ffffff;
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #70f0ff;
+}

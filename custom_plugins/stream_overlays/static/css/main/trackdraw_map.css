@@ -1,0 +1,159 @@
+html {
+  background: transparent;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: transparent;
+  margin: 0;
+}
+
+/* Full-screen transparent canvas — resize the OBS browser source to fit your layout */
+.trackdraw-map {
+  height: 100vh;
+  position: relative;
+  width: 100vw;
+}
+
+.trackdraw-map__panel {
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+/* ---- Header badge (top-left info overlay) ---- */
+
+.trackdraw-map__header {
+  align-items: center;
+  background: var(--trackdraw-panel-bg, rgb(5 10 18 / 82%));
+  border: 1px solid var(--trackdraw-panel-border, rgb(255 255 255 / 12%));
+  border-left: var(--trackdraw-accent-bar-h, 3px) solid var(--trackdraw-accent, #2de2a7);
+  border-radius: 3px;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 36%);
+  display: flex;
+  font-family: "Barlow", sans-serif;
+  font-variant-numeric: tabular-nums;
+  gap: 8px;
+  left: 10px;
+  padding: 5px 9px 4px;
+  position: absolute;
+  top: 10px;
+  z-index: 10;
+}
+
+.trackdraw-map__label {
+  color: var(--trackdraw-accent, #2de2a7);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.trackdraw-map__status {
+  color: var(--trackdraw-muted, rgb(255 255 255 / 52%));
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+/* ---- SVG fills the full panel ---- */
+
+.trackdraw-map__svg {
+  display: block;
+  height: 100%;
+  overflow: visible;
+  width: 100%;
+}
+
+/* ---- Track elements ---- */
+
+.trackdraw-map__field {
+  fill: var(--trackdraw-field-bg, transparent);
+  stroke: var(--trackdraw-field-stroke, rgb(255 255 255 / 6%));
+  stroke-width: 0.25;
+}
+
+.trackdraw-map__route {
+  fill: none;
+  stroke: var(--trackdraw-route, #e8ecf0);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 0.7;
+}
+
+.trackdraw-map__obstacle {
+  fill: var(--trackdraw-obstacle-bg, rgb(5 10 18 / 88%));
+  stroke: var(--trackdraw-obstacle, #2de2a7);
+  stroke-width: 0.3;
+}
+
+.trackdraw-map__obstacle-label,
+.trackdraw-map__timing-label {
+  fill: var(--trackdraw-text, #fff);
+  font-size: 2.6px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--trackdraw-label-stroke, rgb(5 10 18 / 92%));
+  stroke-linejoin: round;
+  stroke-width: 0.9px;
+  text-anchor: middle;
+}
+
+.trackdraw-map__timing {
+  fill: var(--trackdraw-timing, #ffe566);
+  stroke: var(--trackdraw-label-stroke, rgb(5 10 18 / 92%));
+  stroke-width: 0.3;
+}
+
+/* ---- Pilot dots ---- */
+
+.trackdraw-map__pilot {
+  stroke: rgb(255 255 255 / 75%);
+  stroke-width: 0.3;
+}
+
+.trackdraw-map__pilot-label {
+  fill: #fff;
+  font-family: "Barlow", sans-serif;
+  font-size: 2.0px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  paint-order: stroke;
+  stroke: var(--trackdraw-label-stroke, rgb(5 10 18 / 90%));
+  stroke-linejoin: round;
+  stroke-width: 0.65px;
+  text-anchor: middle;
+  text-transform: uppercase;
+}
+
+/* ---- Setup / error message overlay ---- */
+
+.trackdraw-map__message {
+  align-items: center;
+  background: var(--trackdraw-panel-bg, rgb(5 10 18 / 88%));
+  box-sizing: border-box;
+  color: var(--trackdraw-text, #fff);
+  display: none;
+  font-family: "Barlow", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  inset: 0;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+  padding: 32px;
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: pre-line;
+  z-index: 20;
+}
+
+.trackdraw-map__message.is-visible {
+  display: flex;
+}

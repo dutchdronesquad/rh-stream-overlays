@@ -1,0 +1,15 @@
+.trackdraw-map[data-theme="dds"] {
+  --trackdraw-accent: #20e3b2;
+  --trackdraw-accent-bar-h: 3px;
+  --trackdraw-field-bg: transparent;
+  --trackdraw-field-stroke: rgb(32 227 178 / 18%);
+  --trackdraw-label-stroke: rgb(2 8 14 / 94%);
+  --trackdraw-muted: rgb(200 255 242 / 60%);
+  --trackdraw-obstacle: #20e3b2;
+  --trackdraw-obstacle-bg: rgb(2 8 14 / 90%);
+  --trackdraw-panel-bg: rgb(2 8 14 / 84%);
+  --trackdraw-panel-border: rgb(32 227 178 / 36%);
+  --trackdraw-route: #f7fffb;
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #ffe66d;
+}

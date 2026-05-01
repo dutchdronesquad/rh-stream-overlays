@@ -18,7 +18,7 @@ from .const import (
 
 logger = logging.getLogger(__name__)
 
-READINESS_ISSUE_LABELS = {
+_ISSUE_LABELS: dict[str, str] = {
     "duplicate-start-finish": "More than one start/finish timing marker is set.",
     "duplicate-timing-id": "Multiple timing markers use the same timing ID.",
     "missing-route": "No race route is available.",
@@ -30,7 +30,7 @@ READINESS_ISSUE_LABELS = {
 
 
 class TrackDrawClientError(Exception):
-    """Raised when the TrackDraw overlay package cannot be refreshed."""
+    """Raised when the TrackDraw overlay package cannot be fetched or validated."""
 
     def __init__(self, state: str, message: str, package: dict | None = None) -> None:
         """Initialize a TrackDraw client error."""
@@ -40,96 +40,74 @@ class TrackDrawClientError(Exception):
         self.package = package
 
 
-def utc_now() -> datetime:
+# ---- Private module helpers ----
+
+
+def _utc_now() -> datetime:
     """Return a timezone-aware UTC timestamp."""
     return datetime.now(UTC)
 
 
-def to_iso(value: datetime) -> str:
-    """Serialize UTC datetimes in API-friendly ISO format."""
+def _to_iso(value: datetime) -> str:
+    """Serialize a UTC datetime as an API-friendly ISO string."""
     return value.isoformat().replace("+00:00", "Z")
 
 
-def parse_iso(value: str) -> datetime | None:
-    """Parse an ISO timestamp from the plugin cache."""
+def _parse_iso(value: str) -> datetime | None:
+    """Parse an ISO timestamp; return None on any parse failure."""
     try:
         return datetime.fromisoformat(value)
     except (TypeError, ValueError):
         return None
 
 
-def normalize_option(value: Any) -> str:
-    """Normalize RotorHazard option values into stripped strings."""
+def _normalize(value: Any) -> str:
+    """Normalize RotorHazard option values to stripped strings."""
     if value is None or value is False:
         return ""
     return str(value).strip()
 
 
-def format_number(value: Any, suffix: str = "") -> str:
-    """Format a numeric diagnostic value."""
-    if not isinstance(value, int | float) or isinstance(value, bool):
-        return ""
-    return f"{value:.1f}{suffix}"
-
-
-def get_shape_titles(package: dict) -> dict[str, str]:
-    """Return a lookup of TrackDraw shape IDs to operator-facing titles."""
-    shape_titles = {}
-    timing_markers = package.get("timing_markers")
-    if not isinstance(timing_markers, list):
-        return shape_titles
-
-    for marker in timing_markers:
-        if not isinstance(marker, dict):
-            continue
-
-        shape_id = marker.get("shape_id")
-        title = marker.get("title")
-        if isinstance(shape_id, str) and isinstance(title, str) and title:
-            shape_titles[shape_id] = title
-
-    return shape_titles
-
-
-def get_shape_label(shape_id: str, shape_titles: dict[str, str]) -> str:
-    """Return a readable label for a TrackDraw shape reference."""
-    title = shape_titles.get(shape_id)
-    if title:
-        return f"{title} ({shape_id})"
-    return shape_id
-
-
-def get_issue_detail(issue: dict, shape_titles: dict[str, str]) -> str:
+def _issue_detail(issue: dict, shape_titles: dict[str, str]) -> str:
     """Return compact issue metadata without exposing full package internals."""
-    detail_parts = []
+    parts: list[str] = []
+
+    def _shape_label(sid: str) -> str:
+        """Return a readable label for a TrackDraw shape reference."""
+        title = shape_titles.get(sid)
+        return f"{title} ({sid})" if title else sid
 
     shape_id = issue.get("shape_id")
     if isinstance(shape_id, str) and shape_id:
-        detail_parts.append(f"shape {get_shape_label(shape_id, shape_titles)}")
+        parts.append(f"shape {_shape_label(shape_id)}")
 
     shape_ids = issue.get("shape_ids")
     if isinstance(shape_ids, list) and shape_ids:
-        ids = [shape_id for shape_id in shape_ids if isinstance(shape_id, str)]
-        if ids:
-            labels = [get_shape_label(shape_id, shape_titles) for shape_id in ids[:3]]
-            detail_parts.append(f"shapes {', '.join(labels)}")
+        labels = [_shape_label(s) for s in shape_ids if isinstance(s, str)][:3]
+        if labels:
+            parts.append(f"shapes {', '.join(labels)}")
 
     route_id = issue.get("route_id")
     if isinstance(route_id, str) and route_id:
-        detail_parts.append(f"route {route_id}")
+        parts.append(f"route {route_id}")
 
     timing_id = issue.get("timing_id")
     if isinstance(timing_id, str) and timing_id:
-        detail_parts.append(f"timing ID {timing_id}")
+        parts.append(f"timing ID {timing_id}")
 
-    distance = format_number(issue.get("distance_m"), "m")
-    tolerance = format_number(issue.get("tolerance_m"), "m")
-    if distance and tolerance:
-        detail_parts.append(f"{distance} from route, tolerance {tolerance}")
-    elif distance:
-        detail_parts.append(f"{distance} from route")
+    dist = issue.get("distance_m")
+    tol = issue.get("tolerance_m")
+    if isinstance(dist, (int, float)) and not isinstance(dist, bool):
+        d_str = f"{dist:.1f}m"
+        if isinstance(tol, (int, float)) and not isinstance(tol, bool):
+            parts.append(f"{d_str} from route, tolerance {tol:.1f}m")
+        else:
+            parts.append(f"{d_str} from route")
 
-    return "; ".join(detail_parts)
+    return "; ".join(parts)
+
+
+# ---- Public module-level functions ----
 
 
 def get_readiness_diagnostics(package: dict | None) -> dict:
@@ -151,25 +129,28 @@ def get_readiness_diagnostics(package: dict | None) -> dict:
             "issues": [],
         }
 
-    raw_issues = readiness.get("issues")
-    shape_titles = get_shape_titles(package)
-    issues = []
-    if isinstance(raw_issues, list):
-        for issue in raw_issues:
-            if not isinstance(issue, dict) or not isinstance(issue.get("type"), str):
-                continue
+    shape_titles = {
+        m["shape_id"]: m["title"]
+        for m in (package.get("timing_markers") or [])
+        if isinstance(m, dict)
+        and isinstance(m.get("shape_id"), str)
+        and isinstance(m.get("title"), str)
+        and m["title"]
+    }
 
-            issue_type = issue["type"]
-            issues.append(
-                {
-                    "type": issue_type,
-                    "severity": issue.get("severity", "error"),
-                    "message": READINESS_ISSUE_LABELS.get(
-                        issue_type, issue_type.replace("-", " ")
-                    ),
-                    "detail": get_issue_detail(issue, shape_titles),
-                }
-            )
+    issues = []
+    for issue in readiness.get("issues") or []:
+        if not isinstance(issue, dict) or not isinstance(issue.get("type"), str):
+            continue
+        t = issue["type"]
+        issues.append(
+            {
+                "type": t,
+                "severity": issue.get("severity", "error"),
+                "message": _ISSUE_LABELS.get(t, t.replace("-", " ")),
+                "detail": _issue_detail(issue, shape_titles),
+            }
+        )
 
     status = readiness.get("status")
     if not isinstance(status, str):
@@ -179,7 +160,7 @@ def get_readiness_diagnostics(package: dict | None) -> dict:
         summary = "TrackDraw overlay package is ready."
     elif issues:
         issue_names = ", ".join(issue["type"] for issue in issues)
-        summary = f"TrackDraw overlay package is blocked: {issue_names}."
+        summary = f"Overlay package is blocked: {issue_names}."
     else:
         summary = "TrackDraw overlay package is blocked."
 
@@ -191,27 +172,6 @@ def get_readiness_diagnostics(package: dict | None) -> dict:
         "race_route_id": readiness.get("race_route_id"),
         "route_length_m": readiness.get("route_length_m"),
     }
-
-
-def summarize_readiness_issues(package: dict | None) -> str:
-    """Return a compact readiness issue summary for operator-facing messages."""
-    diagnostics = get_readiness_diagnostics(package)
-    issues = diagnostics.get("issues")
-    if not isinstance(issues, list) or not issues:
-        return ""
-
-    unique_issue_types = sorted(
-        {issue["type"] for issue in issues if isinstance(issue.get("type"), str)}
-    )
-    return ", ".join(unique_issue_types)
-
-
-def get_blocked_message(package: dict | None) -> str:
-    """Return a useful message for blocked TrackDraw overlay packages."""
-    issue_summary = summarize_readiness_issues(package)
-    if issue_summary:
-        return f"TrackDraw overlay package is not ready: {issue_summary}."
-    return "TrackDraw overlay package is not ready."
 
 
 def validate_overlay_package(payload: Any) -> dict:
@@ -239,8 +199,17 @@ def validate_overlay_package(payload: Any) -> dict:
         raise TrackDrawClientError(state, message)
 
     if readiness.get("status") != "ready":
+        issue_types = ", ".join(
+            i["type"]
+            for i in (readiness.get("issues") or [])
+            if isinstance(i, dict) and isinstance(i.get("type"), str)
+        )
         state = "blocked"
-        message = get_blocked_message(package)
+        message = (
+            f"Overlay package is not ready: {issue_types}."
+            if issue_types
+            else "Overlay package is not ready."
+        )
         raise TrackDrawClientError(state, message, package)
 
     if not isinstance(package.get("route"), dict):
@@ -255,31 +224,22 @@ def derive_split_map(package: dict | None) -> dict[str, str]:
     """Derive RotorHazard split_id to TrackDraw timing_id mapping."""
     if not isinstance(package, dict):
         return {}
-
     readiness = package.get("readiness")
     if not isinstance(readiness, dict):
         return {}
+    return {
+        str(p["split_index"]): p["timing_id"].strip()
+        for p in (readiness.get("timing_points") or [])
+        if isinstance(p, dict)
+        and p.get("role") == "split"
+        and isinstance(p.get("split_index"), int)
+        and not isinstance(p.get("split_index"), bool)
+        and isinstance(p.get("timing_id"), str)
+        and p.get("timing_id", "").strip()
+    }
 
-    timing_points = readiness.get("timing_points")
-    if not isinstance(timing_points, list):
-        return {}
 
-    split_map: dict[str, str] = {}
-
-    for point in timing_points:
-        if (
-            not isinstance(point, dict)
-            or point.get("role") != "split"
-            or not isinstance(point.get("timing_id"), str)
-            or not point["timing_id"].strip()
-        ):
-            continue
-
-        split_index = point.get("split_index")
-        if isinstance(split_index, int) and not isinstance(split_index, bool):
-            split_map[str(split_index)] = point["timing_id"].strip()
-
-    return split_map
+# ---- Store ----
 
 
 class TrackDrawOverlayStore:
@@ -292,13 +252,13 @@ class TrackDrawOverlayStore:
 
     def get_project_id(self) -> str:
         """Return the configured TrackDraw project id."""
-        return normalize_option(
+        return _normalize(
             self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, PROJECT_ID_KEY)
         )
 
     def get_api_key(self) -> str:
         """Return the configured TrackDraw API key."""
-        return normalize_option(
+        return _normalize(
             self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, API_KEY_KEY)
         )
 
@@ -306,7 +266,7 @@ class TrackDrawOverlayStore:
         """Return whether the required TrackDraw credentials are configured."""
         return bool(self.get_project_id() and self.get_api_key())
 
-    def get_config_state(self) -> dict:
+    def _config_state(self) -> dict:
         """Return non-secret configuration state for diagnostics."""
         return {
             "has_project_id": bool(self.get_project_id()),
@@ -315,26 +275,23 @@ class TrackDrawOverlayStore:
 
     def load_cache(self) -> dict | None:
         """Load the last-good-ready TrackDraw cache from RotorHazard options."""
-        raw_cache = normalize_option(self._rhapi.db.option(CACHE_OPTION, ""))
-        if not raw_cache:
+        raw = _normalize(self._rhapi.db.option(CACHE_OPTION, ""))
+        if not raw:
             return None
-
         try:
-            cache = json.loads(raw_cache)
+            cache = json.loads(raw)
         except (TypeError, ValueError):
             logger.warning("Ignoring invalid TrackDraw overlay cache")
             return None
-
-        if not isinstance(cache, dict) or not isinstance(cache.get("package"), dict):
-            return None
-
-        return cache
+        if isinstance(cache, dict) and isinstance(cache.get("package"), dict):
+            return cache
+        return None
 
     def save_cache(self, package: dict) -> dict:
         """Persist a last-good-ready overlay package for offline race-day use."""
-        now = utc_now()
+        now = _utc_now()
         cache = {
-            "cached_at": to_iso(now),
+            "cached_at": _to_iso(now),
             "package": package,
             "schema": "trackdraw.overlay.cache.v1",
             "source_updated_at": package.get("updated_at"),
@@ -342,89 +299,83 @@ class TrackDrawOverlayStore:
         self._rhapi.db.option_set(CACHE_OPTION, json.dumps(cache))
         return cache
 
-    def get_cache_state(self, cache: dict) -> dict:
+    def _cache_age_seconds(self, cache: dict) -> int | None:
+        """Return how many seconds old the cache is, or None if unparseable."""
+        cached_at = _parse_iso(cache.get("cached_at", ""))
+        if not cached_at:
+            return None
+        return max(0, int((_utc_now() - cached_at).total_seconds()))
+
+    def _cache_is_fresh(self, cache: dict) -> bool:
+        """Return whether the cache is within its freshness window."""
+        age = self._cache_age_seconds(cache)
+        return age is not None and age <= TRACKDRAW_CACHE_TTL_SECONDS
+
+    def _cache_state(self, cache: dict) -> dict:
         """Return cache age and freshness metadata."""
-        cached_at = parse_iso(cache.get("cached_at", ""))
-        now = utc_now()
-        age_seconds = None
-
-        if cached_at:
-            age_seconds = max(0, int((now - cached_at).total_seconds()))
-
-        is_fresh = (
-            age_seconds is not None and age_seconds <= TRACKDRAW_CACHE_TTL_SECONDS
-        )
-
+        age = self._cache_age_seconds(cache)
         return {
             "cached_at": cache.get("cached_at"),
-            "fresh_for_seconds": TRACKDRAW_CACHE_TTL_SECONDS,
-            "age_seconds": age_seconds,
+            "age_seconds": age,
             "source_updated_at": cache.get("source_updated_at"),
-            "status": "fresh" if is_fresh else "stale",
+            "status": "fresh"
+            if (age is not None and age <= TRACKDRAW_CACHE_TTL_SECONDS)
+            else "stale",
         }
 
     def should_auto_refresh(self, cache: dict | None) -> bool:
         """Return whether the cache should be refreshed automatically."""
-        if not self.has_config():
-            return False
-        if cache is None:
-            return True
-        return self.get_cache_state(cache)["status"] == "stale"
+        return self.has_config() and (cache is None or not self._cache_is_fresh(cache))
 
-    def get_cache_payload(
+    def _build_payload(
         self,
-        cache: dict,
-        refresh_error: TrackDrawClientError | None = None,
+        cache: dict | None,
+        error: TrackDrawClientError | None = None,
     ) -> dict:
-        """Return the public payload for a cached TrackDraw package."""
-        cache_state = self.get_cache_state(cache)
-        payload = {
-            "ok": True,
-            "state": cache_state["status"],
-            "track": cache["package"],
-            "cache": cache_state,
-            "config": self.get_config_state(),
-            "diagnostics": {
-                "readiness": get_readiness_diagnostics(cache["package"]),
-            },
-            "split_map": derive_split_map(cache["package"]),
-        }
-
-        if refresh_error:
-            payload["refresh_error"] = {
-                "state": refresh_error.state,
-                "message": refresh_error.message,
+        """Return the public overlay payload for a cached or error state."""
+        if cache is not None:
+            cache_state = self._cache_state(cache)
+            payload: dict = {
+                "ok": True,
+                "state": cache_state["status"],
+                "track": cache["package"],
+                "cache": cache_state,
+                "config": self._config_state(),
                 "diagnostics": {
-                    "readiness": get_readiness_diagnostics(refresh_error.package),
+                    "readiness": get_readiness_diagnostics(cache["package"]),
                 },
+                "split_map": derive_split_map(cache["package"]),
             }
+            if error is not None:
+                payload["refresh_error"] = {
+                    "state": error.state,
+                    "message": error.message,
+                    "diagnostics": {
+                        "readiness": get_readiness_diagnostics(error.package),
+                    },
+                }
+            return payload
 
-        return payload
-
-    def get_error_payload(self, error: TrackDrawClientError | None = None) -> dict:
-        """Return the public payload for a missing or failed TrackDraw package."""
-        if error:
-            track = error.package
+        if error is not None:
             state = error.state
             message = error.message
+            track = error.package
         elif self.has_config():
-            track = None
             state = "missing_cache"
             message = "No cached TrackDraw overlay package is available."
-        else:
             track = None
+        else:
             state = "missing_config"
             message = "Configure a TrackDraw project ID and API key."
+            track = None
 
         return {
             "ok": False,
             "state": state,
             "track": track,
             "cache": None,
-            "config": self.get_config_state(),
-            "diagnostics": {
-                "readiness": get_readiness_diagnostics(track),
-            },
+            "config": self._config_state(),
+            "diagnostics": {"readiness": get_readiness_diagnostics(track)},
             "error": message,
             "split_map": derive_split_map(track),
         }
@@ -486,7 +437,7 @@ class TrackDrawOverlayStore:
         """Fetch TrackDraw data and update the durable cache when ready."""
         package = self.fetch_package()
         cache = self.save_cache(package)
-        return self.get_cache_payload(cache)
+        return self._build_payload(cache)
 
     def get_payload(self, *, force_refresh: bool = False) -> dict:
         """Return a cached or freshly refreshed overlay payload."""
@@ -496,12 +447,6 @@ class TrackDrawOverlayStore:
             try:
                 return self.refresh()
             except TrackDrawClientError as exc:
-                if cache:
-                    return self.get_cache_payload(cache, refresh_error=exc)
+                return self._build_payload(cache, exc)
 
-                return self.get_error_payload(exc)
-
-        if cache is None:
-            return self.get_error_payload()
-
-        return self.get_cache_payload(cache)
+        return self._build_payload(cache)

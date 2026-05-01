@@ -16,7 +16,7 @@ from .utils import (
     create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
-    create_trackdraw_minimap_markdown,
+    create_trackdraw_map_markdown,
 )
 
 overlays: dict = {
@@ -25,21 +25,21 @@ overlays: dict = {
         "topbar": True,
         "leaderboard": True,
         "heat": True,
-        "trackdraw_minimap": True,
+        "trackdraw_map": True,
     },
     "LCDR": {
         "node": True,
         "topbar": True,
         "leaderboard": False,
         "heat": True,
-        "trackdraw_minimap": True,
+        "trackdraw_map": True,
     },
     "APEX": {
         "node": True,
         "topbar": True,
         "leaderboard": False,
         "heat": True,
-        "trackdraw_minimap": True,
+        "trackdraw_map": True,
     },
 }
 
@@ -241,14 +241,12 @@ class StreamOverlays:
                     panel_id, f"{overlay_name}-Heat", heat_markdown
                 )
 
-            if features.get("trackdraw_minimap"):
-                minimap_markdown = create_trackdraw_minimap_markdown(
-                    overlay_name, base_path
-                )
+            if features.get("trackdraw_map"):
+                map_markdown = create_trackdraw_map_markdown(overlay_name, base_path)
                 self._rhapi.ui.register_markdown(
                     panel_id,
-                    f"{overlay_name}-TrackDraw-Minimap",
-                    minimap_markdown,
+                    f"{overlay_name}-TrackDraw-Map",
+                    map_markdown,
                 )
 
 
@@ -333,11 +331,11 @@ def initialize(rhapi: object) -> None:
             num_nodes=len(rhapi.interface.seats),
         )
 
-    @bp.route("/stream/overlay/<string:name>/trackdraw/minimap")
-    def render_trackdraw_minimap(name: str) -> str:
-        """Render the TrackDraw minimap overlay."""
+    @bp.route("/stream/overlay/<string:name>/trackdraw/map")
+    def render_trackdraw_map(name: str) -> str:
+        """Render the TrackDraw map overlay."""
         return templating.render_template(
-            "stream/trackdraw/minimap.html",
+            "stream/trackdraw/map.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,

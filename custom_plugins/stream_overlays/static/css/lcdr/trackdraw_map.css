@@ -1,0 +1,15 @@
+.trackdraw-map[data-theme="lcdr"] {
+  --trackdraw-accent: #f5d469;
+  --trackdraw-accent-bar-h: 3px;
+  --trackdraw-field-bg: transparent;
+  --trackdraw-field-stroke: rgb(245 212 105 / 18%);
+  --trackdraw-label-stroke: rgb(4 4 4 / 94%);
+  --trackdraw-muted: rgb(255 242 200 / 60%);
+  --trackdraw-obstacle: #f5d469;
+  --trackdraw-obstacle-bg: rgb(5 5 5 / 90%);
+  --trackdraw-panel-bg: rgb(6 6 6 / 84%);
+  --trackdraw-panel-border: rgb(245 212 105 / 36%);
+  --trackdraw-route: #ffffff;
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #ff7c5c;
+}
