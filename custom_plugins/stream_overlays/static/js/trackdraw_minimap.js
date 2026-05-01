@@ -28,6 +28,32 @@
       .join(" ");
   }
 
+  function hasValidField(field) {
+    return (
+      field &&
+      typeof field.width === "number" &&
+      field.width > 0 &&
+      typeof field.height === "number" &&
+      field.height > 0
+    );
+  }
+
+  function hasPoint(point) {
+    return (
+      point &&
+      typeof point.x === "number" &&
+      typeof point.y === "number"
+    );
+  }
+
+  function getTrackJsonUrl() {
+    var path = window.location.pathname.replace(/\/+$/, "");
+    if (/\/minimap$/.test(path)) {
+      return path.replace(/\/minimap$/, "/track.json");
+    }
+    return path + "/track.json";
+  }
+
   function clearElement(element) {
     while (element.firstChild) {
       element.removeChild(element.firstChild);
@@ -45,6 +71,35 @@
       messageElement.textContent = message || "TrackDraw minimap is not ready.";
       messageElement.classList.add("is-visible");
     }
+  }
+
+  function getReadinessMessage(payload) {
+    var readiness =
+      payload &&
+      payload.diagnostics &&
+      payload.diagnostics.readiness &&
+      typeof payload.diagnostics.readiness === "object"
+        ? payload.diagnostics.readiness
+        : null;
+
+    if (!readiness || !readiness.summary) {
+      return (payload && payload.error) || "TrackDraw setup is incomplete.";
+    }
+
+    var lines = [readiness.summary];
+    (readiness.issues || []).slice(0, 4).forEach(function (issue) {
+      var line = "- " + (issue.message || issue.type || "Readiness issue");
+      if (issue.detail) {
+        line += " (" + issue.detail + ")";
+      }
+      lines.push(line);
+    });
+
+    if (readiness.issue_count > 4) {
+      lines.push("- " + (readiness.issue_count - 4) + " more issue(s)");
+    }
+
+    return lines.join("\n");
   }
 
   function hideSetupState(statusText) {
@@ -113,8 +168,13 @@
 
   function renderTrack(track, cacheState) {
     var svg = document.getElementById("trackdraw-minimap-svg");
-    if (!svg || !track || !track.route || !track.field) {
-      renderSetupState("No ready TrackDraw route found.", "Blocked");
+    if (!svg) {
+      renderSetupState("TrackDraw minimap SVG mount is missing.", "Error");
+      return;
+    }
+
+    if (!track || !track.route || !hasValidField(track.field)) {
+      renderSetupState("No ready TrackDraw route and field found.", "Blocked");
       return;
     }
 
@@ -129,7 +189,9 @@
     var viewY = -padding;
     var viewWidth = field.width + padding * 2;
     var viewHeight = field.height + padding * 2;
-    var points = track.route.sampled_points || track.route.waypoints || [];
+    var points = (track.route.sampled_points || track.route.waypoints || []).filter(
+      hasPoint
+    );
 
     clearElement(svg);
     svg.setAttribute("viewBox", [viewX, viewY, viewWidth, viewHeight].join(" "));
@@ -144,14 +206,17 @@
       })
     );
 
-    if (points.length > 1) {
-      svg.appendChild(
-        createSvgElement("path", {
-          class: "trackdraw-minimap__route",
-          d: getRoutePath(field, points),
-        })
-      );
+    if (points.length <= 1) {
+      renderSetupState("TrackDraw route has no drawable sampled points.", "Blocked");
+      return;
     }
+
+    svg.appendChild(
+      createSvgElement("path", {
+        class: "trackdraw-minimap__route",
+        d: getRoutePath(field, points),
+      })
+    );
 
     (track.route_obstacles || []).forEach(function (obstacle) {
       renderObstacle(svg, field, obstacle);
@@ -165,24 +230,47 @@
   }
 
   function loadTrack() {
-    fetch(window.location.pathname.replace(/\/minimap$/, "/track.json"), {
+    var trackJsonUrl = getTrackJsonUrl();
+    renderSetupState("Loading TrackDraw minimap...\n" + trackJsonUrl, "Loading");
+
+    fetch(trackJsonUrl, {
+      headers: { Accept: "application/json" },
       cache: "no-store",
     })
       .then(function (response) {
-        return response.json();
+        if (!response.ok) {
+          throw new Error(
+            "TrackDraw JSON returned HTTP " +
+              response.status +
+              " for " +
+              trackJsonUrl
+          );
+        }
+        return response.text();
+      })
+      .then(function (body) {
+        try {
+          return JSON.parse(body);
+        } catch (error) {
+          throw new Error(
+            "TrackDraw JSON response was not valid JSON from " + trackJsonUrl
+          );
+        }
       })
       .then(function (payload) {
         if (!payload.ok || !payload.track) {
-          renderSetupState(
-            payload.error || "TrackDraw setup is incomplete.",
-            payload.state
-          );
+          renderSetupState(getReadinessMessage(payload), payload.state);
           return;
         }
         renderTrack(payload.track, payload.state);
       })
-      .catch(function () {
-        renderSetupState("Could not load local TrackDraw cache.", "Offline");
+      .catch(function (error) {
+        renderSetupState(
+          error && error.message
+            ? error.message
+            : "Could not load local TrackDraw cache.",
+          "Error"
+        );
       });
   }
 

@@ -76,12 +76,45 @@ class StreamOverlays:
 
         self.get_trackdraw_payload(force_refresh=False)
 
+    def _get_trackdraw_readiness_message(self, payload: dict) -> str | None:
+        """Return a compact readiness message from a TrackDraw payload."""
+        diagnostics = payload.get("diagnostics")
+        if not isinstance(diagnostics, dict):
+            return None
+
+        readiness = diagnostics.get("readiness")
+        if not isinstance(readiness, dict) or not isinstance(
+            readiness.get("summary"), str
+        ):
+            return None
+
+        lines = [readiness["summary"]]
+        issues = readiness.get("issues")
+        if isinstance(issues, list):
+            for issue in issues[:3]:
+                if not isinstance(issue, dict):
+                    continue
+
+                message = issue.get("message")
+                if not isinstance(message, str):
+                    message = issue.get("type", "Readiness issue")
+
+                detail = issue.get("detail")
+                if isinstance(detail, str) and detail:
+                    message = f"{message} ({detail})"
+
+                lines.append(message)
+
+        return " ".join(lines)
+
     def _notify_trackdraw_refresh_result(self, payload: dict) -> None:
         """Show a RotorHazard message for a manual TrackDraw refresh."""
         if payload.get("ok"):
             refresh_error = payload.get("refresh_error")
             if isinstance(refresh_error, dict):
-                message = refresh_error.get("message", "Refresh failed.")
+                message = self._get_trackdraw_readiness_message(
+                    refresh_error
+                ) or refresh_error.get("message", "Refresh failed.")
                 self._rhapi.ui.message_notify(
                     f"TrackDraw refresh failed; using cached package. {message}"
                 )
@@ -99,7 +132,9 @@ class StreamOverlays:
             )
             return
 
-        error = payload.get("error", "Check the TrackDraw project ID and API key.")
+        error = self._get_trackdraw_readiness_message(payload) or payload.get(
+            "error", "Check the TrackDraw project ID and API key."
+        )
         self._rhapi.ui.message_alert(
             f"TrackDraw overlay package was not cached. {error}"
         )

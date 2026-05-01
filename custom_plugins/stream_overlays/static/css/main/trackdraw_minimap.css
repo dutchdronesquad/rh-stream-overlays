@@ -117,6 +117,7 @@ body {
   padding: 32px;
   position: absolute;
   text-align: center;
+  white-space: pre-line;
 }
 
 .trackdraw-minimap__message.is-visible {
