@@ -7,7 +7,6 @@ from RHUI import UIField, UIFieldType
 
 from .const import (
     API_KEY_KEY,
-    AUTO_SYNC_KEY,
     PROJECT_ID_KEY,
     TRACKDRAW_CONFIG_SECTION,
 )
@@ -67,7 +66,7 @@ class StreamOverlays:
     def refresh_trackdraw_cache(self, _args: dict | None = None) -> None:
         """Fetch TrackDraw data, update the cache, and notify the operator."""
         payload = self.get_trackdraw_payload(force_refresh=True)
-        self._notify_trackdraw_sync_result(payload, manual=True)
+        self._notify_trackdraw_refresh_result(payload)
 
     def sync_trackdraw_cache(self, _args: dict | None = None) -> None:
         """Automatically refresh TrackDraw data when configured."""
@@ -75,11 +74,10 @@ class StreamOverlays:
         if not self._trackdraw.should_auto_refresh(cache):
             return
 
-        payload = self.get_trackdraw_payload(force_refresh=False)
-        self._notify_trackdraw_sync_result(payload, manual=False)
+        self.get_trackdraw_payload(force_refresh=False)
 
-    def _notify_trackdraw_sync_result(self, payload: dict, *, manual: bool) -> None:
-        """Show a RotorHazard message for a TrackDraw sync result."""
+    def _notify_trackdraw_refresh_result(self, payload: dict) -> None:
+        """Show a RotorHazard message for a manual TrackDraw refresh."""
         if payload.get("ok"):
             refresh_error = payload.get("refresh_error")
             if isinstance(refresh_error, dict):
@@ -101,9 +99,6 @@ class StreamOverlays:
             )
             return
 
-        if not manual and payload.get("state") == "missing_cache":
-            return
-
         error = payload.get("error", "Check the TrackDraw project ID and API key.")
         self._rhapi.ui.message_alert(
             f"TrackDraw overlay package was not cached. {error}"
@@ -116,7 +111,7 @@ class StreamOverlays:
         self._rhapi.ui.register_panel(
             panel_id,
             "TrackDraw - Live Minimap",
-            "streams",
+            "settings",
             open=False,
         )
         self._rhapi.fields.register_option(
@@ -139,20 +134,6 @@ class StreamOverlays:
                 value="",
                 desc="Stored only in RotorHazard and never sent to OBS overlays.",
                 private=True,
-                persistent_section=TRACKDRAW_CONFIG_SECTION,
-            ),
-            panel=panel_id,
-        )
-        self._rhapi.fields.register_option(
-            UIField(
-                AUTO_SYNC_KEY,
-                "Enable automatic sync",
-                UIFieldType.CHECKBOX,
-                value="1",
-                desc=(
-                    "Fetch and refresh the TrackDraw overlay package "
-                    "automatically when RotorHazard starts or the cache is stale."
-                ),
                 persistent_section=TRACKDRAW_CONFIG_SECTION,
             ),
             panel=panel_id,

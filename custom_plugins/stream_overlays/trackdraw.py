@@ -9,7 +9,6 @@ import requests
 
 from .const import (
     API_KEY_KEY,
-    AUTO_SYNC_KEY,
     CACHE_OPTION,
     PROJECT_ID_KEY,
     TRACKDRAW_API_ORIGIN,
@@ -56,6 +55,40 @@ def normalize_option(value: Any) -> str:
     return str(value).strip()
 
 
+def summarize_readiness_issues(package: dict | None) -> str:
+    """Return a compact readiness issue summary for operator-facing messages."""
+    if not isinstance(package, dict):
+        return ""
+
+    readiness = package.get("readiness")
+    if not isinstance(readiness, dict):
+        return ""
+
+    issues = readiness.get("issues")
+    if not isinstance(issues, list):
+        return ""
+
+    issue_types = []
+    for issue in issues:
+        if not isinstance(issue, dict) or not isinstance(issue.get("type"), str):
+            continue
+        issue_types.append(issue["type"])
+
+    if not issue_types:
+        return ""
+
+    unique_issue_types = sorted(set(issue_types))
+    return ", ".join(unique_issue_types)
+
+
+def get_blocked_message(package: dict | None) -> str:
+    """Return a useful message for blocked TrackDraw overlay packages."""
+    issue_summary = summarize_readiness_issues(package)
+    if issue_summary:
+        return f"TrackDraw overlay package is not ready: {issue_summary}."
+    return "TrackDraw overlay package is not ready."
+
+
 def validate_overlay_package(payload: Any) -> dict:
     """Validate the TrackDraw v1 envelope and return the overlay package."""
     if not isinstance(payload, dict):
@@ -82,7 +115,7 @@ def validate_overlay_package(payload: Any) -> dict:
 
     if readiness.get("status") != "ready":
         state = "blocked"
-        message = "TrackDraw overlay package is not ready."
+        message = get_blocked_message(package)
         raise TrackDrawClientError(state, message, package)
 
     if not isinstance(package.get("route"), dict):
@@ -144,18 +177,16 @@ class TrackDrawOverlayStore:
             self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, API_KEY_KEY)
         )
 
-    def get_auto_sync_enabled(self) -> bool:
-        """Return whether automatic TrackDraw package sync is enabled."""
-        return (
-            normalize_option(
-                self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, AUTO_SYNC_KEY)
-            )
-            == "1"
-        )
-
     def has_config(self) -> bool:
         """Return whether the required TrackDraw credentials are configured."""
         return bool(self.get_project_id() and self.get_api_key())
+
+    def get_config_state(self) -> dict:
+        """Return non-secret configuration state for diagnostics."""
+        return {
+            "has_project_id": bool(self.get_project_id()),
+            "has_api_key": bool(self.get_api_key()),
+        }
 
     def load_cache(self) -> dict | None:
         """Load the last-good-ready TrackDraw cache from RotorHazard options."""
@@ -209,11 +240,60 @@ class TrackDrawOverlayStore:
 
     def should_auto_refresh(self, cache: dict | None) -> bool:
         """Return whether the cache should be refreshed automatically."""
-        if not self.get_auto_sync_enabled() or not self.has_config():
+        if not self.has_config():
             return False
         if cache is None:
             return True
         return self.get_cache_state(cache)["status"] == "stale"
+
+    def get_cache_payload(
+        self,
+        cache: dict,
+        refresh_error: TrackDrawClientError | None = None,
+    ) -> dict:
+        """Return the public payload for a cached TrackDraw package."""
+        cache_state = self.get_cache_state(cache)
+        payload = {
+            "ok": True,
+            "state": cache_state["status"],
+            "track": cache["package"],
+            "cache": cache_state,
+            "config": self.get_config_state(),
+            "split_map": derive_split_map(cache["package"]),
+        }
+
+        if refresh_error:
+            payload["refresh_error"] = {
+                "state": refresh_error.state,
+                "message": refresh_error.message,
+            }
+
+        return payload
+
+    def get_error_payload(self, error: TrackDrawClientError | None = None) -> dict:
+        """Return the public payload for a missing or failed TrackDraw package."""
+        if error:
+            track = error.package
+            state = error.state
+            message = error.message
+        elif self.has_config():
+            track = None
+            state = "missing_cache"
+            message = "No cached TrackDraw overlay package is available."
+        else:
+            track = None
+            state = "missing_config"
+            message = "Configure a TrackDraw project ID and API key."
+
+        return {
+            "ok": False,
+            "state": state,
+            "track": track,
+            "cache": None,
+            "config": self.get_config_state(),
+            "error": message,
+            "split_map": derive_split_map(track),
+        }
 
     def fetch_package(self) -> dict:
         """Fetch and validate the configured TrackDraw overlay package."""
@@ -272,13 +352,7 @@ class TrackDrawOverlayStore:
         """Fetch TrackDraw data and update the durable cache when ready."""
         package = self.fetch_package()
         cache = self.save_cache(package)
-        return {
-            "ok": True,
-            "state": "fresh",
-            "track": package,
-            "cache": self.get_cache_state(cache),
-            "split_map": derive_split_map(package),
-        }
+        return self.get_cache_payload(cache)
 
     def get_payload(self, *, force_refresh: bool = False) -> dict:
         """Return a cached or freshly refreshed overlay payload."""
@@ -289,43 +363,11 @@ class TrackDrawOverlayStore:
                 return self.refresh()
             except TrackDrawClientError as exc:
                 if cache:
-                    cache_state = self.get_cache_state(cache)
-                    return {
-                        "ok": True,
-                        "state": cache_state["status"],
-                        "track": cache["package"],
-                        "cache": cache_state,
-                        "refresh_error": {
-                            "state": exc.state,
-                            "message": exc.message,
-                        },
-                        "split_map": derive_split_map(cache["package"]),
-                    }
+                    return self.get_cache_payload(cache, refresh_error=exc)
 
-                return {
-                    "ok": False,
-                    "state": exc.state,
-                    "track": exc.package,
-                    "cache": None,
-                    "error": exc.message,
-                    "split_map": derive_split_map(exc.package),
-                }
+                return self.get_error_payload(exc)
 
         if cache is None:
-            return {
-                "ok": False,
-                "state": "missing_cache",
-                "track": None,
-                "cache": None,
-                "error": "No cached TrackDraw overlay package is available.",
-                "split_map": {},
-            }
+            return self.get_error_payload()
 
-        cache_state = self.get_cache_state(cache)
-        return {
-            "ok": True,
-            "state": cache_state["status"],
-            "track": cache["package"],
-            "cache": cache_state,
-            "split_map": derive_split_map(cache["package"]),
-        }
+        return self.get_cache_payload(cache)
