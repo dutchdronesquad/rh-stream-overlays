@@ -1,0 +1,12 @@
+.trackdraw-minimap[data-theme="dds"] {
+  --trackdraw-accent: #20e3b2;
+  --trackdraw-field-bg: rgb(4 16 22 / 48%);
+  --trackdraw-field-stroke: rgb(32 227 178 / 28%);
+  --trackdraw-muted: rgb(226 255 248 / 66%);
+  --trackdraw-obstacle: #20e3b2;
+  --trackdraw-panel-bg: rgb(3 10 16 / 84%);
+  --trackdraw-panel-border: rgb(32 227 178 / 42%);
+  --trackdraw-route: #f7fffb;
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #ffe66d;
+}

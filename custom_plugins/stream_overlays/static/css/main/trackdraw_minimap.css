@@ -1,0 +1,124 @@
+html {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Barlow", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  background: transparent;
+  margin: 0;
+}
+
+.trackdraw-minimap {
+  align-items: flex-end;
+  box-sizing: border-box;
+  display: flex;
+  height: 100vh;
+  justify-content: flex-end;
+  padding: 42px;
+  width: 100vw;
+}
+
+.trackdraw-minimap__panel {
+  background: var(--trackdraw-panel-bg, rgb(8 14 22 / 82%));
+  border: 2px solid var(--trackdraw-panel-border, rgb(255 255 255 / 18%));
+  box-shadow: 0 16px 48px rgb(0 0 0 / 32%);
+  box-sizing: border-box;
+  color: var(--trackdraw-text, #fff);
+  height: 310px;
+  overflow: hidden;
+  padding: 14px;
+  position: relative;
+  width: 460px;
+}
+
+.trackdraw-minimap__header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  min-height: 20px;
+  text-transform: uppercase;
+}
+
+.trackdraw-minimap__label {
+  color: var(--trackdraw-accent, #2de2a7);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.trackdraw-minimap__status {
+  color: var(--trackdraw-muted, rgb(255 255 255 / 62%));
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.trackdraw-minimap__svg {
+  display: block;
+  height: calc(100% - 28px);
+  overflow: visible;
+  width: 100%;
+}
+
+.trackdraw-minimap__field {
+  fill: var(--trackdraw-field-bg, rgb(255 255 255 / 5%));
+  stroke: var(--trackdraw-field-stroke, rgb(255 255 255 / 16%));
+  stroke-width: 0.35;
+}
+
+.trackdraw-minimap__route {
+  fill: none;
+  stroke: var(--trackdraw-route, #f8f9fb);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 0.55;
+}
+
+.trackdraw-minimap__obstacle {
+  fill: var(--trackdraw-obstacle-bg, rgb(8 14 22 / 86%));
+  stroke: var(--trackdraw-obstacle, #2de2a7);
+  stroke-width: 0.28;
+}
+
+.trackdraw-minimap__obstacle-label,
+.trackdraw-minimap__timing-label {
+  fill: var(--trackdraw-text, #fff);
+  font-size: 2.8px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--trackdraw-label-stroke, rgb(8 14 22 / 90%));
+  stroke-linejoin: round;
+  stroke-width: 0.9px;
+  text-anchor: middle;
+}
+
+.trackdraw-minimap__timing {
+  fill: var(--trackdraw-timing, #ffdd55);
+  stroke: var(--trackdraw-label-stroke, rgb(8 14 22 / 90%));
+  stroke-width: 0.28;
+}
+
+.trackdraw-minimap__message {
+  align-items: center;
+  background: var(--trackdraw-panel-bg, rgb(8 14 22 / 92%));
+  box-sizing: border-box;
+  color: var(--trackdraw-text, #fff);
+  display: none;
+  font-size: 16px;
+  font-weight: 800;
+  inset: 0;
+  justify-content: center;
+  line-height: 1.35;
+  padding: 32px;
+  position: absolute;
+  text-align: center;
+}
+
+.trackdraw-minimap__message.is-visible {
+  display: flex;
+}

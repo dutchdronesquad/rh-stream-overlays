@@ -1,20 +1,46 @@
 """DDS - RotorHazard Stream Overlay Plugin."""
 
 from eventmanager import Evt
-from flask import templating
+from flask import jsonify, request, templating
 from flask.blueprints import Blueprint
+from RHUI import UIField, UIFieldType
 
+from .trackdraw import (
+    API_KEY_OPTION,
+    PROJECT_ID_OPTION,
+    SPLIT_MAP_OPTION,
+    TrackDrawOverlayStore,
+)
 from .utils import (
     create_heat_markdown,
     create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
+    create_trackdraw_minimap_markdown,
 )
 
 overlays: dict = {
-    "DDS": {"node": True, "topbar": True, "leaderboard": True, "heat": True},
-    "LCDR": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
-    "APEX": {"node": True, "topbar": True, "leaderboard": False, "heat": True},
+    "DDS": {
+        "node": True,
+        "topbar": True,
+        "leaderboard": True,
+        "heat": True,
+        "trackdraw_minimap": True,
+    },
+    "LCDR": {
+        "node": True,
+        "topbar": True,
+        "leaderboard": False,
+        "heat": True,
+        "trackdraw_minimap": True,
+    },
+    "APEX": {
+        "node": True,
+        "topbar": True,
+        "leaderboard": False,
+        "heat": True,
+        "trackdraw_minimap": True,
+    },
 }
 
 
@@ -31,6 +57,53 @@ class StreamOverlays:
         """
         self._rhapi = rhapi
         self._overlays = overlays
+        self._trackdraw = TrackDrawOverlayStore(rhapi)
+
+    def get_trackdraw_payload(self, *, force_refresh: bool = False) -> dict:
+        """Return the current TrackDraw overlay payload."""
+        return self._trackdraw.get_payload(force_refresh=force_refresh)
+
+    def register_trackdraw_settings(self) -> None:
+        """Register TrackDraw integration settings."""
+        panel_id = "stream_overlays_trackdraw"
+        self._rhapi.ui.register_panel(
+            panel_id,
+            "TrackDraw - Live Minimap",
+            "streams",
+            open=False,
+        )
+        self._rhapi.fields.register_option(
+            UIField(
+                PROJECT_ID_OPTION,
+                "TrackDraw project ID",
+                UIFieldType.TEXT,
+                desc="Copy this from the TrackDraw project export panel.",
+                placeholder="project_123",
+            ),
+            panel=panel_id,
+        )
+        self._rhapi.fields.register_option(
+            UIField(
+                API_KEY_OPTION,
+                "TrackDraw API key",
+                UIFieldType.PASSWORD,
+                desc="Stored only in RotorHazard and never sent to OBS overlays.",
+            ),
+            panel=panel_id,
+        )
+        self._rhapi.fields.register_option(
+            UIField(
+                SPLIT_MAP_OPTION,
+                "Split map",
+                UIFieldType.TEXT,
+                desc=(
+                    "Optional JSON map from RotorHazard zero-based split_id "
+                    'to TrackDraw timing_id, for example {"0":"split-a"}.'
+                ),
+                placeholder='{"0":"split-a"}',
+            ),
+            panel=panel_id,
+        )
 
     def create_panels(self, _args: dict) -> None:
         """Create the stream overlay panels.
@@ -88,6 +161,16 @@ class StreamOverlays:
                     panel_id, f"{overlay_name}-Heat", heat_markdown
                 )
 
+            if features.get("trackdraw_minimap"):
+                minimap_markdown = create_trackdraw_minimap_markdown(
+                    overlay_name, base_path
+                )
+                self._rhapi.ui.register_markdown(
+                    panel_id,
+                    f"{overlay_name}-TrackDraw-Minimap",
+                    minimap_markdown,
+                )
+
 
 def initialize(rhapi: object) -> None:
     """Initialize the plugin.
@@ -98,6 +181,7 @@ def initialize(rhapi: object) -> None:
 
     """
     stream_overlays = StreamOverlays(rhapi)
+    stream_overlays.register_trackdraw_settings()
 
     # Hook into the startup event to create the panels
     rhapi.events.on(Evt.STARTUP, stream_overlays.create_panels)
@@ -167,6 +251,26 @@ def initialize(rhapi: object) -> None:
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
             num_nodes=len(rhapi.interface.seats),
+        )
+
+    @bp.route("/stream/overlay/<string:name>/trackdraw/minimap")
+    def render_trackdraw_minimap(name: str) -> str:
+        """Render the TrackDraw minimap overlay."""
+        return templating.render_template(
+            "stream/trackdraw/minimap.html",
+            serverInfo=None,
+            getOption=rhapi.db.option,
+            getConfig=rhapi.config.get_item,
+            __=rhapi.__,
+            theme_name=name,
+        )
+
+    @bp.route("/stream/overlay/<string:_name>/trackdraw/track.json")
+    def get_trackdraw_track(_name: str) -> object:
+        """Return cached TrackDraw overlay data for OBS/browser clients."""
+        force_refresh = request.args.get("refresh") == "1"
+        return jsonify(
+            stream_overlays.get_trackdraw_payload(force_refresh=force_refresh)
         )
 
     rhapi.ui.blueprint_add(bp)

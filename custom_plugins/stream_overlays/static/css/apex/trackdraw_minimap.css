@@ -1,0 +1,12 @@
+.trackdraw-minimap[data-theme="apex"] {
+  --trackdraw-accent: #ff4f9a;
+  --trackdraw-field-bg: rgb(17 10 24 / 50%);
+  --trackdraw-field-stroke: rgb(255 79 154 / 28%);
+  --trackdraw-muted: rgb(255 222 238 / 66%);
+  --trackdraw-obstacle: #ff4f9a;
+  --trackdraw-panel-bg: rgb(13 8 20 / 84%);
+  --trackdraw-panel-border: rgb(255 79 154 / 42%);
+  --trackdraw-route: #ffffff;
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #70f0ff;
+}
