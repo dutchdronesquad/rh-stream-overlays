@@ -13,8 +13,7 @@ dev = [
   "ruff==0.15.12",
 ]
 docs = [
-  "mkdocs>=1.6.1",
-  "mkdocs-material>=9.6.5",
+  "zensical>=0.0.29",
 ]
 
 [tool.ruff]

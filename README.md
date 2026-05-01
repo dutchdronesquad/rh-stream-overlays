@@ -22,6 +22,8 @@ Do you have any wishes for a new overlay? Then leave your ideas, sketches or moo
 
 The full documentation can be found at [overlays.dutchdronesquad.nl][website]. Where you can find all the information about the overlays, how to install them and how to use them in [OBS](https://obsproject.com).
 
+The documentation site is now built with [Zensical][Zensical], while continuing to use the existing `mkdocs.yml` through Zensical's compatibility layer. This keeps the current docs structure intact while moving away from the MkDocs Material stack.
+
 ## Setting up development environment
 
 This Python project relies on [UV] as its dependency manager,
@@ -39,6 +41,20 @@ You need the following tools to get started:
 
 ```bash
 uv sync --all-groups
+```
+
+### Documentation preview
+
+To run the documentation locally with live reload, use:
+
+```bash
+uv run zensical serve
+```
+
+To create a production build of the documentation, use:
+
+```bash
+uv run zensical build
 ```
 
 ### Prek check
@@ -82,3 +98,4 @@ Distributed under the **MIT** License. See [`LICENSE`](LICENSE) for more informa
 [UV]: https://docs.astral.sh/uv/
 [Python]: https://www.python.org/
 [prek]: https://github.com/j178/prek
+[Zensical]: https://zensical.org/

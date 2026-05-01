@@ -22,7 +22,7 @@ ln -s ~/rh-stream-overlays/stream_overlays/ ~/RotorHazard/src/server/plugins/str
 
 ## Documentation
 
-The documentation is built with [MkDocs](https://www.mkdocs.org/) and hosted on [GitHub Pages](https://pages.github.com/). The documentation is written in Markdown and can be found in the `docs` folder. This Python project relies on [UV](https://docs.astral.sh/uv/) as its dependency manager, providing comprehensive management and control over project dependencies.
+The documentation is built with [Zensical](https://zensical.org/) and hosted on [GitHub Pages](https://pages.github.com/). The documentation is written in Markdown and can be found in the `docs` folder. Zensical supports the existing `mkdocs.yml` configuration file used by this project, so the current docs structure can stay in place during the migration. This Python project relies on [UV](https://docs.astral.sh/uv/) as its dependency manager, providing comprehensive management and control over project dependencies.
 
 To make changes to the documentation, you need to set up a local development environment. This will allow you to preview your changes before pushing them to the repository.
 
@@ -34,7 +34,7 @@ uv sync --all-groups
 
 3. Start the documentation server
 ```bash
-uv run mkdocs serve
+uv run zensical serve
 ```
 
 4. Open the application in your browser

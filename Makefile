@@ -3,17 +3,17 @@
 # Development server with live reload
 serve:
 	@echo "🚀 Starting development server with live reload..."
-	@uv run mkdocs serve --livereload
+	@uv run zensical serve
 
 # Build documentation
 build:
 	@echo "📦 Building documentation..."
-	@uv run mkdocs build
+	@uv run zensical build
 
 # Clean build artifacts
 clean:
 	@echo "🧹 Cleaning build artifacts..."
-	@uv run mkdocs build --clean
+	@uv run zensical build --clean
 
 # Show help
 help:

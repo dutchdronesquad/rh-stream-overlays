@@ -28,7 +28,7 @@ jobs:
       - name: 🏗 Install project dependencies
         run: uv sync --group docs
       - name: 🏗 Build documentation
-        run: uv run mkdocs build
+        run: uv run zensical build
       - name: ⬆️ Upload pages artifacts
         uses: actions/upload-pages-artifact@v5.0.0
         with:

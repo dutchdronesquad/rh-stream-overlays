@@ -1,4 +1,9 @@
 :root {
+  --page-surface: var(--md-default-bg-color, #ffffff);
+  --page-surface-alt: var(--md-code-bg-color, #f8fafc);
+  --page-text: var(--md-default-fg-color, #1a1a1a);
+  --page-text-muted: var(--md-default-fg-color--light, #4a5568);
+  --page-link: var(--md-typeset-a-color, #1565c0);
   --border-color: rgba(0, 0, 0, 0.15);
   --card-bg: #ffffff;
   --card-bg-hover: #f5f7fa;
@@ -20,12 +25,19 @@
   --border-color: rgba(255, 255, 255, 0.15);
   --card-bg: rgba(255, 255, 255, 0.06);
   --card-bg-hover: rgba(255, 255, 255, 0.1);
-  --text-color: #e8e8e8;
-  --text-muted: #a0aec0;
+  --text-color: var(--page-text);
+  --text-muted: var(--page-text-muted);
   --link-color: #60a5fa;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.25);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+body {
+  --card-bg: var(--page-surface);
+  --text-color: var(--page-text);
+  --text-muted: var(--page-text-muted);
+  --link-color: var(--page-link);
 }
 
 .badge-gradient {
@@ -218,7 +230,7 @@
   padding: 0.5rem !important;
 }
 
-.md-typeset code {
+.md-typeset :not(pre) > code {
   padding: 0.2em 0.5em;
   font-size: 0.85em;
   border-radius: 4px;
@@ -226,12 +238,12 @@
   border: 1px solid var(--border-color);
 }
 
-[data-md-color-scheme="default"] .md-typeset code {
+[data-md-color-scheme="default"] .md-typeset :not(pre) > code {
   background-color: rgba(21, 101, 192, 0.08);
   color: #1565c0;
 }
 
-[data-md-color-scheme="slate"] .md-typeset code {
+[data-md-color-scheme="slate"] .md-typeset :not(pre) > code {
   background-color: rgba(96, 165, 250, 0.15);
   color: #90caf9;
   border-color: rgba(96, 165, 250, 0.3);
@@ -325,6 +337,22 @@
 
 .md-typeset a:hover {
   text-decoration-thickness: 2px;
+}
+
+.md-typeset a.md-button,
+.md-typeset a.hero-button,
+.md-typeset a.theme-card,
+.md-typeset a.faq-card,
+.md-typeset a.overlay-card {
+  text-decoration: none !important;
+}
+
+.md-typeset a.md-button:hover,
+.md-typeset a.hero-button:hover,
+.md-typeset a.theme-card:hover,
+.md-typeset a.faq-card:hover,
+.md-typeset a.overlay-card:hover {
+  text-decoration: none !important;
 }
 
 .md-typeset p {

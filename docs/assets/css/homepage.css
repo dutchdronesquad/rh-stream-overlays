@@ -1,24 +1,29 @@
-/* Remove default spacing only when hero section is present */
-.md-content__inner:has(.hero-section) {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-.md-content__inner:has(.hero-section):before {
-  display: none !important;
-}
-
-.md-content:has(.hero-section) {
-  margin-top: 0 !important;
-}
-
-/* Remove any top spacing from the page */
-.md-main__inner:has(.hero-section) {
-  margin-top: 0 !important;
-}
-
+/* Remove default spacing only on the homepage hero */
 .md-content__inner > :first-child {
   margin-top: 0 !important;
+}
+
+.md-content__inner.md-typeset > .hero-section:first-child {
+  margin-top: 0;
+}
+
+@supports selector(:has(*)) {
+  .md-content__inner:has(.hero-section) {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .md-content__inner:has(.hero-section):before {
+    display: none !important;
+  }
+
+  .md-content:has(.hero-section) {
+    margin-top: 0 !important;
+  }
+
+  .md-main__inner:has(.hero-section) {
+    margin-top: 0 !important;
+  }
 }
 
 /* ==================== HERO SECTION ==================== */
@@ -27,7 +32,8 @@
   background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
   color: white;
   padding: 60px 32px 48px;
-  margin: 0 -24px 36px;
+  margin: 0 0 36px;
+  border-radius: 24px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   position: relative;
@@ -399,6 +405,11 @@
 .cta-card a {
   font-weight: 600;
   color: var(--link-color);
+  text-decoration: none;
+}
+
+.cta-card a:hover {
+  text-decoration: none;
 }
 
 /* Legacy support - hide old CTA */
@@ -422,7 +433,8 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 64px 24px;
+    padding: 48px 24px 40px;
+    border-radius: 20px;
   }
 
   .hero-title {
