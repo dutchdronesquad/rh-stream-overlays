@@ -5,11 +5,13 @@ from flask import jsonify, request, templating
 from flask.blueprints import Blueprint
 from RHUI import UIField, UIFieldType
 
-from .trackdraw import (
-    API_KEY_OPTION,
-    PROJECT_ID_OPTION,
-    TrackDrawOverlayStore,
+from .const import (
+    API_KEY_KEY,
+    AUTO_SYNC_KEY,
+    PROJECT_ID_KEY,
+    TRACKDRAW_CONFIG_SECTION,
 )
+from .trackdraw import TrackDrawOverlayStore
 from .utils import (
     create_heat_markdown,
     create_leaderboard_markdown,
@@ -62,9 +64,55 @@ class StreamOverlays:
         """Return the current TrackDraw overlay payload."""
         return self._trackdraw.get_payload(force_refresh=force_refresh)
 
+    def refresh_trackdraw_cache(self, _args: dict | None = None) -> None:
+        """Fetch TrackDraw data, update the cache, and notify the operator."""
+        payload = self.get_trackdraw_payload(force_refresh=True)
+        self._notify_trackdraw_sync_result(payload, manual=True)
+
+    def sync_trackdraw_cache(self, _args: dict | None = None) -> None:
+        """Automatically refresh TrackDraw data when configured."""
+        cache = self._trackdraw.load_cache()
+        if not self._trackdraw.should_auto_refresh(cache):
+            return
+
+        payload = self.get_trackdraw_payload(force_refresh=False)
+        self._notify_trackdraw_sync_result(payload, manual=False)
+
+    def _notify_trackdraw_sync_result(self, payload: dict, *, manual: bool) -> None:
+        """Show a RotorHazard message for a TrackDraw sync result."""
+        if payload.get("ok"):
+            refresh_error = payload.get("refresh_error")
+            if isinstance(refresh_error, dict):
+                message = refresh_error.get("message", "Refresh failed.")
+                self._rhapi.ui.message_notify(
+                    f"TrackDraw refresh failed; using cached package. {message}"
+                )
+                return
+
+            cache = payload.get("cache")
+            cached_at = (
+                cache.get("cached_at")
+                if isinstance(cache, dict) and isinstance(cache.get("cached_at"), str)
+                else None
+            )
+            suffix = f" Cached at {cached_at}." if cached_at else ""
+            self._rhapi.ui.message_notify(
+                f"TrackDraw overlay package fetched and cached.{suffix}"
+            )
+            return
+
+        if not manual and payload.get("state") == "missing_cache":
+            return
+
+        error = payload.get("error", "Check the TrackDraw project ID and API key.")
+        self._rhapi.ui.message_alert(
+            f"TrackDraw overlay package was not cached. {error}"
+        )
+
     def register_trackdraw_settings(self) -> None:
         """Register TrackDraw integration settings."""
         panel_id = "stream_overlays_trackdraw"
+        self._rhapi.config.register_section(TRACKDRAW_CONFIG_SECTION)
         self._rhapi.ui.register_panel(
             panel_id,
             "TrackDraw - Live Minimap",
@@ -73,23 +121,53 @@ class StreamOverlays:
         )
         self._rhapi.fields.register_option(
             UIField(
-                PROJECT_ID_OPTION,
+                PROJECT_ID_KEY,
                 "TrackDraw project ID",
                 UIFieldType.TEXT,
-                desc="Copy this from the TrackDraw project export panel.",
+                value="",
+                desc="Copy this from the TrackDraw project details.",
                 placeholder="project_123",
+                persistent_section=TRACKDRAW_CONFIG_SECTION,
             ),
             panel=panel_id,
         )
         self._rhapi.fields.register_option(
             UIField(
-                API_KEY_OPTION,
+                API_KEY_KEY,
                 "TrackDraw API key",
                 UIFieldType.PASSWORD,
+                value="",
                 desc="Stored only in RotorHazard and never sent to OBS overlays.",
+                private=True,
+                persistent_section=TRACKDRAW_CONFIG_SECTION,
             ),
             panel=panel_id,
         )
+        self._rhapi.fields.register_option(
+            UIField(
+                AUTO_SYNC_KEY,
+                "Enable automatic sync",
+                UIFieldType.CHECKBOX,
+                value="1",
+                desc=(
+                    "Fetch and refresh the TrackDraw overlay package "
+                    "automatically when RotorHazard starts or the cache is stale."
+                ),
+                persistent_section=TRACKDRAW_CONFIG_SECTION,
+            ),
+            panel=panel_id,
+        )
+        self._rhapi.ui.register_quickbutton(
+            panel=panel_id,
+            name="refresh_trackdraw_cache",
+            label="Fetch TrackDraw package",
+            function=self.refresh_trackdraw_cache,
+        )
+
+    def startup(self, args: dict) -> None:
+        """Create panels and run automatic TrackDraw sync."""
+        self.create_panels(args)
+        self.sync_trackdraw_cache(args)
 
     def create_panels(self, _args: dict) -> None:
         """Create the stream overlay panels.
@@ -170,7 +248,7 @@ def initialize(rhapi: object) -> None:
     stream_overlays.register_trackdraw_settings()
 
     # Hook into the startup event to create the panels
-    rhapi.events.on(Evt.STARTUP, stream_overlays.create_panels)
+    rhapi.events.on(Evt.STARTUP, stream_overlays.startup)
 
     bp = Blueprint(
         "stream_overlays",

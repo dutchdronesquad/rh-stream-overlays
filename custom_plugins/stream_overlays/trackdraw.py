@@ -7,12 +7,15 @@ from typing import Any
 
 import requests
 
-TRACKDRAW_API_ORIGIN = "https://trackdraw.app"
-TRACKDRAW_CACHE_TTL_SECONDS = 24 * 60 * 60
-
-PROJECT_ID_OPTION = "stream_overlays_trackdraw_project_id"
-API_KEY_OPTION = "stream_overlays_trackdraw_api_key"
-CACHE_OPTION = "stream_overlays_trackdraw_cache_v1"
+from .const import (
+    API_KEY_KEY,
+    AUTO_SYNC_KEY,
+    CACHE_OPTION,
+    PROJECT_ID_KEY,
+    TRACKDRAW_API_ORIGIN,
+    TRACKDRAW_CACHE_TTL_SECONDS,
+    TRACKDRAW_CONFIG_SECTION,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +125,7 @@ def derive_split_map(package: dict | None) -> dict[str, str]:
 
 
 class TrackDrawOverlayStore:
-    """Fetch and cache a TrackDraw overlay package through RotorHazard options."""
+    """Fetch and cache a TrackDraw overlay package through RotorHazard config."""
 
     def __init__(self, rhapi: object) -> None:
         """Initialize the TrackDraw overlay store."""
@@ -131,11 +134,28 @@ class TrackDrawOverlayStore:
 
     def get_project_id(self) -> str:
         """Return the configured TrackDraw project id."""
-        return normalize_option(self._rhapi.db.option(PROJECT_ID_OPTION, ""))
+        return normalize_option(
+            self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, PROJECT_ID_KEY)
+        )
 
     def get_api_key(self) -> str:
         """Return the configured TrackDraw API key."""
-        return normalize_option(self._rhapi.db.option(API_KEY_OPTION, ""))
+        return normalize_option(
+            self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, API_KEY_KEY)
+        )
+
+    def get_auto_sync_enabled(self) -> bool:
+        """Return whether automatic TrackDraw package sync is enabled."""
+        return (
+            normalize_option(
+                self._rhapi.config.get_item(TRACKDRAW_CONFIG_SECTION, AUTO_SYNC_KEY)
+            )
+            == "1"
+        )
+
+    def has_config(self) -> bool:
+        """Return whether the required TrackDraw credentials are configured."""
+        return bool(self.get_project_id() and self.get_api_key())
 
     def load_cache(self) -> dict | None:
         """Load the last-good-ready TrackDraw cache from RotorHazard options."""
@@ -186,6 +206,14 @@ class TrackDrawOverlayStore:
             "source_updated_at": cache.get("source_updated_at"),
             "status": "fresh" if is_fresh else "stale",
         }
+
+    def should_auto_refresh(self, cache: dict | None) -> bool:
+        """Return whether the cache should be refreshed automatically."""
+        if not self.get_auto_sync_enabled() or not self.has_config():
+            return False
+        if cache is None:
+            return True
+        return self.get_cache_state(cache)["status"] == "stale"
 
     def fetch_package(self) -> dict:
         """Fetch and validate the configured TrackDraw overlay package."""
@@ -256,7 +284,7 @@ class TrackDrawOverlayStore:
         """Return a cached or freshly refreshed overlay payload."""
         cache = self.load_cache()
 
-        if force_refresh or cache is None:
+        if force_refresh or self.should_auto_refresh(cache):
             try:
                 return self.refresh()
             except TrackDrawClientError as exc:
@@ -282,6 +310,16 @@ class TrackDrawOverlayStore:
                     "error": exc.message,
                     "split_map": derive_split_map(exc.package),
                 }
+
+        if cache is None:
+            return {
+                "ok": False,
+                "state": "missing_cache",
+                "track": None,
+                "cache": None,
+                "error": "No cached TrackDraw overlay package is available.",
+                "split_map": {},
+            }
 
         cache_state = self.get_cache_state(cache)
         return {
