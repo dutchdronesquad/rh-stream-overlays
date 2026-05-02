@@ -47,7 +47,7 @@
   var rootEl = null;
 
   function getRoot() {
-    return rootEl || (rootEl = getRoot());
+    return rootEl || (rootEl = document.querySelector(".trackdraw-map"));
   }
 
   // ----------------------------------------------------------------
