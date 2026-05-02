@@ -4,7 +4,13 @@
    the other stream overlays and can be filtered/keyed in OBS.
    ============================================================ */
 
-html,
+html {
+  background: transparent;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: var(--trackdraw-key-bg, grey);
   font-family: "Barlow", sans-serif;
