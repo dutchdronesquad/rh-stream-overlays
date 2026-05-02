@@ -52,6 +52,12 @@ body {
   top: 8px;
 }
 
+.trackdraw-map.is-obs-720 .trackdraw-map__header,
+.trackdraw-map.is-obs-1080 .trackdraw-map__header {
+  left: max(12px, 1.2vw);
+  top: max(12px, 1.2vh);
+}
+
 .trackdraw-map__label {
   color: var(--trackdraw-accent, #2de2a7);
   font-size: 10px;
@@ -262,6 +268,10 @@ body {
   opacity: 0.74;
 }
 
+.trackdraw-map__pilot-group.is-correcting {
+  animation: td-anchor-correction-fade 650ms ease-out both;
+}
+
 .trackdraw-map__pilot-group.is-leader .trackdraw-map__pilot-halo {
   animation: td-leader-pulse 1.1s ease-in-out infinite;
   opacity: 1;
@@ -276,10 +286,37 @@ body {
   fill: var(--trackdraw-leader-text, #04100c);
 }
 
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-bg,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-accent,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-connector,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-position,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-position-bg {
+  display: none;
+}
+
 @keyframes td-leader-pulse {
   0%,
   100% { opacity: 1; }
   50% { opacity: 0.45; }
+}
+
+@keyframes td-anchor-correction-fade {
+  0% { opacity: 0.18; }
+  45% { opacity: 0.52; }
+  100% { opacity: 1; }
+}
+
+.trackdraw-map.is-crowded .trackdraw-map__pilot-label-bg {
+  fill: var(--trackdraw-pilot-label-bg-crowded, rgb(0 0 0 / 78%));
+}
+
+.trackdraw-map.is-crowded .trackdraw-map__pilot-label-connector {
+  opacity: 0.34;
+}
+
+.trackdraw-map.is-packed .trackdraw-map__pilot-group:not(.is-leader) .trackdraw-map__pilot-halo {
+  opacity: 0.5;
 }
 
 .trackdraw-map.is-compact .trackdraw-map__obstacle-label,

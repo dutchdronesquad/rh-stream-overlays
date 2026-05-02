@@ -13,6 +13,7 @@
   --trackdraw-panel-bg: rgb(6 6 6 / 84%);
   --trackdraw-panel-border: rgb(245 212 105 / 36%);
   --trackdraw-pilot-label-bg: rgb(5 5 5 / 88%);
+  --trackdraw-pilot-label-bg-crowded: rgb(5 5 5 / 78%);
   --trackdraw-pilot-position-text: #050505;
   --trackdraw-route: #ffffff;
   --trackdraw-route-chevron: #f5d469;

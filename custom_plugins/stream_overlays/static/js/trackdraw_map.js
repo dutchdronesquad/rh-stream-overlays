@@ -106,11 +106,6 @@
     );
   }
 
-  function easeOutCubic(value) {
-    var t = 1 - clamp01(value);
-    return 1 - t * t * t;
-  }
-
   // ----------------------------------------------------------------
   // Route geometry
   // ----------------------------------------------------------------
@@ -279,11 +274,122 @@
 
     var width = window.innerWidth || document.documentElement.clientWidth || 0;
     var height = window.innerHeight || document.documentElement.clientHeight || 0;
+    var aspect = height > 0 ? width / height : 16 / 9;
+    var is16x9 = Math.abs(aspect - 16 / 9) < 0.04;
     var compact = width < 560 || height < 360;
     var tiny = width < 380 || height < 250;
 
     root.classList.toggle("is-compact", compact);
     root.classList.toggle("is-tiny", tiny);
+    root.classList.toggle("is-obs-1080", is16x9 && width >= 1800 && height >= 1000);
+    root.classList.toggle(
+      "is-obs-720",
+      is16x9 && width >= 1180 && width < 1800 && height >= 650
+    );
+  }
+
+  function updatePilotDensityClass(activeCount) {
+    var root = document.querySelector(".trackdraw-map");
+    if (!root) return;
+    root.classList.toggle("is-crowded", activeCount >= 5);
+    root.classList.toggle("is-packed", activeCount >= 7);
+  }
+
+  function getViewportAspect() {
+    var width = window.innerWidth || document.documentElement.clientWidth || 0;
+    var height = window.innerHeight || document.documentElement.clientHeight || 0;
+    return width > 0 && height > 0 ? width / height : 16 / 9;
+  }
+
+  function includeBoundsPoint(bounds, point) {
+    if (!point || typeof point.x !== "number" || typeof point.y !== "number") return;
+    bounds.minX = Math.min(bounds.minX, point.x);
+    bounds.minY = Math.min(bounds.minY, point.y);
+    bounds.maxX = Math.max(bounds.maxX, point.x);
+    bounds.maxY = Math.max(bounds.maxY, point.y);
+  }
+
+  function getTrackContentBounds(field, points, track) {
+    var bounds = {
+      minX: Infinity,
+      minY: Infinity,
+      maxX: -Infinity,
+      maxY: -Infinity,
+    };
+
+    points.forEach(function (point) {
+      includeBoundsPoint(bounds, getPoint(field, point));
+    });
+    (track.route_obstacles || []).forEach(function (obstacle) {
+      if (obstacle && obstacle.route_position) {
+        includeBoundsPoint(bounds, getPoint(field, obstacle.route_position));
+      }
+    });
+    (track.timing_markers || []).forEach(function (marker) {
+      if (marker && marker.route_position) {
+        includeBoundsPoint(bounds, getPoint(field, marker.route_position));
+      }
+    });
+
+    if (
+      !isFinite(bounds.minX) ||
+      !isFinite(bounds.minY) ||
+      !isFinite(bounds.maxX) ||
+      !isFinite(bounds.maxY)
+    ) {
+      return {
+        minX: 0,
+        minY: 0,
+        maxX: field.width,
+        maxY: field.height,
+      };
+    }
+
+    return bounds;
+  }
+
+  function expandBoundsToAspect(bounds, aspect) {
+    var width = Math.max(bounds.maxX - bounds.minX, fieldScale * 0.1);
+    var height = Math.max(bounds.maxY - bounds.minY, fieldScale * 0.1);
+    var currentAspect = width / height;
+    var centerX = bounds.minX + width / 2;
+    var centerY = bounds.minY + height / 2;
+
+    if (currentAspect < aspect) {
+      width = height * aspect;
+    } else {
+      height = width / aspect;
+    }
+
+    return {
+      minX: centerX - width / 2,
+      minY: centerY - height / 2,
+      maxX: centerX + width / 2,
+      maxY: centerY + height / 2,
+    };
+  }
+
+  function setSafeViewBox(field, points, track) {
+    var bounds = getTrackContentBounds(field, points, track);
+    var basePadding = fieldScale * 0.075;
+    var topPadding = fieldScale * 0.12;
+    var padded = {
+      minX: bounds.minX - basePadding,
+      minY: bounds.minY - topPadding,
+      maxX: bounds.maxX + basePadding,
+      maxY: bounds.maxY + basePadding,
+    };
+    var framed = expandBoundsToAspect(padded, getViewportAspect());
+
+    svgEl.setAttribute(
+      "viewBox",
+      [
+        framed.minX,
+        framed.minY,
+        framed.maxX - framed.minX,
+        framed.maxY - framed.minY,
+      ].join(" ")
+    );
   }
 
   // ----------------------------------------------------------------
@@ -328,12 +434,8 @@
     var timingSwW = fieldScale * 0.003;
     var timingFontZ = fieldScale * 0.022;
 
-    var padding = fieldScale * 0.06;
     clearSvg(svgEl);
-    svgEl.setAttribute(
-      "viewBox",
-      [-padding, -padding, field.width + padding * 2, field.height + padding * 2].join(" ")
-    );
+    setSafeViewBox(field, points, track);
 
     var routeD = getRoutePath(field, points);
     [
@@ -570,14 +672,13 @@
     var opts = options || {};
     var now = window.performance.now();
     var normalized = normalizeProgress(progress);
-    var previousProgress = getCurrentPilotProgress(pilot);
-    var shouldEase =
+    var shouldFadeCorrection =
       opts.ease !== false &&
       !opts.freeze &&
       raceRunning &&
       socketConnected &&
       pilot.lastAnchorTime !== null &&
-      forwardDelta(previousProgress, normalized) > 0.004;
+      forwardDelta(getCurrentPilotProgress(pilot), normalized) > 0.004;
     var correctionMs = opts.easeMs || ANCHOR_CORRECTION_MS;
 
     pilot.lastAnchorProgress = normalized;
@@ -587,31 +688,24 @@
       pilot.lastAnchorProgress,
       pilot.nextAnchorProgress
     );
-    pilot.lastAnchorTime = opts.freeze ? null : now + (shouldEase ? correctionMs : 0);
+    pilot.lastAnchorTime = opts.freeze ? null : now + (shouldFadeCorrection ? correctionMs : 0);
     pilot.confidence = opts.confidence || "high";
     pilot.lastSeenAt = now;
-    pilot.correctionFromProgress = shouldEase ? previousProgress : null;
-    pilot.correctionToProgress = shouldEase ? normalized : null;
-    pilot.correctionStartTime = shouldEase ? now : null;
-    pilot.correctionEndTime = shouldEase ? now + correctionMs : null;
+    pilot.correctionStartTime = shouldFadeCorrection ? now : null;
+    pilot.correctionEndTime = shouldFadeCorrection ? now + correctionMs : null;
+  }
+
+  function isPilotCorrecting(pilot) {
+    var now = window.performance.now();
+    return (
+      pilot.correctionStartTime !== null &&
+      pilot.correctionEndTime !== null &&
+      now < pilot.correctionEndTime
+    );
   }
 
   function getCurrentPilotProgress(pilot) {
     var now = window.performance.now();
-    if (
-      pilot.correctionStartTime !== null &&
-      pilot.correctionEndTime !== null &&
-      now < pilot.correctionEndTime
-    ) {
-      return interpolateProgress(
-        pilot.correctionFromProgress,
-        pilot.correctionToProgress,
-        easeOutCubic(
-          (now - pilot.correctionStartTime) /
-            (pilot.correctionEndTime - pilot.correctionStartTime)
-        )
-      );
-    }
     if (pilot.lastAnchorTime === null || !raceRunning) {
       return pilot.lastAnchorProgress;
     }
@@ -706,9 +800,13 @@
 
   function animationTick() {
     if (svgEl && pilotGroupEl) {
-      Object.keys(pilots).forEach(function (nodeIdx) {
+      var activeNodeIndexes = Object.keys(pilots).filter(function (nodeIdx) {
+        return pilots[nodeIdx] && pilots[nodeIdx].active;
+      });
+      updatePilotDensityClass(activeNodeIndexes.length);
+
+      activeNodeIndexes.forEach(function (nodeIdx) {
         var pilot = pilots[nodeIdx];
-        if (!pilot.active) return;
 
         ensurePilotEl(pilot);
 
@@ -723,11 +821,23 @@
         var labelSlot = getLabelSlot(pilot);
         var labelOffset = getLabelOffset(labelSlot);
 
+        var position = Number(pilot.position);
+        var hasPosition = !isNaN(position) && position > 0;
         var confidence = getPilotConfidence(pilot);
-        var isLeader = Number(pilot.position) === 1;
+        var isLeader = position === 1;
+        var hideLabel =
+          activeNodeIndexes.length >= 7 &&
+          !isLeader &&
+          (!hasPosition || position > 4);
         var groupClass = "trackdraw-map__pilot-group is-" + confidence;
         if (isLeader) {
           groupClass += " is-leader";
+        }
+        if (isPilotCorrecting(pilot)) {
+          groupClass += " is-correcting";
+        }
+        if (hideLabel) {
+          groupClass += " is-label-hidden";
         }
         g.setAttribute("class", groupClass);
         g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
@@ -745,8 +855,6 @@
         var positionText = g.querySelector(".trackdraw-map__pilot-position");
         var lbl = g.querySelector(".trackdraw-map__pilot-label");
         var label = getPilotLabel(pilot);
-        var position = Number(pilot.position);
-        var hasPosition = !isNaN(position) && position > 0;
 
         if (halo) {
           halo.style.stroke = pilot.color;
@@ -856,8 +964,6 @@
         hasLearnedPace: false,
         confidence: "idle",
         lastSeenAt: null,
-        correctionFromProgress: null,
-        correctionToProgress: null,
         correctionStartTime: null,
         correctionEndTime: null,
       };
@@ -869,8 +975,6 @@
       pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
       pilots[nodeIdx].lastAnchorTime = null;
       pilots[nodeIdx].confidence = confidence || "idle";
-      pilots[nodeIdx].correctionFromProgress = null;
-      pilots[nodeIdx].correctionToProgress = null;
       pilots[nodeIdx].correctionStartTime = null;
       pilots[nodeIdx].correctionEndTime = null;
     });
@@ -906,8 +1010,6 @@
         );
         pilots[nodeIdx].lastAnchorTime = null;
         pilots[nodeIdx].confidence = "idle";
-        pilots[nodeIdx].correctionFromProgress = null;
-        pilots[nodeIdx].correctionToProgress = null;
         pilots[nodeIdx].correctionStartTime = null;
         pilots[nodeIdx].correctionEndTime = null;
       });
@@ -1086,7 +1188,12 @@
 
   $(document).ready(function () {
     applyViewportClass();
-    window.addEventListener("resize", applyViewportClass);
+    window.addEventListener("resize", function () {
+      applyViewportClass();
+      if (svgEl && trackData && sampledPoints.length) {
+        setSafeViewBox(trackData.field, sampledPoints, trackData);
+      }
+    });
     loadTrack();
     registerSocketHandlers();
   });
