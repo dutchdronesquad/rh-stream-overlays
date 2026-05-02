@@ -15,7 +15,6 @@ body {
 }
 
 .trackdraw-map {
-  background: var(--trackdraw-key-bg, grey);
   height: 100vh;
   position: relative;
   width: 100vw;
