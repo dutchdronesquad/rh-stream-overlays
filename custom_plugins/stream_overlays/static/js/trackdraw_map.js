@@ -355,7 +355,9 @@
     prevSplitCounts = {};
     clearPilotEls();
 
-    msg.heatNodes.forEach(function (node, index) {
+    Object.keys(msg.heatNodes).forEach(function (key) {
+      var index = parseInt(key, 10);
+      var node = msg.heatNodes[key];
       if (!node || !node.callsign) return;
 
       pilots[String(index)] = {
