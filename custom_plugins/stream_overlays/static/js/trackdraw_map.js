@@ -4,6 +4,12 @@
   var SVG_NS = "http://www.w3.org/2000/svg";
   var DEFAULT_LAP_MS = 30000;
   var STALE_WINDOW_MS = 8000;
+  var EMA_ALPHA = 0.35;
+
+  // Set in renderTrack from the actual track field diagonal (meters).
+  // All SVG sizes are derived as fractions of this value so proportions
+  // stay correct regardless of how large or small the physical course is.
+  var fieldScale = 72;
 
   // ---- Track state ----
   var trackData = null;
@@ -170,52 +176,31 @@
       return false;
     }
 
-    var padding = Math.max(field.width, field.height) * 0.08;
+    // Derive proportional sizes from the field diagonal so elements look
+    // correct at any physical track scale (small club field or large venue).
+    fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
+    var routeW    = fieldScale * 0.005;
+    var gateR     = fieldScale * 0.009;
+    var gateFontZ = fieldScale * 0.026;
+    var gateSwW   = fieldScale * 0.003;
+    var timingSfR = fieldScale * 0.013;
+    var timingR   = fieldScale * 0.010;
+    var timingSwW = fieldScale * 0.003;
+    var timingFontZ = fieldScale * 0.022;
+
+    var padding = fieldScale * 0.06;
     clearSvg(svgEl);
     svgEl.setAttribute(
       "viewBox",
       [-padding, -padding, field.width + padding * 2, field.height + padding * 2].join(" ")
     );
 
-    // SVG filter: soft glow behind the route line
-    var defs = createSvgElement("defs", {});
-    var glowFilter = createSvgElement("filter", {
-      id: "td-route-glow",
-      x: "-30%",
-      y: "-30%",
-      width: "160%",
-      height: "160%",
+    var routePath = createSvgElement("path", {
+      class: "trackdraw-map__route",
+      d: getRoutePath(field, points),
     });
-    var blur = createSvgElement("feGaussianBlur", {
-      in: "SourceGraphic",
-      stdDeviation: "0.7",
-      result: "blur",
-    });
-    var merge = createSvgElement("feMerge", {});
-    merge.appendChild(createSvgElement("feMergeNode", { in: "blur" }));
-    merge.appendChild(createSvgElement("feMergeNode", { in: "SourceGraphic" }));
-    glowFilter.appendChild(blur);
-    glowFilter.appendChild(merge);
-    defs.appendChild(glowFilter);
-    svgEl.appendChild(defs);
-
-    svgEl.appendChild(
-      createSvgElement("rect", {
-        class: "trackdraw-map__field",
-        x: 0,
-        y: 0,
-        width: field.width,
-        height: field.height,
-      })
-    );
-
-    svgEl.appendChild(
-      createSvgElement("path", {
-        class: "trackdraw-map__route",
-        d: getRoutePath(field, points),
-        filter: "url(#td-route-glow)",
-      })
-    );
+    routePath.style.strokeWidth = String(routeW);
+    svgEl.appendChild(routePath);
 
     (track.route_obstacles || []).forEach(function (obstacle) {
       if (!obstacle.route_position) return;
@@ -223,17 +208,19 @@
       var g = createSvgElement("g", {
         transform: "translate(" + pt.x + " " + pt.y + ")",
       });
-      g.appendChild(
-        createSvgElement("circle", {
-          class: "trackdraw-map__obstacle",
-          r: 1.55,
-        })
-      );
+      var dot = createSvgElement("circle", {
+        class: "trackdraw-map__obstacle",
+        r: gateR,
+      });
+      dot.style.strokeWidth = String(gateSwW);
+      g.appendChild(dot);
       if (obstacle.route_number != null) {
         var lbl = createSvgElement("text", {
           class: "trackdraw-map__obstacle-label",
-          dy: "0.92",
+          dy: String(gateR * 0.6),
         });
+        lbl.style.fontSize = gateFontZ + "px";
+        lbl.style.strokeWidth = String(fieldScale * 0.010) + "px";
         lbl.textContent = String(obstacle.route_number);
         g.appendChild(lbl);
       }
@@ -244,24 +231,27 @@
       if (!marker.route_position) return;
       var pt = getPoint(field, marker.route_position);
       var isStartFinish = marker.role === "start_finish";
-      svgEl.appendChild(
-        createSvgElement("circle", {
-          class: "trackdraw-map__timing",
-          cx: pt.x,
-          cy: pt.y,
-          r: isStartFinish ? 1.4 : 1.0,
-        })
-      );
+      var r = isStartFinish ? timingSfR : timingR;
+      var circle = createSvgElement("circle", {
+        class: "trackdraw-map__timing",
+        cx: pt.x,
+        cy: pt.y,
+        r: r,
+      });
+      circle.style.strokeWidth = String(timingSwW);
+      svgEl.appendChild(circle);
       var lbl = createSvgElement("text", {
         class: "trackdraw-map__timing-label",
         x: pt.x,
-        y: pt.y - 2.3,
+        y: pt.y - r * 1.8,
       });
+      lbl.style.fontSize = timingFontZ + "px";
+      lbl.style.strokeWidth = String(fieldScale * 0.009) + "px";
       lbl.textContent = isStartFinish ? "S/F" : marker.title;
       svgEl.appendChild(lbl);
     });
 
-    // Track title in header label
+    // Show the actual track title in the header badge
     var headerLabel = document.querySelector(".trackdraw-map__label");
     if (headerLabel && track.title) {
       headerLabel.textContent = track.title;
@@ -286,16 +276,20 @@
 
     var g = createSvgElement("g", { id: id, class: "trackdraw-map__pilot-group" });
 
+    var pilotR = fieldScale * 0.013;
     var dot = createSvgElement("circle", {
       class: "trackdraw-map__pilot",
-      r: 2.5,
+      r: pilotR,
     });
     dot.style.fill = pilot.color;
+    dot.style.strokeWidth = String(fieldScale * 0.003);
 
     var lbl = createSvgElement("text", {
       class: "trackdraw-map__pilot-label",
     });
-    lbl.textContent = (pilot.callsign || "").slice(0, 4);
+    lbl.style.fontSize = fieldScale * 0.020 + "px";
+    lbl.style.strokeWidth = String(fieldScale * 0.007) + "px";
+    lbl.textContent = (pilot.callsign || "").slice(0, 3);
 
     g.appendChild(dot);
     g.appendChild(lbl);
@@ -364,9 +358,9 @@
         }
         if (lbl) {
           lbl.setAttribute("x", pt.x);
-          lbl.setAttribute("y", pt.y - 2.8);
+          lbl.setAttribute("y", pt.y - fieldScale * 0.022);
           lbl.setAttribute("opacity", opacity);
-          lbl.textContent = (pilot.callsign || "").slice(0, 4);
+          lbl.textContent = (pilot.callsign || "").slice(0, 3);
         }
       });
     }
@@ -397,7 +391,7 @@
         active: true,
         lapCount: 0,
         lastAnchorProgress: 0,
-        lastAnchorTime: raceRunning ? window.performance.now() : null,
+        lastAnchorTime: null,  // frozen until holeshot is confirmed
         expectedLapMs: DEFAULT_LAP_MS,
       };
     });
@@ -419,10 +413,13 @@
     }
 
     if (status === 1 && !wasRunning) {
-      // Race just started: place all pilots at start/finish
+      // Race started: park all pilots at start/finish, frozen until holeshot.
+      // Drones launch from start pads — we don't animate until the first gate
+      // pass is confirmed, so the marker doesn't wander across the field.
       Object.keys(pilots).forEach(function (nodeIdx) {
         pilots[nodeIdx].lastAnchorProgress = 0;
-        pilots[nodeIdx].lastAnchorTime = window.performance.now();
+        pilots[nodeIdx].lastAnchorTime = null;
+        pilots[nodeIdx].expectedLapMs = DEFAULT_LAP_MS;
       });
       prevLapCounts = {};
       prevSplitCounts = {};
@@ -451,15 +448,32 @@
       if (laps.length > prevCount) {
         var latest = laps[laps.length - 1];
 
-        // Update expected lap time from real data (skip lap_number 0 = holeshot)
-        if (latest.lap_number > 0 && typeof latest.lap_raw === "number" && latest.lap_raw > 0) {
-          pilot.expectedLapMs = latest.lap_raw;
+        if (latest.lap_number === 0) {
+          // Holeshot: first gate pass after launch. The marker was frozen at
+          // start/finish — now we activate it and use the holeshot time as
+          // an initial lap-time estimate so the first lap looks believable.
+          if (typeof latest.lap_raw === "number" && latest.lap_raw > 0) {
+            pilot.expectedLapMs = latest.lap_raw;
+          }
+          pilot.lastAnchorProgress = 0;
+          pilot.lastAnchorTime = window.performance.now();
+        } else if (latest.lap_number > 0) {
+          // Racing lap completed — snap back to S/F and update expected time
+          // via exponential moving average so the estimate adapts to the
+          // pilot's actual pace without being thrown off by a single outlier.
+          if (typeof latest.lap_raw === "number" && latest.lap_raw > 0) {
+            if (pilot.expectedLapMs === DEFAULT_LAP_MS) {
+              pilot.expectedLapMs = latest.lap_raw;
+            } else {
+              pilot.expectedLapMs = Math.round(
+                EMA_ALPHA * latest.lap_raw + (1 - EMA_ALPHA) * pilot.expectedLapMs
+              );
+            }
+          }
+          pilot.lastAnchorProgress = 0;
+          pilot.lastAnchorTime = window.performance.now();
+          pilot.lapCount = latest.lap_number;
         }
-
-        // Snap pilot back to start/finish
-        pilot.lastAnchorProgress = 0;
-        pilot.lastAnchorTime = window.performance.now();
-        pilot.lapCount = latest.lap_number || laps.length;
       }
 
       // Check for new splits in the current lap (only if splits are configured)

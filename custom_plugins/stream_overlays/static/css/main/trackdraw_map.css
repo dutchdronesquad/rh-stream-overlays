@@ -1,19 +1,18 @@
 /* ============================================================
    TrackDraw Live Race Map
-   F1 broadcast-inspired dark theme
+   Designed for OBS browser source — enable "Allow transparency"
+   in source properties for a fully transparent background.
    ============================================================ */
 
 html,
 body {
-  background: var(--trackdraw-bg, #06090f);
+  background: transparent;
   font-family: "Barlow", sans-serif;
   font-variant-numeric: tabular-nums;
   height: 100%;
   margin: 0;
   padding: 0;
 }
-
-/* ---- Full-screen canvas ---- */
 
 .trackdraw-map {
   height: 100vh;
@@ -22,7 +21,6 @@ body {
 }
 
 .trackdraw-map__panel {
-  box-sizing: border-box;
   height: 100%;
   overflow: hidden;
   position: relative;
@@ -32,48 +30,47 @@ body {
 /* ---- Header info badge ---- */
 
 .trackdraw-map__header {
-  -webkit-backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(8px);
   align-items: center;
-  backdrop-filter: blur(10px);
-  background: rgb(0 0 0 / 55%);
-  border-left: 3px solid var(--trackdraw-accent, #2de2a7);
+  backdrop-filter: blur(8px);
+  background: rgb(0 0 0 / 60%);
+  border-left: 2px solid var(--trackdraw-accent, #2de2a7);
   border-radius: 2px;
-  box-shadow: 0 2px 16px rgb(0 0 0 / 60%);
   display: flex;
-  gap: 8px;
-  left: 14px;
-  padding: 5px 10px 4px 8px;
+  gap: 7px;
+  left: 12px;
+  padding: 4px 8px 3px 7px;
   position: absolute;
-  top: 14px;
+  top: 12px;
   z-index: 10;
 }
 
 .trackdraw-map__label {
   color: var(--trackdraw-accent, #2de2a7);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .trackdraw-map__status {
-  color: rgb(255 255 255 / 40%);
+  color: rgb(255 255 255 / 38%);
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-/* Live indicator dot — shown via ::after, animated when race is running */
+/* Live indicator — pulsing dot appended via ::after */
 .trackdraw-map__header::after {
-  background: rgb(255 255 255 / 16%);
+  background: rgb(255 255 255 / 14%);
   border-radius: 50%;
   content: "";
   display: block;
   flex-shrink: 0;
-  height: 6px;
+  height: 5px;
   margin-left: 2px;
-  width: 6px;
+  width: 5px;
 }
 
 .trackdraw-map__header.is-live::after {
@@ -84,10 +81,10 @@ body {
 @keyframes td-live-pulse {
   0%,
   100% { opacity: 1; }
-  50% { opacity: 0.15; }
+  50% { opacity: 0.1; }
 }
 
-/* ---- SVG canvas ---- */
+/* ---- SVG fills the full panel ---- */
 
 .trackdraw-map__svg {
   display: block;
@@ -96,64 +93,49 @@ body {
   width: 100%;
 }
 
-/* ---- Track elements ---- */
-
-.trackdraw-map__field {
-  fill: var(--trackdraw-field-bg, rgb(255 255 255 / 2%));
-  stroke: var(--trackdraw-field-stroke, rgb(255 255 255 / 5%));
-  stroke-dasharray: 0.8 2;
-  stroke-width: 0.18;
-}
+/* ---- Track elements (sizes set proportionally in JS) ---- */
 
 .trackdraw-map__route {
   fill: none;
-  stroke: var(--trackdraw-route, #dde4ed);
+  stroke: var(--trackdraw-route, #d8e2ee);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 0.85;
 }
 
 .trackdraw-map__obstacle {
-  fill: var(--trackdraw-obstacle-bg, #06090f);
+  fill: var(--trackdraw-obstacle-bg, transparent);
   stroke: var(--trackdraw-obstacle, #2de2a7);
-  stroke-width: 0.32;
 }
 
 .trackdraw-map__obstacle-label,
 .trackdraw-map__timing-label {
   fill: var(--trackdraw-text, #fff);
-  font-size: 2.5px;
-  font-weight: 900;
+  font-weight: 800;
   paint-order: stroke;
-  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 90%));
+  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
   stroke-linejoin: round;
-  stroke-width: 1px;
   text-anchor: middle;
 }
 
 .trackdraw-map__timing {
   fill: var(--trackdraw-timing, #ffe566);
-  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 90%));
-  stroke-width: 0.28;
+  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
 }
 
 /* ---- Pilot dots ---- */
 
 .trackdraw-map__pilot {
-  stroke: rgb(255 255 255 / 85%);
-  stroke-width: 0.28;
+  stroke: rgb(255 255 255 / 80%);
 }
 
 .trackdraw-map__pilot-label {
   fill: #fff;
   font-family: "Barlow", sans-serif;
-  font-size: 2.2px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.05em;
   paint-order: stroke;
-  stroke: rgb(0 0 0 / 90%);
+  stroke: rgb(0 0 0 / 85%);
   stroke-linejoin: round;
-  stroke-width: 0.7px;
   text-anchor: middle;
   text-transform: uppercase;
 }
@@ -162,11 +144,11 @@ body {
 
 .trackdraw-map__message {
   align-items: center;
-  background: var(--trackdraw-bg, #06090f);
+  background: rgb(0 0 0 / 72%);
   box-sizing: border-box;
-  color: rgb(255 255 255 / 75%);
+  color: rgb(255 255 255 / 70%);
   display: none;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   inset: 0;
   justify-content: center;
