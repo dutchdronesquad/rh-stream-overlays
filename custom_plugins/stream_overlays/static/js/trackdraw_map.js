@@ -177,6 +177,28 @@
       [-padding, -padding, field.width + padding * 2, field.height + padding * 2].join(" ")
     );
 
+    // SVG filter: soft glow behind the route line
+    var defs = createSvgElement("defs", {});
+    var glowFilter = createSvgElement("filter", {
+      id: "td-route-glow",
+      x: "-30%",
+      y: "-30%",
+      width: "160%",
+      height: "160%",
+    });
+    var blur = createSvgElement("feGaussianBlur", {
+      in: "SourceGraphic",
+      stdDeviation: "0.7",
+      result: "blur",
+    });
+    var merge = createSvgElement("feMerge", {});
+    merge.appendChild(createSvgElement("feMergeNode", { in: "blur" }));
+    merge.appendChild(createSvgElement("feMergeNode", { in: "SourceGraphic" }));
+    glowFilter.appendChild(blur);
+    glowFilter.appendChild(merge);
+    defs.appendChild(glowFilter);
+    svgEl.appendChild(defs);
+
     svgEl.appendChild(
       createSvgElement("rect", {
         class: "trackdraw-map__field",
@@ -191,6 +213,7 @@
       createSvgElement("path", {
         class: "trackdraw-map__route",
         d: getRoutePath(field, points),
+        filter: "url(#td-route-glow)",
       })
     );
 
@@ -203,7 +226,7 @@
       g.appendChild(
         createSvgElement("circle", {
           class: "trackdraw-map__obstacle",
-          r: 1.45,
+          r: 1.55,
         })
       );
       if (obstacle.route_number != null) {
@@ -220,22 +243,29 @@
     (track.timing_markers || []).forEach(function (marker) {
       if (!marker.route_position) return;
       var pt = getPoint(field, marker.route_position);
+      var isStartFinish = marker.role === "start_finish";
       svgEl.appendChild(
         createSvgElement("circle", {
           class: "trackdraw-map__timing",
           cx: pt.x,
           cy: pt.y,
-          r: marker.role === "start_finish" ? 1.25 : 0.95,
+          r: isStartFinish ? 1.4 : 1.0,
         })
       );
       var lbl = createSvgElement("text", {
         class: "trackdraw-map__timing-label",
         x: pt.x,
-        y: pt.y - 2.15,
+        y: pt.y - 2.3,
       });
-      lbl.textContent = marker.role === "start_finish" ? "S/F" : marker.title;
+      lbl.textContent = isStartFinish ? "S/F" : marker.title;
       svgEl.appendChild(lbl);
     });
+
+    // Track title in header label
+    var headerLabel = document.querySelector(".trackdraw-map__label");
+    if (headerLabel && track.title) {
+      headerLabel.textContent = track.title;
+    }
 
     // Pilot group always rendered on top
     pilotGroupEl = createSvgElement("g", { class: "trackdraw-map__pilots" });
@@ -258,7 +288,7 @@
 
     var dot = createSvgElement("circle", {
       class: "trackdraw-map__pilot",
-      r: 2.0,
+      r: 2.5,
     });
     dot.style.fill = pilot.color;
 
@@ -377,6 +407,16 @@
     var status = msg && msg.race_status;
     var wasRunning = raceRunning;
     raceRunning = status === 1;
+
+    // Live indicator dot in header badge
+    var header = document.querySelector(".trackdraw-map__header");
+    if (header) {
+      if (raceRunning) {
+        header.classList.add("is-live");
+      } else {
+        header.classList.remove("is-live");
+      }
+    }
 
     if (status === 1 && !wasRunning) {
       // Race just started: place all pilots at start/finish

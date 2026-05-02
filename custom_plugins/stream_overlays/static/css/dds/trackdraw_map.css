@@ -1,3 +1,7 @@
+:root {
+  --trackdraw-bg: #02080e;
+}
+
 .trackdraw-map[data-theme="dds"] {
   --trackdraw-accent: #20e3b2;
   --trackdraw-accent-bar-h: 3px;

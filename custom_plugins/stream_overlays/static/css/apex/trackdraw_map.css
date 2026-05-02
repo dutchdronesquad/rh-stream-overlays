@@ -1,3 +1,7 @@
+:root {
+  --trackdraw-bg: #07040e;
+}
+
 .trackdraw-map[data-theme="apex"] {
   --trackdraw-accent: #ff4f9a;
   --trackdraw-accent-bar-h: 3px;
