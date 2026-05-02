@@ -6,6 +6,7 @@
   }
 
   var SVG_NS = "http://www.w3.org/2000/svg";
+  var theme = (window.trackdrawOverlayTheme || "").toLowerCase();
   var DEFAULT_LAP_MS = 30000;
   var STALE_WINDOW_MS = 8000;
   var EMA_ALPHA = 0.35;
@@ -673,12 +674,10 @@
           halo: existing.querySelector(".trackdraw-map__pilot-halo"),
           marker: existing.querySelector(".trackdraw-map__pilot-marker"),
           arrow: existing.querySelector(".trackdraw-map__pilot"),
-          connector: existing.querySelector(".trackdraw-map__pilot-label-connector"),
-          labelBg: existing.querySelector(".trackdraw-map__pilot-label-bg"),
-          labelAccent: existing.querySelector(".trackdraw-map__pilot-label-accent"),
-          positionBg: existing.querySelector(".trackdraw-map__pilot-position-bg"),
-          positionText: existing.querySelector(".trackdraw-map__pilot-position"),
-          lbl: existing.querySelector(".trackdraw-map__pilot-label"),
+          callsignBg: existing.querySelector(".trackdraw-map__pilot-callsign-bg"),
+          callsignText: existing.querySelector(".trackdraw-map__pilot-callsign"),
+          lapBg: existing.querySelector(".trackdraw-map__pilot-lap-bg"),
+          lapText: existing.querySelector(".trackdraw-map__pilot-lap"),
         };
       }
       return existing;
@@ -717,56 +716,45 @@
     arrow.style.strokeWidth = String(fieldScale * 0.0023);
     marker.appendChild(arrow);
 
-    var connector = createSvgElement("line", {
-      class: "trackdraw-map__pilot-label-connector",
+    // Label: two-box popup (colored callsign + dark lap count), no connector.
+    var rx = fieldScale * 0.004;
+    var callsignBg = createSvgElement("rect", {
+      class: "trackdraw-map__pilot-callsign-bg",
+      rx: rx,
     });
-    connector.style.strokeWidth = String(fieldScale * 0.0015);
+    callsignBg.style.fill = pilot.color;
 
-    var labelBg = createSvgElement("rect", {
-      class: "trackdraw-map__pilot-label-bg",
-      rx: fieldScale * 0.006,
+    var callsignText = createSvgElement("text", {
+      class: "trackdraw-map__pilot-callsign",
     });
-    labelBg.style.strokeWidth = String(fieldScale * 0.002);
+    callsignText.style.fontSize = fieldScale * 0.0158 + "px";
+    callsignText.style.fill = getContrastColor(pilot.color);
+    callsignText.textContent = getPilotLabel(pilot);
 
-    var labelAccent = createSvgElement("rect", {
-      class: "trackdraw-map__pilot-label-accent",
-      rx: fieldScale * 0.002,
-    });
-
-    var positionBg = createSvgElement("rect", {
-      class: "trackdraw-map__pilot-position-bg",
-      rx: fieldScale * 0.004,
+    var lapBg = createSvgElement("rect", {
+      class: "trackdraw-map__pilot-lap-bg",
+      rx: rx,
     });
 
-    var positionText = createSvgElement("text", {
-      class: "trackdraw-map__pilot-position",
+    var lapText = createSvgElement("text", {
+      class: "trackdraw-map__pilot-lap",
     });
-    positionText.style.fontSize = fieldScale * 0.013 + "px";
-
-    var lbl = createSvgElement("text", {
-      class: "trackdraw-map__pilot-label",
-    });
-    lbl.style.fontSize = fieldScale * 0.0165 + "px";
-    lbl.textContent = getPilotLabel(pilot);
+    lapText.style.fontSize = fieldScale * 0.0158 + "px";
 
     g.appendChild(halo);
     g.appendChild(marker);
-    g.appendChild(connector);
-    g.appendChild(labelBg);
-    g.appendChild(labelAccent);
-    g.appendChild(positionBg);
-    g.appendChild(positionText);
-    g.appendChild(lbl);
+    g.appendChild(callsignBg);
+    g.appendChild(callsignText);
+    g.appendChild(lapBg);
+    g.appendChild(lapText);
     g._trackdrawEls = {
       halo: halo,
       marker: marker,
       arrow: arrow,
-      connector: connector,
-      labelBg: labelBg,
-      labelAccent: labelAccent,
-      positionBg: positionBg,
-      positionText: positionText,
-      lbl: lbl,
+      callsignBg: callsignBg,
+      callsignText: callsignText,
+      lapBg: lapBg,
+      lapText: lapText,
     };
     pilotGroupEl.appendChild(g);
     return g;
@@ -797,7 +785,7 @@
     ];
     var direction = directions[slot] || directions[0];
     var length = Math.sqrt(direction.x * direction.x + direction.y * direction.y) || 1;
-    var radius = fieldScale * 0.058;
+    var radius = fieldScale * 0.044;
     return {
       x: (direction.x / length) * radius,
       y: (direction.y / length) * radius,
@@ -1067,71 +1055,50 @@
           }
         }
 
+        var lapCount = pilot.lapCount || 0;
         var labelLayoutKey = [
           labelSlot,
           label,
-          hasPosition ? position : "",
+          lapCount,
           pilot.color,
         ].join("|");
         if (pilot._labelLayoutKey !== labelLayoutKey) {
-          var accentW = fieldScale * 0.005;
-          var posW = hasPosition ? fieldScale * 0.022 : 0;
-          var gap = hasPosition ? fieldScale * 0.004 : 0;
-          var labelW = Math.max(
-            fieldScale * (hasPosition ? 0.066 : 0.046),
-            fieldScale * (0.014 * String(label).length + 0.030) + posW + gap
+          var labelH = fieldScale * 0.028;
+          var csW = Math.max(
+            fieldScale * 0.030,
+            fieldScale * (0.013 * String(label).length + 0.016)
           );
-          var labelH = fieldScale * 0.030;
-          var labelX = labelOffset.x - labelW / 2;
+          var lapW = fieldScale * 0.024;
+          var totalW = csW + lapW;
+          var labelX = labelOffset.x - totalW / 2;
           var labelY = labelOffset.y - labelH / 2;
-          if (els.connector) {
-            els.connector.setAttribute("x1", 0);
-            els.connector.setAttribute("y1", -fieldScale * 0.011);
-            els.connector.setAttribute("x2", labelOffset.x);
-            els.connector.setAttribute("y2", labelOffset.y + fieldScale * 0.013);
-            els.connector.style.stroke = pilot.color;
+          var midX = labelX + csW;
+
+          if (els.callsignBg) {
+            els.callsignBg.setAttribute("x", labelX);
+            els.callsignBg.setAttribute("y", labelY);
+            els.callsignBg.setAttribute("width", csW);
+            els.callsignBg.setAttribute("height", labelH);
+            els.callsignBg.style.fill = pilot.color;
           }
-          if (els.labelBg) {
-            els.labelBg.setAttribute("x", labelX);
-            els.labelBg.setAttribute("y", labelY);
-            els.labelBg.setAttribute("width", labelW);
-            els.labelBg.setAttribute("height", labelH);
-            els.labelBg.style.stroke = pilot.color;
+          if (els.callsignText) {
+            els.callsignText.setAttribute("x", labelX + csW / 2);
+            els.callsignText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
+            els.callsignText.style.fill = getContrastColor(pilot.color);
+            els.callsignText.textContent = label;
           }
-          if (els.labelAccent) {
-            els.labelAccent.setAttribute("x", labelX);
-            els.labelAccent.setAttribute("y", labelY);
-            els.labelAccent.setAttribute("width", accentW);
-            els.labelAccent.setAttribute("height", labelH);
-            els.labelAccent.style.fill = pilot.color;
+          if (els.lapBg) {
+            els.lapBg.setAttribute("x", midX);
+            els.lapBg.setAttribute("y", labelY);
+            els.lapBg.setAttribute("width", lapW);
+            els.lapBg.setAttribute("height", labelH);
           }
-          if (els.positionBg && els.positionText) {
-            if (hasPosition) {
-              var posX = labelX + accentW + fieldScale * 0.004;
-              els.positionBg.removeAttribute("display");
-              els.positionText.removeAttribute("display");
-              els.positionBg.setAttribute("x", posX);
-              els.positionBg.setAttribute("y", labelY + fieldScale * 0.004);
-              els.positionBg.setAttribute("width", posW);
-              els.positionBg.setAttribute("height", labelH - fieldScale * 0.008);
-              els.positionBg.style.fill = pilot.color;
-              els.positionText.setAttribute("x", posX + posW / 2);
-              els.positionText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
-              els.positionText.style.fill = getContrastColor(pilot.color);
-              els.positionText.textContent = String(position);
-            } else {
-              els.positionBg.setAttribute("display", "none");
-              els.positionText.setAttribute("display", "none");
-            }
+          if (els.lapText) {
+            els.lapText.setAttribute("x", midX + lapW / 2);
+            els.lapText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
+            els.lapText.textContent = String(lapCount);
           }
-          if (els.lbl) {
-            var textAreaStart =
-              labelX + accentW + fieldScale * 0.006 + (hasPosition ? posW + gap : 0);
-            var textAreaW = labelW - (textAreaStart - labelX) - fieldScale * 0.008;
-            els.lbl.setAttribute("x", textAreaStart + textAreaW / 2);
-            els.lbl.setAttribute("y", labelOffset.y + fieldScale * 0.0055);
-            els.lbl.textContent = label;
-          }
+
           pilot._labelLayoutKey = labelLayoutKey;
         }
       });

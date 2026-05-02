@@ -211,38 +211,31 @@ body {
   stroke-linejoin: round;
 }
 
-.trackdraw-map__pilot-label-connector {
-  opacity: 0.42;
-  stroke-linecap: round;
-}
+/* Popup-style label: colored callsign box + dark lap-count box */
 
-.trackdraw-map__pilot-label-bg {
-  fill: var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 84%));
-  stroke: rgb(255 255 255 / 52%);
-}
-
-.trackdraw-map__pilot-label-accent {
-  opacity: 0.96;
-}
-
-.trackdraw-map__pilot-position-bg {
+.trackdraw-map__pilot-callsign-bg {
   opacity: 0.95;
 }
 
-.trackdraw-map__pilot-position {
-  fill: var(--trackdraw-pilot-position-text, #06100d);
-  font-family: "Barlow", sans-serif;
-  font-weight: 900;
-  text-anchor: middle;
-}
-
-.trackdraw-map__pilot-label {
-  fill: #fff;
+.trackdraw-map__pilot-callsign {
   font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
   font-weight: var(--trackdraw-badge-weight, 900);
   letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
   text-anchor: middle;
   text-transform: uppercase;
+}
+
+.trackdraw-map__pilot-lap-bg {
+  fill: var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 88%));
+  opacity: 0.95;
+}
+
+.trackdraw-map__pilot-lap {
+  fill: var(--trackdraw-text, #fff);
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-weight: var(--trackdraw-badge-weight, 900);
+  letter-spacing: 0.02em;
+  text-anchor: middle;
 }
 
 .trackdraw-map__pilot-group.is-high .trackdraw-map__pilot-halo {
@@ -281,20 +274,11 @@ body {
   stroke: var(--trackdraw-leader, #ffffff);
 }
 
-.trackdraw-map__pilot-group.is-leader .trackdraw-map__pilot-label-bg {
-  fill: var(--trackdraw-leader-bg, rgb(255 255 255 / 92%));
-}
 
-.trackdraw-map__pilot-group.is-leader .trackdraw-map__pilot-label {
-  fill: var(--trackdraw-leader-text, #04100c);
-}
-
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-bg,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-accent,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-label-connector,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-position,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-position-bg {
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-lap-bg,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-lap {
   display: none;
 }
 
@@ -310,12 +294,12 @@ body {
   100% { opacity: 1; }
 }
 
-.trackdraw-map.is-crowded .trackdraw-map__pilot-label-bg {
-  fill: var(--trackdraw-pilot-label-bg-crowded, rgb(0 0 0 / 78%));
+.trackdraw-map.is-crowded .trackdraw-map__pilot-callsign-bg {
+  opacity: 0.80;
 }
 
-.trackdraw-map.is-crowded .trackdraw-map__pilot-label-connector {
-  opacity: 0.34;
+.trackdraw-map.is-crowded .trackdraw-map__pilot-lap-bg {
+  fill: var(--trackdraw-pilot-label-bg-crowded, rgb(0 0 0 / 78%));
 }
 
 .trackdraw-map.is-packed .trackdraw-map__pilot-group:not(.is-leader) .trackdraw-map__pilot-halo {
@@ -335,12 +319,10 @@ body {
   display: none;
 }
 
-.trackdraw-map.is-tiny .trackdraw-map__pilot-label,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-label-bg,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-label-accent,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-label-connector,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-position,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-position-bg {
+.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-lap-bg,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-lap {
   display: none;
 }
 
