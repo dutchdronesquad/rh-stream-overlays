@@ -145,7 +145,7 @@ class StreamOverlays:
         self._rhapi.config.register_section(TRACKDRAW_CONFIG_SECTION)
         self._rhapi.ui.register_panel(
             panel_id,
-            "TrackDraw - Live Minimap",
+            "TrackDraw",
             "settings",
             open=False,
         )

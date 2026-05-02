@@ -369,30 +369,21 @@
   // UI helpers
   // ----------------------------------------------------------------
 
-  function showMessage(text, status) {
+  function showMessage(text) {
     var msgEl = document.getElementById("trackdraw-map-message");
-    var statusEl = document.getElementById("trackdraw-cache-status");
-    if (statusEl) statusEl.textContent = status || "Setup";
     if (msgEl) {
       msgEl.textContent = text || "TrackDraw map is not ready.";
       msgEl.classList.add("is-visible");
     }
   }
 
-  function hideMessage(status) {
+  function hideMessage() {
     var msgEl = document.getElementById("trackdraw-map-message");
-    var statusEl = document.getElementById("trackdraw-cache-status");
-    if (statusEl) statusEl.textContent = status || "Ready";
     if (msgEl) msgEl.classList.remove("is-visible");
   }
 
   function clearSvg(svg) {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
-  }
-
-  function setLiveIndicator(isLive) {
-    var header = document.querySelector(".trackdraw-map__header");
-    if (header) header.classList.toggle("is-live", isLive);
   }
 
   function applyViewportClass() {
@@ -528,16 +519,16 @@
     });
 
     [-1, 1].forEach(function (side) {
-      finishLine.appendChild(
-        createSvgElement("rect", {
-          class: "trackdraw-map__finish-line-cap",
-          x: -r * 0.75,
-          y: side * tickSize - r * 0.34,
-          width: r * 1.5,
-          height: r * 0.68,
-          rx: r * 0.12,
-        })
-      );
+      var cap = createSvgElement("rect", {
+        class: "trackdraw-map__finish-line-cap",
+        x: -r * 0.75,
+        y: side * tickSize - r * 0.34,
+        width: r * 1.5,
+        height: r * 0.68,
+        rx: r * 0.12,
+      });
+      cap.style.strokeWidth = String(r * 0.08);
+      finishLine.appendChild(cap);
     });
 
     var blockRows = 6;
@@ -566,22 +557,22 @@
   function renderTrack(track, cacheState) {
     svgEl = document.getElementById("trackdraw-map-svg");
     if (!svgEl) {
-      showMessage("SVG mount missing.", "Error");
+      showMessage("SVG mount missing.");
       return false;
     }
     if (!track || !track.route || !hasValidField(track.field)) {
-      showMessage("No ready TrackDraw route.", "Blocked");
+      showMessage("No ready TrackDraw route.");
       return false;
     }
     if (!track.readiness || track.readiness.status !== "ready") {
-      showMessage("TrackDraw setup is blocked.", "Blocked");
+      showMessage("TrackDraw setup is blocked.");
       return false;
     }
 
     var field = track.field;
     var points = (track.route.sampled_points || track.route.waypoints || []).filter(hasPoint);
     if (points.length <= 1) {
-      showMessage("Route has no drawable points.", "Blocked");
+      showMessage("Route has no drawable points.");
       return false;
     }
 
@@ -681,17 +672,11 @@
       }
     });
 
-    // Show the actual track title in the header badge
-    var headerLabel = document.querySelector(".trackdraw-map__label");
-    if (headerLabel && track.title) {
-      headerLabel.textContent = track.title;
-    }
-
     // Pilot group always rendered on top
     pilotGroupEl = createSvgElement("g", { class: "trackdraw-map__pilots" });
     svgEl.appendChild(pilotGroupEl);
 
-    hideMessage(cacheState === "stale" ? "Stale cache" : "Ready");
+    hideMessage();
     return true;
   }
 
@@ -1046,7 +1031,7 @@
           g.setAttribute("transform", groupTransform);
           pilot._frameTransform = groupTransform;
         }
-        if (isLeader && g.parentNode === pilotGroupEl) {
+        if (isLeader && g.parentNode === pilotGroupEl && g !== pilotGroupEl.lastChild) {
           pilotGroupEl.appendChild(g);
         }
 
@@ -1176,8 +1161,6 @@
     var status = msg && msg.race_status;
     var wasRunning = raceRunning;
     raceRunning = status === 1;
-
-    setLiveIndicator(raceRunning);
 
     if (status === 1 && !wasRunning) {
       // Race started: park every pilot at start/finish. Movement begins only
@@ -1351,7 +1334,7 @@
 
   function loadTrack() {
     var url = getTrackJsonUrl();
-    showMessage("Loading TrackDraw map...", "Loading");
+    showMessage("Loading TrackDraw map...");
 
     fetch(url, { headers: { Accept: "application/json" }, cache: "no-store" })
       .then(function (r) {
@@ -1360,7 +1343,7 @@
       })
       .then(function (payload) {
         if (!payload.ok || !payload.track) {
-          showMessage(getReadinessMessage(payload), payload.state || "Error");
+          showMessage(getReadinessMessage(payload));
           return;
         }
 
@@ -1379,10 +1362,7 @@
         window.requestAnimationFrame(animationTick);
       })
       .catch(function (err) {
-        showMessage(
-          err && err.message ? err.message : "Could not load TrackDraw cache.",
-          "Error"
-        );
+        showMessage(err && err.message ? err.message : "Could not load TrackDraw cache.");
       });
   }
 
