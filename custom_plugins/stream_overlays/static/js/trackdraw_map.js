@@ -549,6 +549,21 @@
     return "medium";
   }
 
+  function getLapTimeMs(lap) {
+    if (!lap) return null;
+    var value = null;
+
+    if (typeof lap.lap_time === "number") {
+      value = lap.lap_time;
+    } else if (typeof lap.lap_raw === "number") {
+      value = lap.lap_raw;
+    } else if (typeof lap.lap_time === "string" && lap.lap_time.trim() !== "") {
+      value = Number(lap.lap_time);
+    }
+
+    return typeof value === "number" && !isNaN(value) && value > 0 ? value : null;
+  }
+
   function updateExpectedLapMs(pilot, lapMs) {
     if (typeof lapMs !== "number" || lapMs <= 0) return;
     if (
@@ -659,12 +674,20 @@
     }
 
     if (status === 1 && !wasRunning) {
-      // Race started: begin from the TrackDraw start/finish anchor using a
-      // low-confidence baseline until RotorHazard confirms a lap or split.
+      // Race started: park every pilot at start/finish. Movement begins only
+      // after RotorHazard confirms the first crossing/holeshot in current_laps.
       Object.keys(pilots).forEach(function (nodeIdx) {
-        setPilotAnchor(pilots[nodeIdx], anchorModel.startFinishProgress, {
-          confidence: "low",
-        });
+        pilots[nodeIdx].lastAnchorProgress = anchorModel.startFinishProgress;
+        pilots[nodeIdx].nextAnchorProgress = getNextAnchorProgress(
+          anchorModel.startFinishProgress
+        );
+        pilots[nodeIdx].expectedSegmentMs = getExpectedSegmentMs(
+          pilots[nodeIdx],
+          pilots[nodeIdx].lastAnchorProgress,
+          pilots[nodeIdx].nextAnchorProgress
+        );
+        pilots[nodeIdx].lastAnchorTime = null;
+        pilots[nodeIdx].confidence = "idle";
       });
       prevLapCounts = {};
       prevSplitCounts = {};
@@ -694,22 +717,23 @@
 
       if (laps.length > prevCount) {
         var latest = laps[laps.length - 1];
+        var lapNumber = Number(latest.lap_number);
 
-        if (latest.lap_number === 0) {
+        if (lapNumber === 0) {
           // Holeshot/start confirmation. Do not learn full-lap pace from this:
           // RotorHazard lap 0 is not a completed racing lap.
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
             confidence: pilot.hasLearnedPace ? "high" : "low",
           });
-        } else if (latest.lap_number > 0) {
+        } else if (lapNumber > 0) {
           // Racing lap completed — snap back to S/F and update expected time
           // via exponential moving average so the estimate adapts to the
           // pilot's actual pace without being thrown off by a single outlier.
-          updateExpectedLapMs(pilot, latest.lap_raw);
+          updateExpectedLapMs(pilot, getLapTimeMs(latest));
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
             confidence: "high",
           });
-          pilot.lapCount = latest.lap_number;
+          pilot.lapCount = lapNumber;
         }
       }
 
