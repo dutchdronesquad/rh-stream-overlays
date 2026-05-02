@@ -1,6 +1,10 @@
 (function (window, document) {
   "use strict";
 
+  if (window.rotorhazard) {
+    window.rotorhazard.show_messages = false;
+  }
+
   var SVG_NS = "http://www.w3.org/2000/svg";
   var DEFAULT_LAP_MS = 30000;
   var STALE_WINDOW_MS = 8000;
