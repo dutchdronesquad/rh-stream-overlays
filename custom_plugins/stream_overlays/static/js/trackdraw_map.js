@@ -12,7 +12,7 @@
   var CONFIDENCE_HIGH_MS = 2500;
   var ANCHOR_CORRECTION_MS = 650;
   var CORRECTION_FADE_THRESHOLD_PROGRESS = 0.025;
-  var LAP_ROLLOVER_CONTINUITY_PROGRESS = 0.08;
+  var LAP_ROLLOVER_CONTINUITY_PROGRESS = 0.18;
   var MIN_OBSERVED_SEGMENT_MS = 600;
 
   // Set in renderTrack from the actual track field diagonal (meters).
@@ -44,6 +44,11 @@
   // ---- SVG elements ----
   var svgEl = null;
   var pilotGroupEl = null;
+  var rootEl = null;
+
+  function getRoot() {
+    return rootEl || (rootEl = getRoot());
+  }
 
   // ----------------------------------------------------------------
   // SVG helpers
@@ -173,55 +178,41 @@
     };
   }
 
-  function buildSplitProgressMap(timingMarkers) {
-    var map = {};
-    if (!Array.isArray(timingMarkers)) return map;
-    timingMarkers.forEach(function (marker) {
-      if (
-        marker &&
-        marker.role === "split" &&
-        typeof marker.split_index === "number" &&
-        marker.route_position &&
-        typeof marker.route_position.progress === "number"
-      ) {
-        map[marker.split_index] = marker.route_position.progress;
-      }
-    });
-    return map;
-  }
-
-  function buildAnchorModel(timingMarkers) {
+  // Single pass over timing markers that builds both the split progress map
+  // (split_index → route progress, used for current_laps diffing) and the
+  // anchor model (ordered splits + S/F metadata, used for interpolation).
+  function buildTrackModel(timingMarkers) {
+    var splitProgressMap = {};
     var startFinishProgress = 0;
     var splits = [];
 
-    if (Array.isArray(timingMarkers)) {
-      timingMarkers.forEach(function (marker) {
-        if (
-          !marker ||
-          !marker.route_position ||
-          typeof marker.route_position.progress !== "number"
-        ) {
-          return;
-        }
+    (timingMarkers || []).forEach(function (marker) {
+      if (
+        !marker ||
+        !marker.route_position ||
+        typeof marker.route_position.progress !== "number"
+      ) {
+        return;
+      }
 
-        if (marker.role === "start_finish") {
-          startFinishProgress = normalizeProgress(marker.route_position.progress);
-        }
+      var progress = normalizeProgress(marker.route_position.progress);
 
-        if (
-          marker.role === "split" &&
-          typeof marker.split_index === "number" &&
-          !isNaN(marker.split_index)
-        ) {
-          splits.push({
-            key: "split:" + marker.split_index,
-            splitIndex: marker.split_index,
-            progress: normalizeProgress(marker.route_position.progress),
-            title: marker.title || "Split " + (marker.split_index + 1),
-          });
-        }
-      });
-    }
+      if (marker.role === "start_finish") {
+        startFinishProgress = progress;
+      } else if (
+        marker.role === "split" &&
+        typeof marker.split_index === "number" &&
+        !isNaN(marker.split_index)
+      ) {
+        splitProgressMap[marker.split_index] = progress;
+        splits.push({
+          key: "split:" + marker.split_index,
+          splitIndex: marker.split_index,
+          progress: progress,
+          title: marker.title || "Split " + (marker.split_index + 1),
+        });
+      }
+    });
 
     splits.sort(function (a, b) {
       return (
@@ -231,9 +222,12 @@
     });
 
     return {
-      startFinishProgress: startFinishProgress,
-      startFinishKey: "sf",
-      orderedSplits: splits,
+      splitProgressMap: splitProgressMap,
+      anchorModel: {
+        startFinishProgress: startFinishProgress,
+        startFinishKey: "sf",
+        orderedSplits: splits,
+      },
     };
   }
 
@@ -256,10 +250,6 @@
       key: anchorModel.startFinishKey,
       progress: anchorModel.startFinishProgress,
     };
-  }
-
-  function getNextAnchorProgress(progress) {
-    return getNextAnchor(progress).progress;
   }
 
   function getAnchorKeyForProgress(progress) {
@@ -376,8 +366,13 @@
     while (svg.firstChild) svg.removeChild(svg.firstChild);
   }
 
+  function setLiveIndicator(isLive) {
+    var header = document.querySelector(".trackdraw-map__header");
+    if (header) header.classList.toggle("is-live", isLive);
+  }
+
   function applyViewportClass() {
-    var root = document.querySelector(".trackdraw-map");
+    var root = getRoot();
     if (!root) return;
 
     var width = window.innerWidth || document.documentElement.clientWidth || 0;
@@ -397,7 +392,7 @@
   }
 
   function updatePilotDensityClass(activeCount) {
-    var root = document.querySelector(".trackdraw-map");
+    var root = getRoot();
     if (!root) return;
     root.classList.toggle("is-crowded", activeCount >= 5);
     root.classList.toggle("is-packed", activeCount >= 7);
@@ -500,6 +495,50 @@
   // Track rendering (static layer)
   // ----------------------------------------------------------------
 
+  function renderFinishLine(svg, pt, angle, r) {
+    var tickSize = r * 2.8;
+    var finishLine = createSvgElement("g", {
+      class: "trackdraw-map__finish-line",
+      transform:
+        "translate(" + pt.x + " " + pt.y + ") rotate(" + (angle * 180) / Math.PI + ")",
+    });
+
+    [-1, 1].forEach(function (side) {
+      finishLine.appendChild(
+        createSvgElement("rect", {
+          class: "trackdraw-map__finish-line-cap",
+          x: -r * 0.75,
+          y: side * tickSize - r * 0.34,
+          width: r * 1.5,
+          height: r * 0.68,
+          rx: r * 0.12,
+        })
+      );
+    });
+
+    var blockRows = 6;
+    var blockH = (tickSize * 2) / blockRows;
+    var blockW = r * 0.52;
+    for (var row = 0; row < blockRows; row++) {
+      for (var col = 0; col < 2; col++) {
+        finishLine.appendChild(
+          createSvgElement("rect", {
+            class:
+              (row + col) % 2 === 0
+                ? "trackdraw-map__finish-block is-light"
+                : "trackdraw-map__finish-block is-dark",
+            x: (col - 1) * blockW,
+            y: -tickSize + row * blockH,
+            width: blockW,
+            height: blockH,
+          })
+        );
+      }
+    }
+
+    svg.appendChild(finishLine);
+  }
+
   function renderTrack(track, cacheState) {
     svgEl = document.getElementById("trackdraw-map-svg");
     if (!svgEl) {
@@ -589,6 +628,7 @@
       var angle = routePoint ? routePoint.angle : 0;
       var normal = angle + Math.PI / 2;
       var tickSize = isStartFinish ? r * 2.8 : r * 2.1;
+
       var tick = createSvgElement("line", {
         class: isStartFinish
           ? "trackdraw-map__timing-tick is-start-finish"
@@ -602,53 +642,8 @@
       svgEl.appendChild(tick);
 
       if (isStartFinish) {
-        var finishLine = createSvgElement("g", {
-          class: "trackdraw-map__finish-line",
-          transform:
-            "translate(" +
-            pt.x +
-            " " +
-            pt.y +
-            ") rotate(" +
-            (angle * 180) / Math.PI +
-            ")",
-        });
-
-        [-1, 1].forEach(function (side) {
-          var cap = createSvgElement("rect", {
-            class: "trackdraw-map__finish-line-cap",
-            x: -r * 0.75,
-            y: side * tickSize - r * 0.34,
-            width: r * 1.5,
-            height: r * 0.68,
-            rx: r * 0.12,
-          });
-          finishLine.appendChild(cap);
-        });
-
-        var blockRows = 6;
-        var blockH = (tickSize * 2) / blockRows;
-        var blockW = r * 0.52;
-        for (var row = 0; row < blockRows; row++) {
-          for (var col = 0; col < 2; col++) {
-            var block = createSvgElement("rect", {
-              class:
-                (row + col) % 2 === 0
-                  ? "trackdraw-map__finish-block is-light"
-                  : "trackdraw-map__finish-block is-dark",
-              x: (col - 1) * blockW,
-              y: -tickSize + row * blockH,
-              width: blockW,
-              height: blockH,
-            });
-            finishLine.appendChild(block);
-          }
-        }
-
-        svgEl.appendChild(finishLine);
-        return;
+        renderFinishLine(svgEl, pt, angle, r);
       }
-
     });
 
     // Show the actual track title in the header badge
@@ -892,13 +887,20 @@
     }
     var elapsed = now - pilot.lastAnchorTime;
     var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
-    return interpolateProgress(
-      pilot.lastAnchorProgress,
-      pilot.nextAnchorProgress,
-      elapsed / segmentMs,
-      pilot.lastAnchorKey,
-      pilot.nextAnchorKey
-    );
+    var ratio = elapsed / segmentMs;
+
+    if (ratio <= 1.0) {
+      return interpolateProgress(
+        pilot.lastAnchorProgress,
+        pilot.nextAnchorProgress,
+        ratio,
+        pilot.lastAnchorKey,
+        pilot.nextAnchorKey
+      );
+    }
+    var segmentEnd = normalizeProgress(pilot.nextAnchorProgress);
+    var overProgress = (elapsed - segmentMs) / segmentMs;
+    return normalizeProgress(segmentEnd + overProgress);
   }
 
   function estimateProgress(pilot) {
@@ -1161,7 +1163,7 @@
         position: null,
         lastAnchorProgress: anchorModel.startFinishProgress,
         lastAnchorKey: anchorModel.startFinishKey,
-        nextAnchorProgress: getNextAnchorProgress(anchorModel.startFinishProgress),
+        nextAnchorProgress: getNextAnchor(anchorModel.startFinishProgress).progress,
         nextAnchorKey: getNextAnchor(anchorModel.startFinishProgress).key,
         lastAnchorTime: null,
         lastTimingAt: null,
@@ -1179,20 +1181,17 @@
 
   function freezePilots(confidence) {
     Object.keys(pilots).forEach(function (nodeIdx) {
-      pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
-      pilots[nodeIdx].lastAnchorKey = getAnchorKeyForProgress(
-        pilots[nodeIdx].lastAnchorProgress
-      );
-      pilots[nodeIdx].nextAnchorProgress = getNextAnchorProgress(
-        pilots[nodeIdx].lastAnchorProgress
-      );
-      pilots[nodeIdx].nextAnchorKey = getNextAnchor(
-        pilots[nodeIdx].lastAnchorProgress
-      ).key;
-      pilots[nodeIdx].lastAnchorTime = null;
-      pilots[nodeIdx].confidence = confidence || "idle";
-      pilots[nodeIdx].correctionStartTime = null;
-      pilots[nodeIdx].correctionEndTime = null;
+      var pilot = pilots[nodeIdx];
+      var progress = getCurrentPilotProgress(pilot);
+      var next = getNextAnchor(progress);
+      pilot.lastAnchorProgress = progress;
+      pilot.lastAnchorKey = getAnchorKeyForProgress(progress);
+      pilot.nextAnchorProgress = next.progress;
+      pilot.nextAnchorKey = next.key;
+      pilot.lastAnchorTime = null;
+      pilot.confidence = confidence || "idle";
+      pilot.correctionStartTime = null;
+      pilot.correctionEndTime = null;
     });
   }
 
@@ -1201,37 +1200,30 @@
     var wasRunning = raceRunning;
     raceRunning = status === 1;
 
-    // Live indicator dot in header badge
-    var header = document.querySelector(".trackdraw-map__header");
-    if (header) {
-      if (raceRunning) {
-        header.classList.add("is-live");
-      } else {
-        header.classList.remove("is-live");
-      }
-    }
+    setLiveIndicator(raceRunning);
 
     if (status === 1 && !wasRunning) {
       // Race started: park every pilot at start/finish. Movement begins only
       // after RotorHazard confirms the first crossing/holeshot in current_laps.
+      var startNext = getNextAnchor(anchorModel.startFinishProgress);
       Object.keys(pilots).forEach(function (nodeIdx) {
-        var nextAnchor = getNextAnchor(anchorModel.startFinishProgress);
-        pilots[nodeIdx].lastAnchorProgress = anchorModel.startFinishProgress;
-        pilots[nodeIdx].lastAnchorKey = anchorModel.startFinishKey;
-        pilots[nodeIdx].nextAnchorProgress = nextAnchor.progress;
-        pilots[nodeIdx].nextAnchorKey = nextAnchor.key;
-        pilots[nodeIdx].expectedSegmentMs = getExpectedSegmentMs(
-          pilots[nodeIdx],
-          pilots[nodeIdx].lastAnchorProgress,
-          pilots[nodeIdx].nextAnchorProgress,
-          pilots[nodeIdx].lastAnchorKey,
-          pilots[nodeIdx].nextAnchorKey
+        var pilot = pilots[nodeIdx];
+        pilot.lastAnchorProgress = anchorModel.startFinishProgress;
+        pilot.lastAnchorKey = anchorModel.startFinishKey;
+        pilot.nextAnchorProgress = startNext.progress;
+        pilot.nextAnchorKey = startNext.key;
+        pilot.expectedSegmentMs = getExpectedSegmentMs(
+          pilot,
+          pilot.lastAnchorProgress,
+          pilot.nextAnchorProgress,
+          pilot.lastAnchorKey,
+          pilot.nextAnchorKey
         );
-        pilots[nodeIdx].lastAnchorTime = null;
-        pilots[nodeIdx].lastTimingAt = null;
-        pilots[nodeIdx].confidence = "idle";
-        pilots[nodeIdx].correctionStartTime = null;
-        pilots[nodeIdx].correctionEndTime = null;
+        pilot.lastAnchorTime = null;
+        pilot.lastTimingAt = null;
+        pilot.confidence = "idle";
+        pilot.correctionStartTime = null;
+        pilot.correctionEndTime = null;
       });
       prevLapCounts = {};
       prevSplitCounts = {};
@@ -1292,8 +1284,8 @@
       // Check for new splits in the current lap (only if splits are configured)
       if (laps.length > 0 && Object.keys(splitProgressMap).length > 0) {
         var lapIdx = laps.length - 1;
-        var latest = laps[lapIdx];
-        var splits = latest.splits || [];
+        var currentLap = laps[lapIdx];
+        var splits = currentLap.splits || [];
         var splitKey = nodeIdx + ":" + lapIdx;
         var prevSplitCount = prevSplitCounts[splitKey] || 0;
 
@@ -1314,18 +1306,15 @@
     });
   }
 
-  function objectValues(value) {
-    if (!value || typeof value !== "object") return [];
-    return Object.keys(value).map(function (key) {
-      return value[key];
-    });
-  }
-
   function handleLeaderboard(msg) {
     var race = msg && msg.current && msg.current.leaderboard;
     var primary = race && race.meta && race.meta.primary_leaderboard;
     var leaderboard = primary && race ? race[primary] : null;
-    var entries = Array.isArray(leaderboard) ? leaderboard : objectValues(leaderboard);
+    var entries = Array.isArray(leaderboard)
+      ? leaderboard
+      : leaderboard && typeof leaderboard === "object"
+        ? Object.keys(leaderboard).map(function (k) { return leaderboard[k]; })
+        : [];
 
     entries.forEach(function (entry) {
       if (!entry || entry.node == null) return;
@@ -1395,8 +1384,9 @@
           (trackData.route && trackData.route.waypoints) ||
           []
         ).filter(hasPoint);
-        splitProgressMap = buildSplitProgressMap(trackData.timing_markers);
-        anchorModel = buildAnchorModel(trackData.timing_markers);
+        var model = buildTrackModel(trackData.timing_markers);
+        splitProgressMap = model.splitProgressMap;
+        anchorModel = model.anchorModel;
 
         if (!renderTrack(trackData, payload.state)) return;
 
