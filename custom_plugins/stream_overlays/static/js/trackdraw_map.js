@@ -1052,8 +1052,8 @@
         var labelLayoutKey = [labelSlot, label, pilot.color].join("|");
         if (pilot._labelLayoutKey !== labelLayoutKey) {
           // Fixed width so every label sits at exactly the same distance from the arrow.
-          var labelW = fieldScale * 0.052;
-          var labelH = fieldScale * 0.026;
+          var labelW = fieldScale * 0.064;
+          var labelH = fieldScale * 0.022;
           var r = labelH * 0.40;
           var labelX = labelOffset.x - labelW / 2;
           var labelY = labelOffset.y - labelH / 2;
@@ -1073,8 +1073,8 @@
               els.callsignBg.style.stroke = pilot.color;
               els.callsignBg.style.strokeWidth = String(fieldScale * 0.003);
             } else {
-              // DDS: only top-left corner rounded
-              bgd = roundedRectPath(labelX, labelY, labelW, labelH, r, 0, 0, 0);
+              // DDS: top-left + bottom-right rounded (diagonal, matching DDS popup style)
+              bgd = roundedRectPath(labelX, labelY, labelW, labelH, r, 0, r, 0);
               els.callsignBg.style.fill = pilot.color;
               els.callsignBg.style.stroke = "none";
             }
