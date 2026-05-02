@@ -322,6 +322,31 @@
     return "#" + colorval.toString(16).padStart(6, "0");
   }
 
+  function getContrastColor(color) {
+    if (typeof window.contrastColor === "function") {
+      return window.contrastColor(color);
+    }
+
+    var hex = String(color || "#ffffff").replace("#", "");
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map(function (char) {
+          return char + char;
+        })
+        .join("");
+    }
+
+    var value = parseInt(hex, 16);
+    if (isNaN(value)) return "#000000";
+
+    var r = (value >> 16) & 255;
+    var g = (value >> 8) & 255;
+    var b = value & 255;
+    var luminance = (r * 299 + g * 587 + b * 114) / 1000;
+    return luminance > 145 ? "#06100d" : "#ffffff";
+  }
+
   // ----------------------------------------------------------------
   // UI helpers
   // ----------------------------------------------------------------
@@ -730,18 +755,20 @@
   }
 
   function getLabelOffset(slot) {
-    var offsets = [
-      { x: 0, y: -0.036 },
-      { x: 0.036, y: -0.042 },
-      { x: -0.036, y: -0.042 },
-      { x: 0.052, y: -0.028 },
-      { x: -0.052, y: -0.028 },
-      { x: 0, y: -0.056 },
+    var directions = [
+      { x: 0, y: -1 },
+      { x: 0.68, y: -0.73 },
+      { x: -0.68, y: -0.73 },
+      { x: 0.96, y: -0.28 },
+      { x: -0.96, y: -0.28 },
+      { x: 0, y: 1 },
     ];
-    var offset = offsets[slot] || offsets[0];
+    var direction = directions[slot] || directions[0];
+    var length = Math.sqrt(direction.x * direction.x + direction.y * direction.y) || 1;
+    var radius = fieldScale * 0.058;
     return {
-      x: fieldScale * offset.x,
-      y: fieldScale * offset.y,
+      x: (direction.x / length) * radius,
+      y: (direction.y / length) * radius,
     };
   }
 
@@ -880,6 +907,7 @@
 
   function getLapTimeMs(lap) {
     if (!lap) return null;
+    if (lap.deleted === true) return null;
     var value = null;
 
     if (typeof lap.lap_time === "number") {
@@ -891,6 +919,13 @@
     }
 
     return typeof value === "number" && !isNaN(value) && value > 0 ? value : null;
+  }
+
+  function getActiveLaps(laps) {
+    if (!Array.isArray(laps)) return [];
+    return laps.filter(function (lap) {
+      return lap && lap.deleted !== true;
+    });
   }
 
   function updateExpectedLapMs(pilot, lapMs) {
@@ -1026,6 +1061,7 @@
               positionBg.style.fill = pilot.color;
               positionText.setAttribute("x", posX + posW / 2);
               positionText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
+              positionText.style.fill = getContrastColor(pilot.color);
               positionText.textContent = String(position);
             } else {
               positionBg.setAttribute("display", "none");
@@ -1174,7 +1210,7 @@
       var pilot = pilots[nodeIdx];
       if (!pilot || !nodeData || !Array.isArray(nodeData.laps)) return;
 
-      var laps = nodeData.laps;
+      var laps = getActiveLaps(nodeData.laps);
       var prevCount = prevLapCounts[nodeIdx] || 0;
 
       if (laps.length > prevCount) {
