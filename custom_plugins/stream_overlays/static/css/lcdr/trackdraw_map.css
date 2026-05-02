@@ -7,7 +7,7 @@
   --trackdraw-key-bg: grey;
   --trackdraw-label-stroke: rgb(4 4 4 / 94%);
   --trackdraw-muted: rgb(255 242 200 / 60%);
-  --trackdraw-gate-tick: rgb(245 212 105 / 72%);
+  --trackdraw-gate-tick: rgb(245 212 105 / 88%);
   --trackdraw-obstacle: #f5d469;
   --trackdraw-obstacle-bg: rgb(5 5 5 / 90%);
   --trackdraw-panel-bg: rgb(6 6 6 / 84%);
@@ -15,12 +15,9 @@
   --trackdraw-pilot-label-bg: rgb(5 5 5 / 88%);
   --trackdraw-pilot-label-bg-crowded: rgb(5 5 5 / 78%);
   --trackdraw-pilot-position-text: #050505;
-  --trackdraw-route: #ffffff;
-  --trackdraw-route-chevron: #f5d469;
-  --trackdraw-route-glow: rgb(245 212 105 / 30%);
-  --trackdraw-route-highlight: rgb(245 212 105 / 62%);
-  --trackdraw-route-outline: rgb(0 0 0 / 92%);
-  --trackdraw-route-shadow: rgb(0 0 0 / 58%);
+  --trackdraw-route: #f4f4f1;
+  --trackdraw-route-outline: rgb(0 0 0 / 88%);
+  --trackdraw-route-shadow: rgb(0 0 0 / 50%);
   --trackdraw-leader: #ffffff;
   --trackdraw-leader-bg: #ffffff;
   --trackdraw-leader-text: #050505;

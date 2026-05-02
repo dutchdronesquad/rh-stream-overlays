@@ -7,6 +7,8 @@
   var EMA_ALPHA = 0.35;
   var CONFIDENCE_HIGH_MS = 2500;
   var ANCHOR_CORRECTION_MS = 650;
+  var CORRECTION_FADE_THRESHOLD_PROGRESS = 0.025;
+  var MIN_OBSERVED_SEGMENT_MS = 600;
 
   // Set in renderTrack from the actual track field diagonal (meters).
   // All SVG sizes are derived as fractions of this value so proportions
@@ -19,6 +21,7 @@
   var splitProgressMap = {};  // split_index(number) -> route progress (0..1)
   var anchorModel = {
     startFinishProgress: 0,
+    startFinishKey: "sf",
     orderedSplits: [],
   };
 
@@ -96,8 +99,12 @@
     var from = normalizeProgress(fromProgress);
     var to = normalizeProgress(toProgress);
     var delta = to - from;
-    if (delta <= 0) delta += 1;
+    if (delta < 0) delta += 1;
     return delta;
+  }
+
+  function progressDistance(a, b) {
+    return Math.min(forwardDelta(a, b), forwardDelta(b, a));
   }
 
   function interpolateProgress(fromProgress, toProgress, ratio) {
@@ -132,16 +139,15 @@
     var point = progressToPoint(progress);
     if (!point || sampledPoints.length < 2 || !trackData) return null;
 
-    var clamped = normalizeProgress(progress);
-    var idx = clamped * (sampledPoints.length - 1);
-    var i = Math.max(0, Math.min(sampledPoints.length - 2, Math.floor(idx)));
-    var a = getPoint(trackData.field, sampledPoints[i]);
-    var b = getPoint(trackData.field, sampledPoints[i + 1]);
+    var tangentDelta = Math.max(0.003, 1 / (sampledPoints.length - 1));
+    var a = progressToPoint(progress - tangentDelta);
+    var b = progressToPoint(progress + tangentDelta);
+    var angle = a && b ? Math.atan2(b.y - a.y, b.x - a.x) : 0;
 
     return {
       x: point.x,
       y: point.y,
-      angle: Math.atan2(b.y - a.y, b.x - a.x),
+      angle: angle,
     };
   }
 
@@ -186,6 +192,7 @@
           !isNaN(marker.split_index)
         ) {
           splits.push({
+            key: "split:" + marker.split_index,
             splitIndex: marker.split_index,
             progress: normalizeProgress(marker.route_position.progress),
             title: marker.title || "Split " + (marker.split_index + 1),
@@ -203,11 +210,12 @@
 
     return {
       startFinishProgress: startFinishProgress,
+      startFinishKey: "sf",
       orderedSplits: splits,
     };
   }
 
-  function getNextAnchorProgress(progress) {
+  function getNextAnchor(progress) {
     var current = normalizeProgress(progress);
     var splits = anchorModel.orderedSplits || [];
     var nextSplit = null;
@@ -221,11 +229,64 @@
       }
     });
 
-    if (nextSplit) return nextSplit.progress;
-    return anchorModel.startFinishProgress;
+    if (nextSplit) return nextSplit;
+    return {
+      key: anchorModel.startFinishKey,
+      progress: anchorModel.startFinishProgress,
+    };
   }
 
-  function getExpectedSegmentMs(pilot, fromProgress, toProgress) {
+  function getNextAnchorProgress(progress) {
+    return getNextAnchor(progress).progress;
+  }
+
+  function getAnchorKeyForProgress(progress) {
+    var normalized = normalizeProgress(progress);
+    var bestKey = anchorModel.startFinishKey;
+    var bestDistance = progressDistance(anchorModel.startFinishProgress, normalized);
+
+    (anchorModel.orderedSplits || []).forEach(function (split) {
+      var distance = progressDistance(split.progress, normalized);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestKey = split.key;
+      }
+    });
+
+    return bestKey;
+  }
+
+  function getSegmentKey(fromKey, toKey) {
+    return String(fromKey || "unknown") + ">" + String(toKey || "unknown");
+  }
+
+  function updateExpectedSegmentMs(pilot, fromKey, toKey, segmentMs) {
+    if (
+      !pilot ||
+      !fromKey ||
+      !toKey ||
+      typeof segmentMs !== "number" ||
+      segmentMs < MIN_OBSERVED_SEGMENT_MS
+    ) {
+      return;
+    }
+
+    var key = getSegmentKey(fromKey, toKey);
+    var current = pilot.expectedSegmentMsByKey[key];
+    pilot.expectedSegmentMsByKey[key] =
+      typeof current === "number"
+        ? Math.round(EMA_ALPHA * segmentMs + (1 - EMA_ALPHA) * current)
+        : Math.round(segmentMs);
+  }
+
+  function getExpectedSegmentMs(pilot, fromProgress, toProgress, fromKey, toKey) {
+    var segmentKey = getSegmentKey(fromKey, toKey);
+    var segmentMs =
+      pilot.expectedSegmentMsByKey && pilot.expectedSegmentMsByKey[segmentKey];
+    if (typeof segmentMs === "number" && segmentMs > 0) {
+      return segmentMs;
+    }
+
     var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
     var share = forwardDelta(fromProgress, toProgress);
     return Math.max(1200, Math.round(lapMs * share));
@@ -421,14 +482,11 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeShadowW = fieldScale * 0.020;
-    var routeOuterW = fieldScale * 0.013;
-    var routeInnerW = fieldScale * 0.0055;
-    var routeHighlightW = fieldScale * 0.0018;
-    var chevronLen = fieldScale * 0.024;
-    var chevronW = fieldScale * 0.008;
-    var gateTickLen = fieldScale * 0.013;
-    var gateSwW   = fieldScale * 0.0018;
+    var routeShadowW = fieldScale * 0.018;
+    var routeOuterW = fieldScale * 0.011;
+    var routeInnerW = fieldScale * 0.0065;
+    var gateTickLen = fieldScale * 0.017;
+    var gateSwW   = fieldScale * 0.0026;
     var timingSfR = fieldScale * 0.013;
     var timingR   = fieldScale * 0.010;
     var timingSwW = fieldScale * 0.003;
@@ -442,7 +500,6 @@
       ["trackdraw-map__route-shadow", routeShadowW],
       ["trackdraw-map__route-outline", routeOuterW],
       ["trackdraw-map__route", routeInnerW],
-      ["trackdraw-map__route-highlight", routeHighlightW],
     ].forEach(function (layer) {
       var routeLayerPath = createSvgElement("path", {
         class: layer[0],
@@ -450,30 +507,6 @@
       });
       routeLayerPath.style.strokeWidth = String(layer[1]);
       svgEl.appendChild(routeLayerPath);
-    });
-
-    [0.16, 0.36, 0.56, 0.76].forEach(function (progress) {
-      var pt = progressToPointWithAngle(progress);
-      if (!pt) return;
-
-      var chevron = createSvgElement("polyline", {
-        class: "trackdraw-map__route-chevron",
-        points: [
-          -chevronLen * 0.42 + "," + -chevronW,
-          chevronLen * 0.42 + ",0",
-          -chevronLen * 0.42 + "," + chevronW,
-        ].join(" "),
-        transform:
-          "translate(" +
-          pt.x +
-          " " +
-          pt.y +
-          ") rotate(" +
-          (pt.angle * 180) / Math.PI +
-          ")",
-      });
-      chevron.style.strokeWidth = String(fieldScale * 0.0022);
-      svgEl.appendChild(chevron);
     });
 
     (track.route_obstacles || []).forEach(function (obstacle) {
@@ -672,25 +705,38 @@
     var opts = options || {};
     var now = window.performance.now();
     var normalized = normalizeProgress(progress);
+    var anchorKey = opts.anchorKey || getAnchorKeyForProgress(normalized);
+    var currentProgress = getCurrentPilotProgress(pilot);
+    var currentAnchorKey = pilot.lastAnchorKey || getAnchorKeyForProgress(pilot.lastAnchorProgress);
     var shouldFadeCorrection =
       opts.ease !== false &&
       !opts.freeze &&
       raceRunning &&
       socketConnected &&
       pilot.lastAnchorTime !== null &&
-      forwardDelta(getCurrentPilotProgress(pilot), normalized) > 0.004;
+      progressDistance(currentProgress, normalized) > CORRECTION_FADE_THRESHOLD_PROGRESS;
     var correctionMs = opts.easeMs || ANCHOR_CORRECTION_MS;
+    var nextAnchor = getNextAnchor(normalized);
+
+    if (pilot.lastTimingAt !== null && currentAnchorKey !== anchorKey) {
+      updateExpectedSegmentMs(pilot, currentAnchorKey, anchorKey, now - pilot.lastTimingAt);
+    }
 
     pilot.lastAnchorProgress = normalized;
-    pilot.nextAnchorProgress = getNextAnchorProgress(normalized);
+    pilot.lastAnchorKey = anchorKey;
+    pilot.nextAnchorProgress = nextAnchor.progress;
+    pilot.nextAnchorKey = nextAnchor.key;
     pilot.expectedSegmentMs = getExpectedSegmentMs(
       pilot,
       pilot.lastAnchorProgress,
-      pilot.nextAnchorProgress
+      pilot.nextAnchorProgress,
+      pilot.lastAnchorKey,
+      pilot.nextAnchorKey
     );
     pilot.lastAnchorTime = opts.freeze ? null : now + (shouldFadeCorrection ? correctionMs : 0);
     pilot.confidence = opts.confidence || "high";
     pilot.lastSeenAt = now;
+    pilot.lastTimingAt = now;
     pilot.correctionStartTime = shouldFadeCorrection ? now : null;
     pilot.correctionEndTime = shouldFadeCorrection ? now + correctionMs : null;
   }
@@ -957,9 +1003,13 @@
         lapCount: 0,
         position: null,
         lastAnchorProgress: anchorModel.startFinishProgress,
+        lastAnchorKey: anchorModel.startFinishKey,
         nextAnchorProgress: getNextAnchorProgress(anchorModel.startFinishProgress),
+        nextAnchorKey: getNextAnchor(anchorModel.startFinishProgress).key,
         lastAnchorTime: null,
+        lastTimingAt: null,
         expectedSegmentMs: DEFAULT_LAP_MS,
+        expectedSegmentMsByKey: {},
         expectedLapMs: DEFAULT_LAP_MS,
         hasLearnedPace: false,
         confidence: "idle",
@@ -973,6 +1023,15 @@
   function freezePilots(confidence) {
     Object.keys(pilots).forEach(function (nodeIdx) {
       pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
+      pilots[nodeIdx].lastAnchorKey = getAnchorKeyForProgress(
+        pilots[nodeIdx].lastAnchorProgress
+      );
+      pilots[nodeIdx].nextAnchorProgress = getNextAnchorProgress(
+        pilots[nodeIdx].lastAnchorProgress
+      );
+      pilots[nodeIdx].nextAnchorKey = getNextAnchor(
+        pilots[nodeIdx].lastAnchorProgress
+      ).key;
       pilots[nodeIdx].lastAnchorTime = null;
       pilots[nodeIdx].confidence = confidence || "idle";
       pilots[nodeIdx].correctionStartTime = null;
@@ -999,16 +1058,20 @@
       // Race started: park every pilot at start/finish. Movement begins only
       // after RotorHazard confirms the first crossing/holeshot in current_laps.
       Object.keys(pilots).forEach(function (nodeIdx) {
+        var nextAnchor = getNextAnchor(anchorModel.startFinishProgress);
         pilots[nodeIdx].lastAnchorProgress = anchorModel.startFinishProgress;
-        pilots[nodeIdx].nextAnchorProgress = getNextAnchorProgress(
-          anchorModel.startFinishProgress
-        );
+        pilots[nodeIdx].lastAnchorKey = anchorModel.startFinishKey;
+        pilots[nodeIdx].nextAnchorProgress = nextAnchor.progress;
+        pilots[nodeIdx].nextAnchorKey = nextAnchor.key;
         pilots[nodeIdx].expectedSegmentMs = getExpectedSegmentMs(
           pilots[nodeIdx],
           pilots[nodeIdx].lastAnchorProgress,
-          pilots[nodeIdx].nextAnchorProgress
+          pilots[nodeIdx].nextAnchorProgress,
+          pilots[nodeIdx].lastAnchorKey,
+          pilots[nodeIdx].nextAnchorKey
         );
         pilots[nodeIdx].lastAnchorTime = null;
+        pilots[nodeIdx].lastTimingAt = null;
         pilots[nodeIdx].confidence = "idle";
         pilots[nodeIdx].correctionStartTime = null;
         pilots[nodeIdx].correctionEndTime = null;
@@ -1052,6 +1115,7 @@
           // Holeshot/start confirmation. Do not learn full-lap pace from this:
           // RotorHazard lap 0 is not a completed racing lap.
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
+            anchorKey: anchorModel.startFinishKey,
             confidence: pilot.hasLearnedPace ? "high" : "low",
           });
         } else if (lapNumber > 0) {
@@ -1060,6 +1124,7 @@
           // pilot's actual pace without being thrown off by a single outlier.
           updateExpectedLapMs(pilot, getLapTimeMs(latest));
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
+            anchorKey: anchorModel.startFinishKey,
             confidence: "high",
           });
           pilot.lapCount = lapNumber;
@@ -1079,6 +1144,7 @@
           var splitProgress = splitProgressMap[split.split_id];
           if (typeof splitProgress === "number") {
             setPilotAnchor(pilot, splitProgress, {
+              anchorKey: "split:" + split.split_id,
               confidence: "high",
             });
           }

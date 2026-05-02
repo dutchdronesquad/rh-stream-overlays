@@ -110,15 +110,14 @@ body {
 
 .trackdraw-map__route-shadow,
 .trackdraw-map__route-outline,
-.trackdraw-map__route,
-.trackdraw-map__route-highlight {
+.trackdraw-map__route {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .trackdraw-map__route-shadow {
-  filter: drop-shadow(0 2px 7px rgb(0 0 0 / 72%));
+  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 68%));
   stroke: var(--trackdraw-route-shadow, rgb(0 0 0 / 48%));
 }
 
@@ -127,25 +126,12 @@ body {
 }
 
 .trackdraw-map__route {
-  filter: drop-shadow(0 0 4px var(--trackdraw-route-glow, rgb(255 255 255 / 22%)));
   stroke: var(--trackdraw-route, #d8e2ee);
 }
 
-.trackdraw-map__route-highlight {
-  opacity: 0.58;
-  stroke: var(--trackdraw-route-highlight, var(--trackdraw-accent, #2de2a7));
-}
-
-.trackdraw-map__route-chevron {
-  fill: none;
-  opacity: 0.72;
-  stroke: var(--trackdraw-route-chevron, var(--trackdraw-accent, #2de2a7));
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 .trackdraw-map__gate-tick {
-  opacity: 0.38;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 68%));
+  opacity: 0.72;
   stroke: var(--trackdraw-gate-tick, var(--trackdraw-obstacle, #2de2a7));
   stroke-linecap: round;
 }
@@ -324,16 +310,8 @@ body {
   display: none;
 }
 
-.trackdraw-map.is-compact .trackdraw-map__route-chevron {
-  opacity: 0.42;
-}
-
 .trackdraw-map.is-compact .trackdraw-map__gate-tick {
-  opacity: 0.24;
-}
-
-.trackdraw-map.is-tiny .trackdraw-map__route-chevron {
-  display: none;
+  opacity: 0.5;
 }
 
 .trackdraw-map.is-tiny .trackdraw-map__gate-tick {
