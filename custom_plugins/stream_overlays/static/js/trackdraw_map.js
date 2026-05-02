@@ -267,6 +267,19 @@
     while (svg.firstChild) svg.removeChild(svg.firstChild);
   }
 
+  function applyViewportClass() {
+    var root = document.querySelector(".trackdraw-map");
+    if (!root) return;
+
+    var width = window.innerWidth || document.documentElement.clientWidth || 0;
+    var height = window.innerHeight || document.documentElement.clientHeight || 0;
+    var compact = width < 560 || height < 360;
+    var tiny = width < 380 || height < 250;
+
+    root.classList.toggle("is-compact", compact);
+    root.classList.toggle("is-tiny", tiny);
+  }
+
   // ----------------------------------------------------------------
   // Track rendering (static layer)
   // ----------------------------------------------------------------
@@ -296,11 +309,10 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeOuterW = fieldScale * 0.016;
-    var routeInnerW = fieldScale * 0.007;
-    var gateR     = fieldScale * 0.009;
-    var gateFontZ = fieldScale * 0.026;
-    var gateSwW   = fieldScale * 0.003;
+    var routeOuterW = fieldScale * 0.014;
+    var routeInnerW = fieldScale * 0.0055;
+    var gateR     = fieldScale * 0.0045;
+    var gateSwW   = fieldScale * 0.0016;
     var timingSfR = fieldScale * 0.013;
     var timingR   = fieldScale * 0.010;
     var timingSwW = fieldScale * 0.003;
@@ -339,16 +351,6 @@
       });
       dot.style.strokeWidth = String(gateSwW);
       g.appendChild(dot);
-      if (obstacle.route_number != null) {
-        var lbl = createSvgElement("text", {
-          class: "trackdraw-map__obstacle-label",
-          dy: String(gateR * 0.6),
-        });
-        lbl.style.fontSize = gateFontZ + "px";
-        lbl.style.strokeWidth = String(fieldScale * 0.010) + "px";
-        lbl.textContent = String(obstacle.route_number);
-        g.appendChild(lbl);
-      }
       svgEl.appendChild(g);
     });
 
@@ -442,19 +444,30 @@
 
     var g = createSvgElement("g", { id: id, class: "trackdraw-map__pilot-group" });
 
-    var pilotR = fieldScale * 0.013;
+    var pilotR = fieldScale * 0.010;
     var halo = createSvgElement("circle", {
       class: "trackdraw-map__pilot-halo",
-      r: pilotR * 1.75,
+      r: pilotR * 1.9,
     });
-    halo.style.strokeWidth = String(fieldScale * 0.004);
+    halo.style.strokeWidth = String(fieldScale * 0.0032);
 
-    var dot = createSvgElement("circle", {
-      class: "trackdraw-map__pilot",
-      r: pilotR,
+    var marker = createSvgElement("g", {
+      class: "trackdraw-map__pilot-marker",
     });
-    dot.style.fill = pilot.color;
-    dot.style.strokeWidth = String(fieldScale * 0.003);
+    var arrowLen = fieldScale * 0.019;
+    var arrowW = fieldScale * 0.009;
+    var arrow = createSvgElement("polygon", {
+      class: "trackdraw-map__pilot",
+      points: [
+        arrowLen + ",0",
+        -arrowLen * 0.58 + "," + -arrowW,
+        -arrowLen * 0.22 + ",0",
+        -arrowLen * 0.58 + "," + arrowW,
+      ].join(" "),
+    });
+    arrow.style.fill = pilot.color;
+    arrow.style.strokeWidth = String(fieldScale * 0.0023);
+    marker.appendChild(arrow);
 
     var labelBg = createSvgElement("rect", {
       class: "trackdraw-map__pilot-label-bg",
@@ -470,7 +483,7 @@
     lbl.textContent = getPilotLabel(pilot);
 
     g.appendChild(halo);
-    g.appendChild(dot);
+    g.appendChild(marker);
     g.appendChild(labelBg);
     g.appendChild(lbl);
     pilotGroupEl.appendChild(g);
@@ -484,6 +497,35 @@
   function getPilotLabel(pilot) {
     if (pilot.position != null) return String(pilot.position);
     return (pilot.callsign || "P" + (pilot.nodeIndex + 1)).slice(0, 3);
+  }
+
+  function getLabelSlot(point, renderedPoints) {
+    var slot = 0;
+    var threshold = fieldScale * 0.055;
+    renderedPoints.forEach(function (rendered) {
+      var dx = point.x - rendered.x;
+      var dy = point.y - rendered.y;
+      if (Math.sqrt(dx * dx + dy * dy) < threshold) {
+        slot += 1;
+      }
+    });
+    return Math.min(slot, 5);
+  }
+
+  function getLabelOffset(slot) {
+    var offsets = [
+      { x: 0, y: -0.036 },
+      { x: 0.045, y: -0.056 },
+      { x: -0.045, y: -0.056 },
+      { x: 0.078, y: -0.028 },
+      { x: -0.078, y: -0.028 },
+      { x: 0, y: -0.078 },
+    ];
+    var offset = offsets[slot] || offsets[0];
+    return {
+      x: fieldScale * offset.x,
+      y: fieldScale * offset.y,
+    };
   }
 
   function setPilotAnchor(pilot, progress, options) {
@@ -595,6 +637,7 @@
 
   function animationTick() {
     if (svgEl && pilotGroupEl) {
+      var renderedPilotPoints = [];
       Object.keys(pilots).forEach(function (nodeIdx) {
         var pilot = pilots[nodeIdx];
         if (!pilot.active) return;
@@ -605,19 +648,29 @@
         if (!g) return;
 
         var progress = estimateProgress(pilot);
-        var pt = progressToPoint(progress);
-        if (!pt) return;
+        var routePoint = progressToPointWithAngle(progress);
+        if (!routePoint) return;
+        var pt = { x: routePoint.x, y: routePoint.y };
+
+        var labelSlot = getLabelSlot(pt, renderedPilotPoints);
+        var labelOffset = getLabelOffset(labelSlot);
+        renderedPilotPoints.push(pt);
 
         var confidence = getPilotConfidence(pilot);
+        var isLeader = Number(pilot.position) === 1;
         var groupClass = "trackdraw-map__pilot-group is-" + confidence;
-        if (Number(pilot.position) === 1) {
+        if (isLeader) {
           groupClass += " is-leader";
         }
         g.setAttribute("class", groupClass);
         g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
+        if (isLeader && g.parentNode === pilotGroupEl) {
+          pilotGroupEl.appendChild(g);
+        }
 
         var halo = g.querySelector(".trackdraw-map__pilot-halo");
-        var dot = g.querySelector(".trackdraw-map__pilot");
+        var marker = g.querySelector(".trackdraw-map__pilot-marker");
+        var arrow = g.querySelector(".trackdraw-map__pilot");
         var labelBg = g.querySelector(".trackdraw-map__pilot-label-bg");
         var lbl = g.querySelector("text");
         var label = getPilotLabel(pilot);
@@ -625,8 +678,14 @@
         if (halo) {
           halo.style.stroke = pilot.color;
         }
-        if (dot) {
-          dot.style.fill = pilot.color;
+        if (marker) {
+          marker.setAttribute(
+            "transform",
+            "rotate(" + (routePoint.angle * 180) / Math.PI + ")"
+          );
+        }
+        if (arrow) {
+          arrow.style.fill = pilot.color;
         }
         if (labelBg) {
           var labelW = Math.max(
@@ -634,13 +693,15 @@
             fieldScale * (0.016 * String(label).length + 0.022)
           );
           var labelH = fieldScale * 0.027;
-          labelBg.setAttribute("x", -labelW / 2);
-          labelBg.setAttribute("y", -fieldScale * 0.049);
+          labelBg.setAttribute("x", labelOffset.x - labelW / 2);
+          labelBg.setAttribute("y", labelOffset.y - labelH / 2);
           labelBg.setAttribute("width", labelW);
           labelBg.setAttribute("height", labelH);
           labelBg.style.stroke = pilot.color;
         }
         if (lbl) {
+          lbl.setAttribute("x", labelOffset.x);
+          lbl.setAttribute("y", labelOffset.y + fieldScale * 0.006);
           lbl.textContent = label;
         }
       });
@@ -897,6 +958,8 @@
   }
 
   $(document).ready(function () {
+    applyViewportClass();
+    window.addEventListener("resize", applyViewportClass);
     loadTrack();
     registerSocketHandlers();
   });
