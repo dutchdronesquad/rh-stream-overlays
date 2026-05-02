@@ -6,6 +6,7 @@
   var STALE_WINDOW_MS = 8000;
   var EMA_ALPHA = 0.35;
   var CONFIDENCE_HIGH_MS = 2500;
+  var ANCHOR_CORRECTION_MS = 650;
 
   // Set in renderTrack from the actual track field diagonal (meters).
   // All SVG sizes are derived as fractions of this value so proportions
@@ -103,6 +104,11 @@
     return normalizeProgress(
       normalizeProgress(fromProgress) + forwardDelta(fromProgress, toProgress) * clamp01(ratio)
     );
+  }
+
+  function easeOutCubic(value) {
+    var t = 1 - clamp01(value);
+    return 1 - t * t * t;
   }
 
   // ----------------------------------------------------------------
@@ -309,10 +315,14 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeOuterW = fieldScale * 0.014;
+    var routeShadowW = fieldScale * 0.020;
+    var routeOuterW = fieldScale * 0.013;
     var routeInnerW = fieldScale * 0.0055;
-    var gateR     = fieldScale * 0.0045;
-    var gateSwW   = fieldScale * 0.0016;
+    var routeHighlightW = fieldScale * 0.0018;
+    var chevronLen = fieldScale * 0.024;
+    var chevronW = fieldScale * 0.008;
+    var gateTickLen = fieldScale * 0.013;
+    var gateSwW   = fieldScale * 0.0018;
     var timingSfR = fieldScale * 0.013;
     var timingR   = fieldScale * 0.010;
     var timingSwW = fieldScale * 0.003;
@@ -325,33 +335,64 @@
       [-padding, -padding, field.width + padding * 2, field.height + padding * 2].join(" ")
     );
 
-    var routeOutlinePath = createSvgElement("path", {
-      class: "trackdraw-map__route-outline",
-      d: getRoutePath(field, points),
+    var routeD = getRoutePath(field, points);
+    [
+      ["trackdraw-map__route-shadow", routeShadowW],
+      ["trackdraw-map__route-outline", routeOuterW],
+      ["trackdraw-map__route", routeInnerW],
+      ["trackdraw-map__route-highlight", routeHighlightW],
+    ].forEach(function (layer) {
+      var routeLayerPath = createSvgElement("path", {
+        class: layer[0],
+        d: routeD,
+      });
+      routeLayerPath.style.strokeWidth = String(layer[1]);
+      svgEl.appendChild(routeLayerPath);
     });
-    routeOutlinePath.style.strokeWidth = String(routeOuterW);
-    svgEl.appendChild(routeOutlinePath);
 
-    var routePath = createSvgElement("path", {
-      class: "trackdraw-map__route",
-      d: getRoutePath(field, points),
+    [0.16, 0.36, 0.56, 0.76].forEach(function (progress) {
+      var pt = progressToPointWithAngle(progress);
+      if (!pt) return;
+
+      var chevron = createSvgElement("polyline", {
+        class: "trackdraw-map__route-chevron",
+        points: [
+          -chevronLen * 0.42 + "," + -chevronW,
+          chevronLen * 0.42 + ",0",
+          -chevronLen * 0.42 + "," + chevronW,
+        ].join(" "),
+        transform:
+          "translate(" +
+          pt.x +
+          " " +
+          pt.y +
+          ") rotate(" +
+          (pt.angle * 180) / Math.PI +
+          ")",
+      });
+      chevron.style.strokeWidth = String(fieldScale * 0.0022);
+      svgEl.appendChild(chevron);
     });
-    routePath.style.strokeWidth = String(routeInnerW);
-    svgEl.appendChild(routePath);
 
     (track.route_obstacles || []).forEach(function (obstacle) {
-      if (!obstacle.route_position) return;
-      var pt = getPoint(field, obstacle.route_position);
-      var g = createSvgElement("g", {
-        transform: "translate(" + pt.x + " " + pt.y + ")",
+      if (
+        !obstacle.route_position ||
+        typeof obstacle.route_position.progress !== "number"
+      ) {
+        return;
+      }
+      var routePoint = progressToPointWithAngle(obstacle.route_position.progress);
+      if (!routePoint) return;
+      var normal = routePoint.angle + Math.PI / 2;
+      var gateTick = createSvgElement("line", {
+        class: "trackdraw-map__gate-tick",
+        x1: routePoint.x - Math.cos(normal) * gateTickLen,
+        y1: routePoint.y - Math.sin(normal) * gateTickLen,
+        x2: routePoint.x + Math.cos(normal) * gateTickLen,
+        y2: routePoint.y + Math.sin(normal) * gateTickLen,
       });
-      var dot = createSvgElement("circle", {
-        class: "trackdraw-map__obstacle",
-        r: gateR,
-      });
-      dot.style.strokeWidth = String(gateSwW);
-      g.appendChild(dot);
-      svgEl.appendChild(g);
+      gateTick.style.strokeWidth = String(gateSwW);
+      svgEl.appendChild(gateTick);
     });
 
     (track.timing_markers || []).forEach(function (marker) {
@@ -452,22 +493,45 @@
     arrow.style.strokeWidth = String(fieldScale * 0.0023);
     marker.appendChild(arrow);
 
+    var connector = createSvgElement("line", {
+      class: "trackdraw-map__pilot-label-connector",
+    });
+    connector.style.strokeWidth = String(fieldScale * 0.0015);
+
     var labelBg = createSvgElement("rect", {
       class: "trackdraw-map__pilot-label-bg",
       rx: fieldScale * 0.006,
     });
     labelBg.style.strokeWidth = String(fieldScale * 0.002);
 
+    var labelAccent = createSvgElement("rect", {
+      class: "trackdraw-map__pilot-label-accent",
+      rx: fieldScale * 0.002,
+    });
+
+    var positionBg = createSvgElement("rect", {
+      class: "trackdraw-map__pilot-position-bg",
+      rx: fieldScale * 0.004,
+    });
+
+    var positionText = createSvgElement("text", {
+      class: "trackdraw-map__pilot-position",
+    });
+    positionText.style.fontSize = fieldScale * 0.013 + "px";
+
     var lbl = createSvgElement("text", {
       class: "trackdraw-map__pilot-label",
     });
-    lbl.style.fontSize = fieldScale * 0.018 + "px";
-    lbl.setAttribute("y", -fieldScale * 0.031);
+    lbl.style.fontSize = fieldScale * 0.0165 + "px";
     lbl.textContent = getPilotLabel(pilot);
 
     g.appendChild(halo);
     g.appendChild(marker);
+    g.appendChild(connector);
     g.appendChild(labelBg);
+    g.appendChild(labelAccent);
+    g.appendChild(positionBg);
+    g.appendChild(positionText);
     g.appendChild(lbl);
     pilotGroupEl.appendChild(g);
   }
@@ -488,12 +552,12 @@
 
   function getLabelOffset(slot) {
     var offsets = [
-      { x: 0, y: -0.036 },
-      { x: 0.045, y: -0.056 },
-      { x: -0.045, y: -0.056 },
-      { x: 0.078, y: -0.028 },
-      { x: -0.078, y: -0.028 },
-      { x: 0, y: -0.078 },
+      { x: 0, y: -0.028 },
+      { x: 0.028, y: -0.034 },
+      { x: -0.028, y: -0.034 },
+      { x: 0.040, y: -0.022 },
+      { x: -0.040, y: -0.022 },
+      { x: 0, y: -0.044 },
     ];
     var offset = offsets[slot] || offsets[0];
     return {
@@ -506,6 +570,15 @@
     var opts = options || {};
     var now = window.performance.now();
     var normalized = normalizeProgress(progress);
+    var previousProgress = getCurrentPilotProgress(pilot);
+    var shouldEase =
+      opts.ease !== false &&
+      !opts.freeze &&
+      raceRunning &&
+      socketConnected &&
+      pilot.lastAnchorTime !== null &&
+      forwardDelta(previousProgress, normalized) > 0.004;
+    var correctionMs = opts.easeMs || ANCHOR_CORRECTION_MS;
 
     pilot.lastAnchorProgress = normalized;
     pilot.nextAnchorProgress = getNextAnchorProgress(normalized);
@@ -514,16 +587,38 @@
       pilot.lastAnchorProgress,
       pilot.nextAnchorProgress
     );
-    pilot.lastAnchorTime = opts.freeze ? null : now;
+    pilot.lastAnchorTime = opts.freeze ? null : now + (shouldEase ? correctionMs : 0);
     pilot.confidence = opts.confidence || "high";
     pilot.lastSeenAt = now;
+    pilot.correctionFromProgress = shouldEase ? previousProgress : null;
+    pilot.correctionToProgress = shouldEase ? normalized : null;
+    pilot.correctionStartTime = shouldEase ? now : null;
+    pilot.correctionEndTime = shouldEase ? now + correctionMs : null;
   }
 
   function getCurrentPilotProgress(pilot) {
+    var now = window.performance.now();
+    if (
+      pilot.correctionStartTime !== null &&
+      pilot.correctionEndTime !== null &&
+      now < pilot.correctionEndTime
+    ) {
+      return interpolateProgress(
+        pilot.correctionFromProgress,
+        pilot.correctionToProgress,
+        easeOutCubic(
+          (now - pilot.correctionStartTime) /
+            (pilot.correctionEndTime - pilot.correctionStartTime)
+        )
+      );
+    }
     if (pilot.lastAnchorTime === null || !raceRunning) {
       return pilot.lastAnchorProgress;
     }
-    var elapsed = window.performance.now() - pilot.lastAnchorTime;
+    if (now < pilot.lastAnchorTime) {
+      return pilot.lastAnchorProgress;
+    }
+    var elapsed = now - pilot.lastAnchorTime;
     var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
     return interpolateProgress(
       pilot.lastAnchorProgress,
@@ -643,9 +738,15 @@
         var halo = g.querySelector(".trackdraw-map__pilot-halo");
         var marker = g.querySelector(".trackdraw-map__pilot-marker");
         var arrow = g.querySelector(".trackdraw-map__pilot");
+        var connector = g.querySelector(".trackdraw-map__pilot-label-connector");
         var labelBg = g.querySelector(".trackdraw-map__pilot-label-bg");
-        var lbl = g.querySelector("text");
+        var labelAccent = g.querySelector(".trackdraw-map__pilot-label-accent");
+        var positionBg = g.querySelector(".trackdraw-map__pilot-position-bg");
+        var positionText = g.querySelector(".trackdraw-map__pilot-position");
+        var lbl = g.querySelector(".trackdraw-map__pilot-label");
         var label = getPilotLabel(pilot);
+        var position = Number(pilot.position);
+        var hasPosition = !isNaN(position) && position > 0;
 
         if (halo) {
           halo.style.stroke = pilot.color;
@@ -659,21 +760,63 @@
         if (arrow) {
           arrow.style.fill = pilot.color;
         }
+        if (connector) {
+          connector.setAttribute("x1", 0);
+          connector.setAttribute("y1", -fieldScale * 0.011);
+          connector.setAttribute("x2", labelOffset.x);
+          connector.setAttribute("y2", labelOffset.y + fieldScale * 0.013);
+          connector.style.stroke = pilot.color;
+        }
         if (labelBg) {
+          var accentW = fieldScale * 0.005;
+          var posW = hasPosition ? fieldScale * 0.022 : 0;
+          var gap = hasPosition ? fieldScale * 0.004 : 0;
           var labelW = Math.max(
-            fieldScale * 0.042,
-            fieldScale * (0.016 * String(label).length + 0.022)
+            fieldScale * (hasPosition ? 0.066 : 0.046),
+            fieldScale * (0.014 * String(label).length + 0.030) + posW + gap
           );
-          var labelH = fieldScale * 0.027;
-          labelBg.setAttribute("x", labelOffset.x - labelW / 2);
-          labelBg.setAttribute("y", labelOffset.y - labelH / 2);
+          var labelH = fieldScale * 0.030;
+          var labelX = labelOffset.x - labelW / 2;
+          var labelY = labelOffset.y - labelH / 2;
+          labelBg.setAttribute("x", labelX);
+          labelBg.setAttribute("y", labelY);
           labelBg.setAttribute("width", labelW);
           labelBg.setAttribute("height", labelH);
           labelBg.style.stroke = pilot.color;
+          if (labelAccent) {
+            labelAccent.setAttribute("x", labelX);
+            labelAccent.setAttribute("y", labelY);
+            labelAccent.setAttribute("width", accentW);
+            labelAccent.setAttribute("height", labelH);
+            labelAccent.style.fill = pilot.color;
+          }
+          if (positionBg && positionText) {
+            if (hasPosition) {
+              var posX = labelX + accentW + fieldScale * 0.004;
+              positionBg.removeAttribute("display");
+              positionText.removeAttribute("display");
+              positionBg.setAttribute("x", posX);
+              positionBg.setAttribute("y", labelY + fieldScale * 0.004);
+              positionBg.setAttribute("width", posW);
+              positionBg.setAttribute("height", labelH - fieldScale * 0.008);
+              positionBg.style.fill = pilot.color;
+              positionText.setAttribute("x", posX + posW / 2);
+              positionText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
+              positionText.textContent = String(position);
+            } else {
+              positionBg.setAttribute("display", "none");
+              positionText.setAttribute("display", "none");
+            }
+          }
+          if (lbl) {
+            var textAreaStart =
+              labelX + accentW + fieldScale * 0.006 + (hasPosition ? posW + gap : 0);
+            var textAreaW = labelW - (textAreaStart - labelX) - fieldScale * 0.008;
+            lbl.setAttribute("x", textAreaStart + textAreaW / 2);
+            lbl.setAttribute("y", labelOffset.y + fieldScale * 0.0055);
+          }
         }
         if (lbl) {
-          lbl.setAttribute("x", labelOffset.x);
-          lbl.setAttribute("y", labelOffset.y + fieldScale * 0.006);
           lbl.textContent = label;
         }
       });
@@ -713,6 +856,10 @@
         hasLearnedPace: false,
         confidence: "idle",
         lastSeenAt: null,
+        correctionFromProgress: null,
+        correctionToProgress: null,
+        correctionStartTime: null,
+        correctionEndTime: null,
       };
     });
   }
@@ -722,6 +869,10 @@
       pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
       pilots[nodeIdx].lastAnchorTime = null;
       pilots[nodeIdx].confidence = confidence || "idle";
+      pilots[nodeIdx].correctionFromProgress = null;
+      pilots[nodeIdx].correctionToProgress = null;
+      pilots[nodeIdx].correctionStartTime = null;
+      pilots[nodeIdx].correctionEndTime = null;
     });
   }
 
@@ -755,6 +906,10 @@
         );
         pilots[nodeIdx].lastAnchorTime = null;
         pilots[nodeIdx].confidence = "idle";
+        pilots[nodeIdx].correctionFromProgress = null;
+        pilots[nodeIdx].correctionToProgress = null;
+        pilots[nodeIdx].correctionStartTime = null;
+        pilots[nodeIdx].correctionEndTime = null;
       });
       prevLapCounts = {};
       prevSplitCounts = {};

@@ -102,15 +102,21 @@ body {
 
 /* ---- Track elements (sizes set proportionally in JS) ---- */
 
+.trackdraw-map__route-shadow,
 .trackdraw-map__route-outline,
-.trackdraw-map__route {
+.trackdraw-map__route,
+.trackdraw-map__route-highlight {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+.trackdraw-map__route-shadow {
+  filter: drop-shadow(0 2px 7px rgb(0 0 0 / 72%));
+  stroke: var(--trackdraw-route-shadow, rgb(0 0 0 / 48%));
+}
+
 .trackdraw-map__route-outline {
-  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 70%));
   stroke: var(--trackdraw-route-outline, rgb(0 0 0 / 86%));
 }
 
@@ -119,10 +125,23 @@ body {
   stroke: var(--trackdraw-route, #d8e2ee);
 }
 
-.trackdraw-map__obstacle {
-  fill: var(--trackdraw-obstacle-bg, transparent);
-  opacity: 0.42;
-  stroke: var(--trackdraw-obstacle, #2de2a7);
+.trackdraw-map__route-highlight {
+  opacity: 0.58;
+  stroke: var(--trackdraw-route-highlight, var(--trackdraw-accent, #2de2a7));
+}
+
+.trackdraw-map__route-chevron {
+  fill: none;
+  opacity: 0.72;
+  stroke: var(--trackdraw-route-chevron, var(--trackdraw-accent, #2de2a7));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trackdraw-map__gate-tick {
+  opacity: 0.38;
+  stroke: var(--trackdraw-gate-tick, var(--trackdraw-obstacle, #2de2a7));
+  stroke-linecap: round;
 }
 
 .trackdraw-map__obstacle-label,
@@ -184,16 +203,36 @@ body {
   stroke-linejoin: round;
 }
 
+.trackdraw-map__pilot-label-connector {
+  opacity: 0.42;
+  stroke-linecap: round;
+}
+
 .trackdraw-map__pilot-label-bg {
   fill: var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 84%));
   stroke: rgb(255 255 255 / 52%);
 }
 
+.trackdraw-map__pilot-label-accent {
+  opacity: 0.96;
+}
+
+.trackdraw-map__pilot-position-bg {
+  opacity: 0.95;
+}
+
+.trackdraw-map__pilot-position {
+  fill: var(--trackdraw-pilot-position-text, #06100d);
+  font-family: "Barlow", sans-serif;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
 .trackdraw-map__pilot-label {
   fill: #fff;
   font-family: "Barlow", sans-serif;
-  font-weight: 800;
-  letter-spacing: 0.03em;
+  font-weight: 900;
+  letter-spacing: 0.02em;
   text-anchor: middle;
   text-transform: uppercase;
 }
@@ -248,8 +287,28 @@ body {
   display: none;
 }
 
+.trackdraw-map.is-compact .trackdraw-map__route-chevron {
+  opacity: 0.42;
+}
+
+.trackdraw-map.is-compact .trackdraw-map__gate-tick {
+  opacity: 0.24;
+}
+
+.trackdraw-map.is-tiny .trackdraw-map__route-chevron {
+  display: none;
+}
+
+.trackdraw-map.is-tiny .trackdraw-map__gate-tick {
+  display: none;
+}
+
 .trackdraw-map.is-tiny .trackdraw-map__pilot-label,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-label-bg {
+.trackdraw-map.is-tiny .trackdraw-map__pilot-label-bg,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-label-accent,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-label-connector,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-position,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-position-bg {
   display: none;
 }
 
