@@ -211,7 +211,7 @@ body {
   stroke-linejoin: round;
 }
 
-/* Popup-style label: colored callsign box + dark lap-count box */
+/* Popup-style label: colored callsign box + dark position box */
 
 .trackdraw-map__pilot-callsign-bg {
   opacity: 0.95;
@@ -221,21 +221,18 @@ body {
   font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
   font-weight: var(--trackdraw-badge-weight, 900);
   letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
-  text-anchor: middle;
   text-transform: uppercase;
 }
 
-.trackdraw-map__pilot-lap-bg {
+.trackdraw-map__pilot-pos-bg {
   fill: var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 88%));
   opacity: 0.95;
 }
 
-.trackdraw-map__pilot-lap {
-  fill: var(--trackdraw-text, #fff);
+.trackdraw-map__pilot-pos {
   font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
   font-weight: var(--trackdraw-badge-weight, 900);
   letter-spacing: 0.02em;
-  text-anchor: middle;
 }
 
 .trackdraw-map__pilot-group.is-high .trackdraw-map__pilot-halo {
@@ -277,8 +274,8 @@ body {
 
 .trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign-bg,
 .trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-lap-bg,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-lap {
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-pos-bg,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-pos {
   display: none;
 }
 
@@ -298,7 +295,7 @@ body {
   opacity: 0.80;
 }
 
-.trackdraw-map.is-crowded .trackdraw-map__pilot-lap-bg {
+.trackdraw-map.is-crowded .trackdraw-map__pilot-pos-bg {
   fill: var(--trackdraw-pilot-label-bg-crowded, rgb(0 0 0 / 78%));
 }
 
@@ -321,8 +318,8 @@ body {
 
 .trackdraw-map.is-tiny .trackdraw-map__pilot-callsign-bg,
 .trackdraw-map.is-tiny .trackdraw-map__pilot-callsign,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-lap-bg,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-lap {
+.trackdraw-map.is-tiny .trackdraw-map__pilot-pos-bg,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-pos {
   display: none;
 }
 

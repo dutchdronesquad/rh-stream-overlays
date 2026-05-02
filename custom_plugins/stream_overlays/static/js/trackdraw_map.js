@@ -63,6 +63,25 @@
     return el;
   }
 
+  // Generates a <path> d-string for a rect with per-corner radii (tl, tr, br, bl).
+  function roundedRectPath(x, y, w, h, tl, tr, br, bl) {
+    var cap = Math.min(w / 2, h / 2);
+    var a = Math.min(tl, cap), b = Math.min(tr, cap);
+    var c = Math.min(br, cap), d = Math.min(bl, cap);
+    return (
+      "M " + (x + a) + " " + y +
+      " H " + (x + w - b) +
+      (b ? " Q " + (x + w) + " " + y + " " + (x + w) + " " + (y + b) : "") +
+      " V " + (y + h - c) +
+      (c ? " Q " + (x + w) + " " + (y + h) + " " + (x + w - c) + " " + (y + h) : "") +
+      " H " + (x + d) +
+      (d ? " Q " + x + " " + (y + h) + " " + x + " " + (y + h - d) : "") +
+      " V " + (y + a) +
+      (a ? " Q " + x + " " + y + " " + (x + a) + " " + y : "") +
+      " Z"
+    );
+  }
+
   function getPoint(field, point) {
     var y = point.y;
     if (field && field.origin === "bl") {
@@ -676,8 +695,8 @@
           arrow: existing.querySelector(".trackdraw-map__pilot"),
           callsignBg: existing.querySelector(".trackdraw-map__pilot-callsign-bg"),
           callsignText: existing.querySelector(".trackdraw-map__pilot-callsign"),
-          lapBg: existing.querySelector(".trackdraw-map__pilot-lap-bg"),
-          lapText: existing.querySelector(".trackdraw-map__pilot-lap"),
+          posBg: existing.querySelector(".trackdraw-map__pilot-pos-bg"),
+          posText: existing.querySelector(".trackdraw-map__pilot-pos"),
         };
       }
       return existing;
@@ -698,9 +717,7 @@
     });
     halo.style.strokeWidth = String(fieldScale * 0.0032);
 
-    var marker = createSvgElement("g", {
-      class: "trackdraw-map__pilot-marker",
-    });
+    var marker = createSvgElement("g", { class: "trackdraw-map__pilot-marker" });
     var arrowLen = fieldScale * 0.019;
     var arrowW = fieldScale * 0.009;
     var arrow = createSvgElement("polygon", {
@@ -716,45 +733,34 @@
     arrow.style.strokeWidth = String(fieldScale * 0.0023);
     marker.appendChild(arrow);
 
-    // Label: two-box popup (colored callsign + dark lap count), no connector.
-    var rx = fieldScale * 0.004;
-    var callsignBg = createSvgElement("rect", {
-      class: "trackdraw-map__pilot-callsign-bg",
-      rx: rx,
-    });
+    // Label: two-box popup (colored callsign box + dark position box), no connector.
+    // Use <path> so each theme can have per-corner rounding.
+    var callsignBg = createSvgElement("path", { class: "trackdraw-map__pilot-callsign-bg" });
     callsignBg.style.fill = pilot.color;
 
-    var callsignText = createSvgElement("text", {
-      class: "trackdraw-map__pilot-callsign",
-    });
+    var callsignText = createSvgElement("text", { class: "trackdraw-map__pilot-callsign" });
     callsignText.style.fontSize = fieldScale * 0.0158 + "px";
-    callsignText.style.fill = getContrastColor(pilot.color);
     callsignText.textContent = getPilotLabel(pilot);
 
-    var lapBg = createSvgElement("rect", {
-      class: "trackdraw-map__pilot-lap-bg",
-      rx: rx,
-    });
+    var posBg = createSvgElement("path", { class: "trackdraw-map__pilot-pos-bg" });
 
-    var lapText = createSvgElement("text", {
-      class: "trackdraw-map__pilot-lap",
-    });
-    lapText.style.fontSize = fieldScale * 0.0158 + "px";
+    var posText = createSvgElement("text", { class: "trackdraw-map__pilot-pos" });
+    posText.style.fontSize = fieldScale * 0.0158 + "px";
 
     g.appendChild(halo);
     g.appendChild(marker);
     g.appendChild(callsignBg);
+    g.appendChild(posBg);
     g.appendChild(callsignText);
-    g.appendChild(lapBg);
-    g.appendChild(lapText);
+    g.appendChild(posText);
     g._trackdrawEls = {
       halo: halo,
       marker: marker,
       arrow: arrow,
       callsignBg: callsignBg,
       callsignText: callsignText,
-      lapBg: lapBg,
-      lapText: lapText,
+      posBg: posBg,
+      posText: posText,
     };
     pilotGroupEl.appendChild(g);
     return g;
@@ -1055,48 +1061,91 @@
           }
         }
 
-        var lapCount = pilot.lapCount || 0;
+        var posVal = hasPosition ? String(position) : "-";
         var labelLayoutKey = [
           labelSlot,
           label,
-          lapCount,
+          posVal,
           pilot.color,
         ].join("|");
         if (pilot._labelLayoutKey !== labelLayoutKey) {
           var labelH = fieldScale * 0.028;
+          var r = labelH * 0.38;
           var csW = Math.max(
             fieldScale * 0.030,
-            fieldScale * (0.013 * String(label).length + 0.016)
+            fieldScale * (0.013 * String(label).length + 0.018)
           );
-          var lapW = fieldScale * 0.024;
-          var totalW = csW + lapW;
+          var posW = fieldScale * 0.022;
+          var totalW = csW + posW;
           var labelX = labelOffset.x - totalW / 2;
           var labelY = labelOffset.y - labelH / 2;
           var midX = labelX + csW;
+          var cy = labelOffset.y + fieldScale * 0.005;
 
           if (els.callsignBg) {
-            els.callsignBg.setAttribute("x", labelX);
-            els.callsignBg.setAttribute("y", labelY);
-            els.callsignBg.setAttribute("width", csW);
-            els.callsignBg.setAttribute("height", labelH);
+            // Shape varies per theme — left side of the two-box badge
+            var csd;
+            if (theme === "lcdr") {
+              // Only top-left corner rounded (tactical / military style)
+              csd = roundedRectPath(labelX, labelY, csW, labelH, r, 0, 0, 0);
+            } else if (theme === "apex") {
+              // APEX: hidden; full border goes on posBg
+              csd = "";
+            } else {
+              // DDS default: left corners rounded, right edge flat
+              csd = roundedRectPath(labelX, labelY, csW, labelH, r, 0, 0, r);
+            }
+            els.callsignBg.setAttribute("d", csd);
             els.callsignBg.style.fill = pilot.color;
           }
           if (els.callsignText) {
-            els.callsignText.setAttribute("x", labelX + csW / 2);
-            els.callsignText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
-            els.callsignText.style.fill = getContrastColor(pilot.color);
+            if (theme === "apex") {
+              // Left-aligned inside single card
+              els.callsignText.setAttribute("x", labelX + fieldScale * 0.008);
+              els.callsignText.setAttribute("text-anchor", "start");
+            } else {
+              els.callsignText.setAttribute("x", labelX + csW / 2);
+              els.callsignText.setAttribute("text-anchor", "middle");
+            }
+            els.callsignText.setAttribute("y", cy);
+            els.callsignText.style.fill = theme === "apex"
+              ? "var(--trackdraw-text, #fff)"
+              : getContrastColor(pilot.color);
             els.callsignText.textContent = label;
           }
-          if (els.lapBg) {
-            els.lapBg.setAttribute("x", midX);
-            els.lapBg.setAttribute("y", labelY);
-            els.lapBg.setAttribute("width", lapW);
-            els.lapBg.setAttribute("height", labelH);
+          if (els.posBg) {
+            var psd;
+            if (theme === "lcdr") {
+              // Only bottom-right corner rounded
+              psd = roundedRectPath(midX, labelY, posW, labelH, 0, 0, r, 0);
+            } else if (theme === "apex") {
+              // Full card: spans entire label width, pilot-color border
+              psd = roundedRectPath(labelX, labelY, totalW, labelH, r, r, r, r);
+            } else {
+              // DDS default: right corners rounded
+              psd = roundedRectPath(midX, labelY, posW, labelH, 0, r, r, 0);
+            }
+            els.posBg.setAttribute("d", psd);
+            if (theme === "apex") {
+              els.posBg.style.stroke = pilot.color;
+              els.posBg.style.strokeWidth = String(fieldScale * 0.003);
+            } else {
+              els.posBg.style.stroke = "none";
+            }
           }
-          if (els.lapText) {
-            els.lapText.setAttribute("x", midX + lapW / 2);
-            els.lapText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
-            els.lapText.textContent = String(lapCount);
+          if (els.posText) {
+            if (theme === "apex") {
+              // Right-aligned in pilot color
+              els.posText.setAttribute("x", labelX + totalW - fieldScale * 0.008);
+              els.posText.setAttribute("text-anchor", "end");
+              els.posText.style.fill = pilot.color;
+            } else {
+              els.posText.setAttribute("x", midX + posW / 2);
+              els.posText.setAttribute("text-anchor", "middle");
+              els.posText.style.fill = "var(--trackdraw-text, #fff)";
+            }
+            els.posText.setAttribute("y", cy);
+            els.posText.textContent = posVal;
           }
 
           pilot._labelLayoutKey = labelLayoutKey;
