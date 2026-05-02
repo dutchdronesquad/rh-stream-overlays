@@ -1,7 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap");
 
 .trackdraw-map[data-theme="apex"] {
   --trackdraw-accent: #ff4f9a;
   --trackdraw-accent-bar-h: 3px;
+  --trackdraw-badge-font: "Rajdhani", sans-serif;
+  --trackdraw-badge-label-size: 12px;
+  --trackdraw-badge-tracking: 0.10em;
+  --trackdraw-badge-weight: 700;
   --trackdraw-field-bg: transparent;
   --trackdraw-field-stroke: rgb(255 79 154 / 18%);
   --trackdraw-key-bg: grey;
@@ -14,8 +19,8 @@
   --trackdraw-obstacle-bg: rgb(8 4 12 / 90%);
   --trackdraw-panel-bg: rgb(8 4 14 / 84%);
   --trackdraw-panel-border: rgb(255 79 154 / 36%);
-  --trackdraw-pilot-label-bg: rgb(8 4 14 / 88%);
-  --trackdraw-pilot-label-bg-crowded: rgb(8 4 14 / 78%);
+  --trackdraw-pilot-label-bg: rgb(5 7 14 / 90%);
+  --trackdraw-pilot-label-bg-crowded: rgb(5 7 14 / 80%);
   --trackdraw-pilot-position-text: #08040e;
   --trackdraw-route: #f5f2f5;
   --trackdraw-route-outline: rgb(4 0 8 / 88%);

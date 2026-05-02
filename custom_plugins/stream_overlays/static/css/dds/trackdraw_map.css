@@ -1,7 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&display=swap");
 
 .trackdraw-map[data-theme="dds"] {
   --trackdraw-accent: #20e3b2;
   --trackdraw-accent-bar-h: 3px;
+  --trackdraw-badge-font: "Teko", sans-serif;
+  --trackdraw-badge-label-size: 13px;
+  --trackdraw-badge-tracking: 0.28em;
+  --trackdraw-badge-weight: 600;
   --trackdraw-field-bg: transparent;
   --trackdraw-field-stroke: rgb(32 227 178 / 18%);
   --trackdraw-key-bg: grey;
@@ -14,8 +19,8 @@
   --trackdraw-obstacle-bg: rgb(2 8 14 / 90%);
   --trackdraw-panel-bg: rgb(2 8 14 / 84%);
   --trackdraw-panel-border: rgb(32 227 178 / 36%);
-  --trackdraw-pilot-label-bg: rgb(2 8 14 / 88%);
-  --trackdraw-pilot-label-bg-crowded: rgb(2 8 14 / 78%);
+  --trackdraw-pilot-label-bg: rgb(7 9 16 / 92%);
+  --trackdraw-pilot-label-bg-crowded: rgb(7 9 16 / 80%);
   --trackdraw-pilot-position-text: #06100d;
   --trackdraw-route: #f2f5f2;
   --trackdraw-route-outline: rgb(0 7 13 / 88%);

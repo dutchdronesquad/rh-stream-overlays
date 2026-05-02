@@ -60,9 +60,10 @@ body {
 
 .trackdraw-map__label {
   color: var(--trackdraw-accent, #2de2a7);
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: var(--trackdraw-badge-label-size, 10px);
+  font-weight: var(--trackdraw-badge-weight, 900);
+  letter-spacing: var(--trackdraw-badge-tracking, 0.14em);
   text-transform: uppercase;
 }
 
@@ -237,9 +238,9 @@ body {
 
 .trackdraw-map__pilot-label {
   fill: #fff;
-  font-family: "Barlow", sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-weight: var(--trackdraw-badge-weight, 900);
+  letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
   text-anchor: middle;
   text-transform: uppercase;
 }
