@@ -505,7 +505,6 @@
     var timingSfR = fieldScale * 0.013;
     var timingR   = fieldScale * 0.010;
     var timingSwW = fieldScale * 0.003;
-    var timingFontZ = fieldScale * 0.022;
 
     clearSvg(svgEl);
     setSafeViewBox(field, points, track);
@@ -564,7 +563,7 @@
       var tick = createSvgElement("line", {
         class: isStartFinish
           ? "trackdraw-map__timing-tick is-start-finish"
-          : "trackdraw-map__timing-tick",
+          : "trackdraw-map__timing-tick is-split",
         x1: pt.x - Math.cos(normal) * tickSize,
         y1: pt.y - Math.sin(normal) * tickSize,
         x2: pt.x + Math.cos(normal) * tickSize,
@@ -574,8 +573,8 @@
       svgEl.appendChild(tick);
 
       if (isStartFinish) {
-        var startGate = createSvgElement("g", {
-          class: "trackdraw-map__start-gate",
+        var finishLine = createSvgElement("g", {
+          class: "trackdraw-map__finish-line",
           transform:
             "translate(" +
             pt.x +
@@ -585,40 +584,39 @@
             (angle * 180) / Math.PI +
             ")",
         });
+
         [-1, 1].forEach(function (side) {
           var cap = createSvgElement("rect", {
-            class: "trackdraw-map__start-gate-cap",
+            class: "trackdraw-map__finish-line-cap",
             x: -r * 0.75,
             y: side * tickSize - r * 0.34,
             width: r * 1.5,
             height: r * 0.68,
             rx: r * 0.12,
           });
-          startGate.appendChild(cap);
+          finishLine.appendChild(cap);
         });
-        svgEl.appendChild(startGate);
 
-        var badge = createSvgElement("g", {
-          class: "trackdraw-map__start-badge",
-          transform: "translate(" + pt.x + " " + (pt.y - r * 3.2) + ")",
-        });
-        var badgeRect = createSvgElement("rect", {
-          x: -r * 2.1,
-          y: -r * 0.95,
-          width: r * 4.2,
-          height: r * 1.9,
-          rx: r * 0.25,
-        });
-        var badgeText = createSvgElement("text", {
-          dy: r * 0.38,
-          class: "trackdraw-map__start-badge-text",
-        });
-        badgeText.style.fontSize = timingFontZ + "px";
-        badgeText.style.strokeWidth = String(fieldScale * 0.006) + "px";
-        badgeText.textContent = "S/F";
-        badge.appendChild(badgeRect);
-        badge.appendChild(badgeText);
-        svgEl.appendChild(badge);
+        var blockRows = 6;
+        var blockH = (tickSize * 2) / blockRows;
+        var blockW = r * 0.52;
+        for (var row = 0; row < blockRows; row++) {
+          for (var col = 0; col < 2; col++) {
+            var block = createSvgElement("rect", {
+              class:
+                (row + col) % 2 === 0
+                  ? "trackdraw-map__finish-block is-light"
+                  : "trackdraw-map__finish-block is-dark",
+              x: (col - 1) * blockW,
+              y: -tickSize + row * blockH,
+              width: blockW,
+              height: blockH,
+            });
+            finishLine.appendChild(block);
+          }
+        }
+
+        svgEl.appendChild(finishLine);
         return;
       }
 
@@ -1191,7 +1189,7 @@
             confidence: pilot.hasLearnedPace ? "high" : "low",
           });
         } else if (lapNumber > 0) {
-          // Racing lap completed — snap back to S/F and update expected time
+          // Racing lap completed: confirm the finish-line anchor and update expected time
           // via exponential moving average so the estimate adapts to the
           // pilot's actual pace without being thrown off by a single outlier.
           updateExpectedLapMs(pilot, getLapTimeMs(latest));

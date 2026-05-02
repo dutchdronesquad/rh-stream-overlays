@@ -163,33 +163,31 @@ body {
   stroke-linecap: round;
 }
 
+.trackdraw-map__timing-tick.is-split {
+  opacity: 0.72;
+}
+
 .trackdraw-map__timing-tick.is-start-finish {
+  opacity: 0.36;
   stroke: var(--trackdraw-start-finish, #ffffff);
 }
 
-.trackdraw-map__start-gate {
+.trackdraw-map__finish-line {
   filter: drop-shadow(0 1px 3px rgb(0 0 0 / 70%));
 }
 
-.trackdraw-map__start-gate-cap {
+.trackdraw-map__finish-line-cap {
   fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
   stroke: var(--trackdraw-start-finish, #ffffff);
   stroke-width: 0.08px;
 }
 
-.trackdraw-map__start-badge rect {
-  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
-  stroke: var(--trackdraw-start-finish, #ffffff);
-  stroke-width: 0.08px;
-}
-
-.trackdraw-map__start-badge-text {
+.trackdraw-map__finish-block.is-light {
   fill: var(--trackdraw-start-finish, #ffffff);
-  font-weight: 900;
-  paint-order: stroke;
-  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
-  stroke-linejoin: round;
-  text-anchor: middle;
+}
+
+.trackdraw-map__finish-block.is-dark {
+  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
 }
 
 /* ---- Pilot dots ---- */
