@@ -107,9 +107,19 @@
     return Math.min(forwardDelta(a, b), forwardDelta(b, a));
   }
 
-  function interpolateProgress(fromProgress, toProgress, ratio) {
+  function isFullLapSegment(fromKey, toKey) {
+    return fromKey === anchorModel.startFinishKey && toKey === anchorModel.startFinishKey;
+  }
+
+  function getSegmentShare(fromProgress, toProgress, fromKey, toKey) {
+    if (isFullLapSegment(fromKey, toKey)) return 1;
+    return forwardDelta(fromProgress, toProgress);
+  }
+
+  function interpolateProgress(fromProgress, toProgress, ratio, fromKey, toKey) {
+    var distance = getSegmentShare(fromProgress, toProgress, fromKey, toKey);
     return normalizeProgress(
-      normalizeProgress(fromProgress) + forwardDelta(fromProgress, toProgress) * clamp01(ratio)
+      normalizeProgress(fromProgress) + distance * clamp01(ratio)
     );
   }
 
@@ -288,7 +298,7 @@
     }
 
     var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
-    var share = forwardDelta(fromProgress, toProgress);
+    var share = getSegmentShare(fromProgress, toProgress, fromKey, toKey);
     return Math.max(1200, Math.round(lapMs * share));
   }
 
@@ -763,7 +773,9 @@
     return interpolateProgress(
       pilot.lastAnchorProgress,
       pilot.nextAnchorProgress,
-      elapsed / segmentMs
+      elapsed / segmentMs,
+      pilot.lastAnchorKey,
+      pilot.nextAnchorKey
     );
   }
 
