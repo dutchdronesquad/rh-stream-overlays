@@ -10,8 +10,13 @@
   --trackdraw-obstacle-bg: rgb(8 4 12 / 90%);
   --trackdraw-panel-bg: rgb(8 4 14 / 84%);
   --trackdraw-panel-border: rgb(255 79 154 / 36%);
+  --trackdraw-pilot-label-bg: rgb(8 4 14 / 88%);
   --trackdraw-route: #ffffff;
+  --trackdraw-route-glow: rgb(255 79 154 / 30%);
   --trackdraw-route-outline: rgb(4 0 8 / 92%);
+  --trackdraw-leader: #ffffff;
+  --trackdraw-leader-bg: #ffffff;
+  --trackdraw-leader-text: #08040e;
   --trackdraw-start-finish: #ffffff;
   --trackdraw-start-finish-bg: rgb(8 4 14 / 92%);
   --trackdraw-text: #ffffff;

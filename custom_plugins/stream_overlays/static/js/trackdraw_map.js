@@ -30,6 +30,7 @@
 
   // ---- Race state ----
   var raceRunning = false;
+  var socketConnected = true;
 
   // ---- SVG elements ----
   var svgEl = null;
@@ -455,16 +456,22 @@
     dot.style.fill = pilot.color;
     dot.style.strokeWidth = String(fieldScale * 0.003);
 
+    var labelBg = createSvgElement("rect", {
+      class: "trackdraw-map__pilot-label-bg",
+      rx: fieldScale * 0.006,
+    });
+    labelBg.style.strokeWidth = String(fieldScale * 0.002);
+
     var lbl = createSvgElement("text", {
       class: "trackdraw-map__pilot-label",
     });
-    lbl.style.fontSize = fieldScale * 0.020 + "px";
-    lbl.style.strokeWidth = String(fieldScale * 0.007) + "px";
-    lbl.setAttribute("y", -fieldScale * 0.022);
+    lbl.style.fontSize = fieldScale * 0.018 + "px";
+    lbl.setAttribute("y", -fieldScale * 0.031);
     lbl.textContent = getPilotLabel(pilot);
 
     g.appendChild(halo);
     g.appendChild(dot);
+    g.appendChild(labelBg);
     g.appendChild(lbl);
     pilotGroupEl.appendChild(g);
   }
@@ -510,7 +517,7 @@
   }
 
   function estimateProgress(pilot) {
-    if (pilot.lastAnchorTime === null || !raceRunning) {
+    if (pilot.lastAnchorTime === null || !raceRunning || !socketConnected) {
       return pilot.lastAnchorProgress;
     }
     return getCurrentPilotProgress(pilot);
@@ -538,6 +545,7 @@
   }
 
   function getPilotConfidence(pilot) {
+    if (!socketConnected && raceRunning) return "stale";
     if (isPilotStale(pilot)) return "stale";
     if (!raceRunning || pilot.lastAnchorTime === null) return "idle";
     if (pilot.confidence === "low") return "low";
@@ -601,12 +609,18 @@
         if (!pt) return;
 
         var confidence = getPilotConfidence(pilot);
-        g.setAttribute("class", "trackdraw-map__pilot-group is-" + confidence);
+        var groupClass = "trackdraw-map__pilot-group is-" + confidence;
+        if (Number(pilot.position) === 1) {
+          groupClass += " is-leader";
+        }
+        g.setAttribute("class", groupClass);
         g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
 
         var halo = g.querySelector(".trackdraw-map__pilot-halo");
         var dot = g.querySelector(".trackdraw-map__pilot");
+        var labelBg = g.querySelector(".trackdraw-map__pilot-label-bg");
         var lbl = g.querySelector("text");
+        var label = getPilotLabel(pilot);
 
         if (halo) {
           halo.style.stroke = pilot.color;
@@ -614,8 +628,20 @@
         if (dot) {
           dot.style.fill = pilot.color;
         }
+        if (labelBg) {
+          var labelW = Math.max(
+            fieldScale * 0.042,
+            fieldScale * (0.016 * String(label).length + 0.022)
+          );
+          var labelH = fieldScale * 0.027;
+          labelBg.setAttribute("x", -labelW / 2);
+          labelBg.setAttribute("y", -fieldScale * 0.049);
+          labelBg.setAttribute("width", labelW);
+          labelBg.setAttribute("height", labelH);
+          labelBg.style.stroke = pilot.color;
+        }
         if (lbl) {
-          lbl.textContent = getPilotLabel(pilot);
+          lbl.textContent = label;
         }
       });
     }
@@ -658,6 +684,14 @@
     });
   }
 
+  function freezePilots(confidence) {
+    Object.keys(pilots).forEach(function (nodeIdx) {
+      pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
+      pilots[nodeIdx].lastAnchorTime = null;
+      pilots[nodeIdx].confidence = confidence || "idle";
+    });
+  }
+
   function handleRaceStatus(msg) {
     var status = msg && msg.race_status;
     var wasRunning = raceRunning;
@@ -695,12 +729,17 @@
 
     if (status === 0 || status === 2) {
       // Race stopped or reset: freeze pilots where they are
-      Object.keys(pilots).forEach(function (nodeIdx) {
-        pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
-        pilots[nodeIdx].lastAnchorTime = null;
-        pilots[nodeIdx].confidence = "idle";
-      });
+      freezePilots("idle");
     }
+  }
+
+  function handleSocketConnect() {
+    socketConnected = true;
+  }
+
+  function handleSocketDisconnect() {
+    socketConnected = false;
+    freezePilots("stale");
   }
 
   function handleCurrentLaps(msg) {
@@ -813,6 +852,8 @@
   }
 
   function registerSocketHandlers() {
+    socket.on("connect", handleSocketConnect);
+    socket.on("disconnect", handleSocketDisconnect);
     socket.on("current_heat", handleHeat);
     socket.on("race_status", handleRaceStatus);
     socket.on("current_laps", handleCurrentLaps);
