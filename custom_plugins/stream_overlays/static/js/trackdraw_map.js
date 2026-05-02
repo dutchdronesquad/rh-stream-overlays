@@ -21,6 +21,10 @@
   // stay correct regardless of how large or small the physical course is.
   var fieldScale = 72;
 
+  // Boosted at small viewport sizes so route lines and pilot dots remain
+  // legible when the overlay is used as a minimap browser source.
+  var visualScale = 1.0;
+
   // ---- Track state ----
   var trackData = null;
   var sampledPoints = [];
@@ -584,15 +588,26 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeShadowW = fieldScale * 0.016;
-    var routeOuterW = fieldScale * 0.010;
-    var routeInnerW = fieldScale * 0.006;
-    var gateR = fieldScale * 0.006;
-    var gateCoreR = fieldScale * 0.0027;
-    var gateSwW = fieldScale * 0.0017;
-    var timingSfR = fieldScale * 0.013;
-    var timingR   = fieldScale * 0.010;
-    var timingSwW = fieldScale * 0.003;
+
+    // Scale up visual element sizes at small viewport dimensions so route
+    // lines and pilot dots remain legible when used as a minimap source.
+    var minDim = Math.min(window.innerWidth || 1920, window.innerHeight || 1080);
+    visualScale = minDim < 300 ? 2.8
+                : minDim < 420 ? 2.2
+                : minDim < 600 ? 1.7
+                : minDim < 900 ? 1.3
+                : 1.0;
+
+    var vs = visualScale;
+    var routeShadowW = fieldScale * 0.016 * vs;
+    var routeOuterW = fieldScale * 0.010 * vs;
+    var routeInnerW = fieldScale * 0.006 * vs;
+    var gateR = fieldScale * 0.006 * vs;
+    var gateCoreR = fieldScale * 0.0027 * vs;
+    var gateSwW = fieldScale * 0.0017 * vs;
+    var timingSfR = fieldScale * 0.013 * vs;
+    var timingR   = fieldScale * 0.010 * vs;
+    var timingSwW = fieldScale * 0.003 * vs;
 
     clearSvg(svgEl);
     setSafeViewBox(field, points, track);
@@ -708,16 +723,17 @@
     pilot._markerTransform = null;
     pilot._labelLayoutKey = null;
 
-    var pilotR = fieldScale * 0.010;
+    var vs = visualScale;
+    var pilotR = fieldScale * 0.010 * vs;
     var halo = createSvgElement("circle", {
       class: "trackdraw-map__pilot-halo",
       r: pilotR * 1.9,
     });
-    halo.style.strokeWidth = String(fieldScale * 0.0032);
+    halo.style.strokeWidth = String(fieldScale * 0.0032 * vs);
 
     var marker = createSvgElement("g", { class: "trackdraw-map__pilot-marker" });
-    var arrowLen = fieldScale * 0.019;
-    var arrowW = fieldScale * 0.009;
+    var arrowLen = fieldScale * 0.019 * vs;
+    var arrowW = fieldScale * 0.009 * vs;
     var arrow = createSvgElement("polygon", {
       class: "trackdraw-map__pilot",
       points: [
@@ -728,7 +744,7 @@
       ].join(" "),
     });
     arrow.style.fill = pilot.color;
-    arrow.style.strokeWidth = String(fieldScale * 0.0023);
+    arrow.style.strokeWidth = String(fieldScale * 0.0023 * vs);
     marker.appendChild(arrow);
 
     // Label: single colored callsign badge, no connector.
@@ -736,7 +752,7 @@
     var callsignBg = createSvgElement("path", { class: "trackdraw-map__pilot-callsign-bg" });
 
     var callsignText = createSvgElement("text", { class: "trackdraw-map__pilot-callsign" });
-    callsignText.style.fontSize = fieldScale * 0.0158 + "px";
+    callsignText.style.fontSize = fieldScale * 0.0158 * vs + "px";
     callsignText.textContent = getPilotLabel(pilot);
 
     g.appendChild(halo);
@@ -779,7 +795,7 @@
     ];
     var direction = directions[slot] || directions[0];
     var length = Math.sqrt(direction.x * direction.x + direction.y * direction.y) || 1;
-    var radius = fieldScale * 0.044;
+    var radius = fieldScale * 0.044 * visualScale;
     return {
       x: (direction.x / length) * radius,
       y: (direction.y / length) * radius,
@@ -1052,12 +1068,13 @@
         var labelLayoutKey = [labelSlot, label, pilot.color].join("|");
         if (pilot._labelLayoutKey !== labelLayoutKey) {
           // Fixed width so every label sits at exactly the same distance from the arrow.
-          var labelW = fieldScale * 0.064;
-          var labelH = fieldScale * 0.022;
+          var vs = visualScale;
+          var labelW = fieldScale * 0.064 * vs;
+          var labelH = fieldScale * 0.022 * vs;
           var r = labelH * 0.40;
           var labelX = labelOffset.x - labelW / 2;
           var labelY = labelOffset.y - labelH / 2;
-          var cy = labelOffset.y + fieldScale * 0.005;
+          var cy = labelOffset.y + fieldScale * 0.005 * vs;
 
           if (els.callsignBg) {
             var bgd;
@@ -1071,7 +1088,7 @@
               bgd = roundedRectPath(labelX, labelY, labelW, labelH, r, r, r, r);
               els.callsignBg.style.fill = "var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 88%))";
               els.callsignBg.style.stroke = pilot.color;
-              els.callsignBg.style.strokeWidth = String(fieldScale * 0.003);
+              els.callsignBg.style.strokeWidth = String(fieldScale * 0.003 * vs);
             } else {
               // DDS: top-left + bottom-right rounded (diagonal, matching DDS popup style)
               bgd = roundedRectPath(labelX, labelY, labelW, labelH, r, 0, r, 0);
