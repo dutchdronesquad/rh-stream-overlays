@@ -117,7 +117,7 @@ body {
 }
 
 .trackdraw-map__route-shadow {
-  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 68%));
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 66%));
   stroke: var(--trackdraw-route-shadow, rgb(0 0 0 / 48%));
 }
 
@@ -129,11 +129,18 @@ body {
   stroke: var(--trackdraw-route, #d8e2ee);
 }
 
-.trackdraw-map__gate-tick {
+.trackdraw-map__gate {
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 68%));
-  opacity: 0.72;
-  stroke: var(--trackdraw-gate-tick, var(--trackdraw-obstacle, #2de2a7));
-  stroke-linecap: round;
+  opacity: 0.88;
+}
+
+.trackdraw-map__gate-marker {
+  fill: var(--trackdraw-gate-bg, rgb(0 0 0 / 90%));
+  stroke: var(--trackdraw-gate-stroke, var(--trackdraw-obstacle, #2de2a7));
+}
+
+.trackdraw-map__gate-marker-core {
+  fill: var(--trackdraw-gate-core, var(--trackdraw-obstacle, #2de2a7));
 }
 
 .trackdraw-map__obstacle-label,
@@ -158,6 +165,16 @@ body {
 
 .trackdraw-map__timing-tick.is-start-finish {
   stroke: var(--trackdraw-start-finish, #ffffff);
+}
+
+.trackdraw-map__start-gate {
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 70%));
+}
+
+.trackdraw-map__start-gate-cap {
+  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
+  stroke: var(--trackdraw-start-finish, #ffffff);
+  stroke-width: 0.08px;
 }
 
 .trackdraw-map__start-badge rect {
@@ -310,11 +327,11 @@ body {
   display: none;
 }
 
-.trackdraw-map.is-compact .trackdraw-map__gate-tick {
-  opacity: 0.5;
+.trackdraw-map.is-compact .trackdraw-map__gate {
+  opacity: 0.7;
 }
 
-.trackdraw-map.is-tiny .trackdraw-map__gate-tick {
+.trackdraw-map.is-tiny .trackdraw-map__gate {
   display: none;
 }
 

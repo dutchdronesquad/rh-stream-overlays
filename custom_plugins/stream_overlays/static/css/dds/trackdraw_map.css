@@ -7,7 +7,9 @@
   --trackdraw-key-bg: grey;
   --trackdraw-label-stroke: rgb(2 8 14 / 94%);
   --trackdraw-muted: rgb(200 255 242 / 60%);
-  --trackdraw-gate-tick: rgb(32 227 178 / 88%);
+  --trackdraw-gate-bg: rgb(0 7 13 / 94%);
+  --trackdraw-gate-core: #20e3b2;
+  --trackdraw-gate-stroke: rgb(32 227 178 / 88%);
   --trackdraw-obstacle: #20e3b2;
   --trackdraw-obstacle-bg: rgb(2 8 14 / 90%);
   --trackdraw-panel-bg: rgb(2 8 14 / 84%);

@@ -8,6 +8,7 @@
   var CONFIDENCE_HIGH_MS = 2500;
   var ANCHOR_CORRECTION_MS = 650;
   var CORRECTION_FADE_THRESHOLD_PROGRESS = 0.025;
+  var LAP_ROLLOVER_CONTINUITY_PROGRESS = 0.08;
   var MIN_OBSERVED_SEGMENT_MS = 600;
 
   // Set in renderTrack from the actual track field diagonal (meters).
@@ -58,6 +59,13 @@
       y = field.height - point.y;
     }
     return { x: point.x, y: y };
+  }
+
+  function getVisualPoint(field, item, fallback) {
+    if (hasPoint(item)) return getPoint(field, item);
+    if (item && hasPoint(item.position)) return getPoint(field, item.position);
+    if (hasPoint(fallback)) return getPoint(field, fallback);
+    return null;
   }
 
   function getRoutePath(field, points) {
@@ -392,14 +400,10 @@
       includeBoundsPoint(bounds, getPoint(field, point));
     });
     (track.route_obstacles || []).forEach(function (obstacle) {
-      if (obstacle && obstacle.route_position) {
-        includeBoundsPoint(bounds, getPoint(field, obstacle.route_position));
-      }
+      includeBoundsPoint(bounds, getVisualPoint(field, obstacle, obstacle.route_position));
     });
     (track.timing_markers || []).forEach(function (marker) {
-      if (marker && marker.route_position) {
-        includeBoundsPoint(bounds, getPoint(field, marker.route_position));
-      }
+      includeBoundsPoint(bounds, getVisualPoint(field, marker, marker.route_position));
     });
 
     if (
@@ -492,11 +496,12 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeShadowW = fieldScale * 0.018;
-    var routeOuterW = fieldScale * 0.011;
-    var routeInnerW = fieldScale * 0.0065;
-    var gateTickLen = fieldScale * 0.017;
-    var gateSwW   = fieldScale * 0.0026;
+    var routeShadowW = fieldScale * 0.016;
+    var routeOuterW = fieldScale * 0.010;
+    var routeInnerW = fieldScale * 0.006;
+    var gateR = fieldScale * 0.006;
+    var gateCoreR = fieldScale * 0.0027;
+    var gateSwW = fieldScale * 0.0017;
     var timingSfR = fieldScale * 0.013;
     var timingR   = fieldScale * 0.010;
     var timingSwW = fieldScale * 0.003;
@@ -526,23 +531,30 @@
       ) {
         return;
       }
-      var routePoint = progressToPointWithAngle(obstacle.route_position.progress);
-      if (!routePoint) return;
-      var normal = routePoint.angle + Math.PI / 2;
-      var gateTick = createSvgElement("line", {
-        class: "trackdraw-map__gate-tick",
-        x1: routePoint.x - Math.cos(normal) * gateTickLen,
-        y1: routePoint.y - Math.sin(normal) * gateTickLen,
-        x2: routePoint.x + Math.cos(normal) * gateTickLen,
-        y2: routePoint.y + Math.sin(normal) * gateTickLen,
+      var gatePoint = getVisualPoint(field, obstacle, obstacle.route_position);
+      if (!gatePoint) return;
+      var gate = createSvgElement("g", {
+        class: "trackdraw-map__gate",
+        transform: "translate(" + gatePoint.x + " " + gatePoint.y + ")",
       });
-      gateTick.style.strokeWidth = String(gateSwW);
-      svgEl.appendChild(gateTick);
+      var marker = createSvgElement("circle", {
+        class: "trackdraw-map__gate-marker",
+        r: gateR,
+      });
+      marker.style.strokeWidth = String(gateSwW);
+      var core = createSvgElement("circle", {
+        class: "trackdraw-map__gate-marker-core",
+        r: gateCoreR,
+      });
+      gate.appendChild(marker);
+      gate.appendChild(core);
+      svgEl.appendChild(gate);
     });
 
     (track.timing_markers || []).forEach(function (marker) {
       if (!marker.route_position) return;
-      var pt = getPoint(field, marker.route_position);
+      var pt = getVisualPoint(field, marker, marker.route_position);
+      if (!pt) return;
       var isStartFinish = marker.role === "start_finish";
       var r = isStartFinish ? timingSfR : timingR;
       var routePoint = progressToPointWithAngle(marker.route_position.progress);
@@ -562,6 +574,30 @@
       svgEl.appendChild(tick);
 
       if (isStartFinish) {
+        var startGate = createSvgElement("g", {
+          class: "trackdraw-map__start-gate",
+          transform:
+            "translate(" +
+            pt.x +
+            " " +
+            pt.y +
+            ") rotate(" +
+            (angle * 180) / Math.PI +
+            ")",
+        });
+        [-1, 1].forEach(function (side) {
+          var cap = createSvgElement("rect", {
+            class: "trackdraw-map__start-gate-cap",
+            x: -r * 0.75,
+            y: side * tickSize - r * 0.34,
+            width: r * 1.5,
+            height: r * 0.68,
+            rx: r * 0.12,
+          });
+          startGate.appendChild(cap);
+        });
+        svgEl.appendChild(startGate);
+
         var badge = createSvgElement("g", {
           class: "trackdraw-map__start-badge",
           transform: "translate(" + pt.x + " " + (pt.y - r * 3.2) + ")",
@@ -697,12 +733,12 @@
 
   function getLabelOffset(slot) {
     var offsets = [
-      { x: 0, y: -0.028 },
-      { x: 0.028, y: -0.034 },
-      { x: -0.028, y: -0.034 },
-      { x: 0.040, y: -0.022 },
-      { x: -0.040, y: -0.022 },
-      { x: 0, y: -0.044 },
+      { x: 0, y: -0.036 },
+      { x: 0.036, y: -0.042 },
+      { x: -0.036, y: -0.042 },
+      { x: 0.052, y: -0.028 },
+      { x: -0.052, y: -0.028 },
+      { x: 0, y: -0.056 },
     ];
     var offset = offsets[slot] || offsets[0];
     return {
@@ -718,15 +754,41 @@
     var anchorKey = opts.anchorKey || getAnchorKeyForProgress(normalized);
     var currentProgress = getCurrentPilotProgress(pilot);
     var currentAnchorKey = pilot.lastAnchorKey || getAnchorKeyForProgress(pilot.lastAnchorProgress);
+    var correctionMs = opts.easeMs || ANCHOR_CORRECTION_MS;
+    var nextAnchor = getNextAnchor(normalized);
+    var segmentMs = getExpectedSegmentMs(
+      pilot,
+      normalized,
+      nextAnchor.progress,
+      anchorKey,
+      nextAnchor.key
+    );
+    var carriedElapsedMs = null;
+    var segmentShare = getSegmentShare(
+      normalized,
+      nextAnchor.progress,
+      anchorKey,
+      nextAnchor.key
+    );
+    var progressFromAnchor = forwardDelta(normalized, currentProgress);
+
+    if (
+      opts.rollover === true &&
+      segmentShare > 0 &&
+      progressFromAnchor > 0 &&
+      progressFromAnchor < Math.min(LAP_ROLLOVER_CONTINUITY_PROGRESS, segmentShare * 0.6)
+    ) {
+      carriedElapsedMs = Math.round(segmentMs * (progressFromAnchor / segmentShare));
+    }
+
     var shouldFadeCorrection =
+      carriedElapsedMs === null &&
       opts.ease !== false &&
       !opts.freeze &&
       raceRunning &&
       socketConnected &&
       pilot.lastAnchorTime !== null &&
       progressDistance(currentProgress, normalized) > CORRECTION_FADE_THRESHOLD_PROGRESS;
-    var correctionMs = opts.easeMs || ANCHOR_CORRECTION_MS;
-    var nextAnchor = getNextAnchor(normalized);
 
     if (pilot.lastTimingAt !== null && currentAnchorKey !== anchorKey) {
       updateExpectedSegmentMs(pilot, currentAnchorKey, anchorKey, now - pilot.lastTimingAt);
@@ -736,14 +798,12 @@
     pilot.lastAnchorKey = anchorKey;
     pilot.nextAnchorProgress = nextAnchor.progress;
     pilot.nextAnchorKey = nextAnchor.key;
-    pilot.expectedSegmentMs = getExpectedSegmentMs(
-      pilot,
-      pilot.lastAnchorProgress,
-      pilot.nextAnchorProgress,
-      pilot.lastAnchorKey,
-      pilot.nextAnchorKey
-    );
-    pilot.lastAnchorTime = opts.freeze ? null : now + (shouldFadeCorrection ? correctionMs : 0);
+    pilot.expectedSegmentMs = segmentMs;
+    pilot.lastAnchorTime = opts.freeze
+      ? null
+      : now +
+        (shouldFadeCorrection ? correctionMs : 0) -
+        (carriedElapsedMs === null ? 0 : carriedElapsedMs);
     pilot.confidence = opts.confidence || "high";
     pilot.lastSeenAt = now;
     pilot.lastTimingAt = now;
@@ -1138,6 +1198,7 @@
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
             anchorKey: anchorModel.startFinishKey,
             confidence: "high",
+            rollover: true,
           });
           pilot.lapCount = lapNumber;
         }
