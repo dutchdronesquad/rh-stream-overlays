@@ -400,23 +400,6 @@
         return;
       }
 
-      var circle = createSvgElement("circle", {
-        class: "trackdraw-map__timing",
-        cx: pt.x,
-        cy: pt.y,
-        r: r,
-      });
-      circle.style.strokeWidth = String(timingSwW);
-      svgEl.appendChild(circle);
-      var lbl = createSvgElement("text", {
-        class: "trackdraw-map__timing-label",
-        x: pt.x,
-        y: pt.y - r * 1.8,
-      });
-      lbl.style.fontSize = timingFontZ + "px";
-      lbl.style.strokeWidth = String(fieldScale * 0.009) + "px";
-      lbl.textContent = marker.title || "S" + (marker.split_index + 1);
-      svgEl.appendChild(lbl);
     });
 
     // Show the actual track title in the header badge
@@ -495,21 +478,12 @@
   }
 
   function getPilotLabel(pilot) {
-    if (pilot.position != null) return String(pilot.position);
-    return (pilot.callsign || "P" + (pilot.nodeIndex + 1)).slice(0, 3);
+    return (pilot.callsign || "N" + (pilot.nodeIndex + 1)).slice(0, 4).toUpperCase();
   }
 
-  function getLabelSlot(point, renderedPoints) {
-    var slot = 0;
-    var threshold = fieldScale * 0.055;
-    renderedPoints.forEach(function (rendered) {
-      var dx = point.x - rendered.x;
-      var dy = point.y - rendered.y;
-      if (Math.sqrt(dx * dx + dy * dy) < threshold) {
-        slot += 1;
-      }
-    });
-    return Math.min(slot, 5);
+  function getLabelSlot(pilot) {
+    var index = Number(pilot.nodeIndex);
+    return isNaN(index) ? 0 : Math.abs(index) % 6;
   }
 
   function getLabelOffset(slot) {
@@ -637,7 +611,6 @@
 
   function animationTick() {
     if (svgEl && pilotGroupEl) {
-      var renderedPilotPoints = [];
       Object.keys(pilots).forEach(function (nodeIdx) {
         var pilot = pilots[nodeIdx];
         if (!pilot.active) return;
@@ -652,9 +625,8 @@
         if (!routePoint) return;
         var pt = { x: routePoint.x, y: routePoint.y };
 
-        var labelSlot = getLabelSlot(pt, renderedPilotPoints);
+        var labelSlot = getLabelSlot(pilot);
         var labelOffset = getLabelOffset(labelSlot);
-        renderedPilotPoints.push(pt);
 
         var confidence = getPilotConfidence(pilot);
         var isLeader = Number(pilot.position) === 1;

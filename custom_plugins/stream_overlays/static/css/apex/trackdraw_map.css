@@ -4,6 +4,7 @@
   --trackdraw-accent-bar-h: 3px;
   --trackdraw-field-bg: transparent;
   --trackdraw-field-stroke: rgb(255 79 154 / 18%);
+  --trackdraw-key-bg: grey;
   --trackdraw-label-stroke: rgb(6 4 10 / 94%);
   --trackdraw-muted: rgb(255 220 238 / 60%);
   --trackdraw-obstacle: #ff4f9a;

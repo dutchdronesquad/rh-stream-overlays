@@ -1,12 +1,12 @@
 /* ============================================================
    TrackDraw Live Race Map
-   Designed for OBS browser source — enable "Allow transparency"
-   in source properties for a fully transparent background.
+   Designed for OBS browser source. The neutral grey background follows
+   the other stream overlays and can be filtered/keyed in OBS.
    ============================================================ */
 
 html,
 body {
-  background: transparent;
+  background: var(--trackdraw-key-bg, grey);
   font-family: "Barlow", sans-serif;
   font-variant-numeric: tabular-nums;
   height: 100%;
@@ -15,6 +15,7 @@ body {
 }
 
 .trackdraw-map {
+  background: var(--trackdraw-key-bg, grey);
   height: 100vh;
   position: relative;
   width: 100vw;
