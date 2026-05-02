@@ -671,10 +671,31 @@
 
   function ensurePilotEl(pilot) {
     var id = "td-pilot-" + pilot.nodeIndex;
-    if (document.getElementById(id)) return;
+    var existing = document.getElementById(id);
+    if (existing) {
+      if (!existing._trackdrawEls) {
+        existing._trackdrawEls = {
+          halo: existing.querySelector(".trackdraw-map__pilot-halo"),
+          marker: existing.querySelector(".trackdraw-map__pilot-marker"),
+          arrow: existing.querySelector(".trackdraw-map__pilot"),
+          connector: existing.querySelector(".trackdraw-map__pilot-label-connector"),
+          labelBg: existing.querySelector(".trackdraw-map__pilot-label-bg"),
+          labelAccent: existing.querySelector(".trackdraw-map__pilot-label-accent"),
+          positionBg: existing.querySelector(".trackdraw-map__pilot-position-bg"),
+          positionText: existing.querySelector(".trackdraw-map__pilot-position"),
+          lbl: existing.querySelector(".trackdraw-map__pilot-label"),
+        };
+      }
+      return existing;
+    }
     if (!pilotGroupEl) return;
 
     var g = createSvgElement("g", { id: id, class: "trackdraw-map__pilot-group" });
+    pilot._frameClass = null;
+    pilot._frameTransform = null;
+    pilot._frameColor = null;
+    pilot._markerTransform = null;
+    pilot._labelLayoutKey = null;
 
     var pilotR = fieldScale * 0.010;
     var halo = createSvgElement("circle", {
@@ -741,7 +762,19 @@
     g.appendChild(positionBg);
     g.appendChild(positionText);
     g.appendChild(lbl);
+    g._trackdrawEls = {
+      halo: halo,
+      marker: marker,
+      arrow: arrow,
+      connector: connector,
+      labelBg: labelBg,
+      labelAccent: labelAccent,
+      positionBg: positionBg,
+      positionText: positionText,
+      lbl: lbl,
+    };
     pilotGroupEl.appendChild(g);
+    return g;
   }
 
   function clearPilotEls() {
@@ -953,6 +986,15 @@
     pilot.hasLearnedPace = true;
   }
 
+  function learnLapSamples(pilot, laps, startIndex) {
+    for (var i = startIndex; i < laps.length; i++) {
+      var lapNumber = Number(laps[i].lap_number);
+      if (lapNumber > 0) {
+        updateExpectedLapMs(pilot, getLapTimeMs(laps[i]));
+      }
+    }
+  }
+
   function animationTick() {
     if (svgEl && pilotGroupEl) {
       var activeNodeIndexes = Object.keys(pilots).filter(function (nodeIdx) {
@@ -963,10 +1005,9 @@
       activeNodeIndexes.forEach(function (nodeIdx) {
         var pilot = pilots[nodeIdx];
 
-        ensurePilotEl(pilot);
-
-        var g = document.getElementById("td-pilot-" + nodeIdx);
+        var g = ensurePilotEl(pilot);
         if (!g) return;
+        var els = g._trackdrawEls || {};
 
         var progress = estimateProgress(pilot);
         var routePoint = progressToPointWithAngle(progress);
@@ -994,43 +1035,41 @@
         if (hideLabel) {
           groupClass += " is-label-hidden";
         }
-        g.setAttribute("class", groupClass);
-        g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
+        if (pilot._frameClass !== groupClass) {
+          g.setAttribute("class", groupClass);
+          pilot._frameClass = groupClass;
+        }
+        var groupTransform = "translate(" + pt.x + " " + pt.y + ")";
+        if (pilot._frameTransform !== groupTransform) {
+          g.setAttribute("transform", groupTransform);
+          pilot._frameTransform = groupTransform;
+        }
         if (isLeader && g.parentNode === pilotGroupEl) {
           pilotGroupEl.appendChild(g);
         }
 
-        var halo = g.querySelector(".trackdraw-map__pilot-halo");
-        var marker = g.querySelector(".trackdraw-map__pilot-marker");
-        var arrow = g.querySelector(".trackdraw-map__pilot");
-        var connector = g.querySelector(".trackdraw-map__pilot-label-connector");
-        var labelBg = g.querySelector(".trackdraw-map__pilot-label-bg");
-        var labelAccent = g.querySelector(".trackdraw-map__pilot-label-accent");
-        var positionBg = g.querySelector(".trackdraw-map__pilot-position-bg");
-        var positionText = g.querySelector(".trackdraw-map__pilot-position");
-        var lbl = g.querySelector(".trackdraw-map__pilot-label");
         var label = getPilotLabel(pilot);
 
-        if (halo) {
-          halo.style.stroke = pilot.color;
+        if (pilot._frameColor !== pilot.color) {
+          if (els.halo) els.halo.style.stroke = pilot.color;
+          if (els.arrow) els.arrow.style.fill = pilot.color;
+          pilot._frameColor = pilot.color;
         }
-        if (marker) {
-          marker.setAttribute(
-            "transform",
-            "rotate(" + (routePoint.angle * 180) / Math.PI + ")"
-          );
+        if (els.marker) {
+          var markerTransform = "rotate(" + (routePoint.angle * 180) / Math.PI + ")";
+          if (pilot._markerTransform !== markerTransform) {
+            els.marker.setAttribute("transform", markerTransform);
+            pilot._markerTransform = markerTransform;
+          }
         }
-        if (arrow) {
-          arrow.style.fill = pilot.color;
-        }
-        if (connector) {
-          connector.setAttribute("x1", 0);
-          connector.setAttribute("y1", -fieldScale * 0.011);
-          connector.setAttribute("x2", labelOffset.x);
-          connector.setAttribute("y2", labelOffset.y + fieldScale * 0.013);
-          connector.style.stroke = pilot.color;
-        }
-        if (labelBg) {
+
+        var labelLayoutKey = [
+          labelSlot,
+          label,
+          hasPosition ? position : "",
+          pilot.color,
+        ].join("|");
+        if (pilot._labelLayoutKey !== labelLayoutKey) {
           var accentW = fieldScale * 0.005;
           var posW = hasPosition ? fieldScale * 0.022 : 0;
           var gap = hasPosition ? fieldScale * 0.004 : 0;
@@ -1041,47 +1080,55 @@
           var labelH = fieldScale * 0.030;
           var labelX = labelOffset.x - labelW / 2;
           var labelY = labelOffset.y - labelH / 2;
-          labelBg.setAttribute("x", labelX);
-          labelBg.setAttribute("y", labelY);
-          labelBg.setAttribute("width", labelW);
-          labelBg.setAttribute("height", labelH);
-          labelBg.style.stroke = pilot.color;
-          if (labelAccent) {
-            labelAccent.setAttribute("x", labelX);
-            labelAccent.setAttribute("y", labelY);
-            labelAccent.setAttribute("width", accentW);
-            labelAccent.setAttribute("height", labelH);
-            labelAccent.style.fill = pilot.color;
+          if (els.connector) {
+            els.connector.setAttribute("x1", 0);
+            els.connector.setAttribute("y1", -fieldScale * 0.011);
+            els.connector.setAttribute("x2", labelOffset.x);
+            els.connector.setAttribute("y2", labelOffset.y + fieldScale * 0.013);
+            els.connector.style.stroke = pilot.color;
           }
-          if (positionBg && positionText) {
+          if (els.labelBg) {
+            els.labelBg.setAttribute("x", labelX);
+            els.labelBg.setAttribute("y", labelY);
+            els.labelBg.setAttribute("width", labelW);
+            els.labelBg.setAttribute("height", labelH);
+            els.labelBg.style.stroke = pilot.color;
+          }
+          if (els.labelAccent) {
+            els.labelAccent.setAttribute("x", labelX);
+            els.labelAccent.setAttribute("y", labelY);
+            els.labelAccent.setAttribute("width", accentW);
+            els.labelAccent.setAttribute("height", labelH);
+            els.labelAccent.style.fill = pilot.color;
+          }
+          if (els.positionBg && els.positionText) {
             if (hasPosition) {
               var posX = labelX + accentW + fieldScale * 0.004;
-              positionBg.removeAttribute("display");
-              positionText.removeAttribute("display");
-              positionBg.setAttribute("x", posX);
-              positionBg.setAttribute("y", labelY + fieldScale * 0.004);
-              positionBg.setAttribute("width", posW);
-              positionBg.setAttribute("height", labelH - fieldScale * 0.008);
-              positionBg.style.fill = pilot.color;
-              positionText.setAttribute("x", posX + posW / 2);
-              positionText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
-              positionText.style.fill = getContrastColor(pilot.color);
-              positionText.textContent = String(position);
+              els.positionBg.removeAttribute("display");
+              els.positionText.removeAttribute("display");
+              els.positionBg.setAttribute("x", posX);
+              els.positionBg.setAttribute("y", labelY + fieldScale * 0.004);
+              els.positionBg.setAttribute("width", posW);
+              els.positionBg.setAttribute("height", labelH - fieldScale * 0.008);
+              els.positionBg.style.fill = pilot.color;
+              els.positionText.setAttribute("x", posX + posW / 2);
+              els.positionText.setAttribute("y", labelOffset.y + fieldScale * 0.005);
+              els.positionText.style.fill = getContrastColor(pilot.color);
+              els.positionText.textContent = String(position);
             } else {
-              positionBg.setAttribute("display", "none");
-              positionText.setAttribute("display", "none");
+              els.positionBg.setAttribute("display", "none");
+              els.positionText.setAttribute("display", "none");
             }
           }
-          if (lbl) {
+          if (els.lbl) {
             var textAreaStart =
               labelX + accentW + fieldScale * 0.006 + (hasPosition ? posW + gap : 0);
             var textAreaW = labelW - (textAreaStart - labelX) - fieldScale * 0.008;
-            lbl.setAttribute("x", textAreaStart + textAreaW / 2);
-            lbl.setAttribute("y", labelOffset.y + fieldScale * 0.0055);
+            els.lbl.setAttribute("x", textAreaStart + textAreaW / 2);
+            els.lbl.setAttribute("y", labelOffset.y + fieldScale * 0.0055);
+            els.lbl.textContent = label;
           }
-        }
-        if (lbl) {
-          lbl.textContent = label;
+          pilot._labelLayoutKey = labelLayoutKey;
         }
       });
     }
@@ -1218,6 +1265,7 @@
       var prevCount = prevLapCounts[nodeIdx] || 0;
 
       if (laps.length > prevCount) {
+        learnLapSamples(pilot, laps, prevCount);
         var latest = laps[laps.length - 1];
         var lapNumber = Number(latest.lap_number);
 
@@ -1232,7 +1280,6 @@
           // Racing lap completed: confirm the finish-line anchor and update expected time
           // via exponential moving average so the estimate adapts to the
           // pilot's actual pace without being thrown off by a single outlier.
-          updateExpectedLapMs(pilot, getLapTimeMs(latest));
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
             anchorKey: anchorModel.startFinishKey,
             confidence: "high",
