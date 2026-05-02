@@ -838,7 +838,9 @@
       carriedElapsedMs = Math.round(segmentMs * (progressFromAnchor / segmentShare));
     }
 
+    var pilotIsApproaching = forwardDelta(normalized, currentProgress) > 0.85;
     var shouldFadeCorrection =
+      !pilotIsApproaching &&
       carriedElapsedMs === null &&
       opts.ease !== false &&
       !opts.freeze &&

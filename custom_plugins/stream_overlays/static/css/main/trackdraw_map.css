@@ -193,7 +193,7 @@ body {
 /* ---- Pilot dots ---- */
 
 .trackdraw-map__pilot-group {
-  transition: opacity 150ms ease;
+  transition: opacity 200ms ease;
 }
 
 .trackdraw-map__pilot-halo {
@@ -258,7 +258,8 @@ body {
 }
 
 .trackdraw-map__pilot-group.is-stale {
-  opacity: 0.34;
+  opacity: 0;
+  transition: opacity 2s ease;
 }
 
 .trackdraw-map__pilot-group.is-stale .trackdraw-map__pilot-halo {
