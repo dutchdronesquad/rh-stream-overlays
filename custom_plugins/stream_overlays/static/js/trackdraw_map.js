@@ -5,6 +5,7 @@
   var DEFAULT_LAP_MS = 30000;
   var STALE_WINDOW_MS = 8000;
   var EMA_ALPHA = 0.35;
+  var CONFIDENCE_HIGH_MS = 2500;
 
   // Set in renderTrack from the actual track field diagonal (meters).
   // All SVG sizes are derived as fractions of this value so proportions
@@ -15,6 +16,10 @@
   var trackData = null;
   var sampledPoints = [];
   var splitProgressMap = {};  // split_index(number) -> route progress (0..1)
+  var anchorModel = {
+    startFinishProgress: 0,
+    orderedSplits: [],
+  };
 
   // ---- Pilot state, keyed by nodeIndex as string ----
   var pilots = {};
@@ -73,6 +78,32 @@
     return pt && typeof pt.x === "number" && typeof pt.y === "number";
   }
 
+  function clamp01(value) {
+    if (value < 0) return 0;
+    if (value > 1) return 1;
+    return value;
+  }
+
+  function normalizeProgress(progress) {
+    var value = progress % 1;
+    if (value < 0) value += 1;
+    return value;
+  }
+
+  function forwardDelta(fromProgress, toProgress) {
+    var from = normalizeProgress(fromProgress);
+    var to = normalizeProgress(toProgress);
+    var delta = to - from;
+    if (delta <= 0) delta += 1;
+    return delta;
+  }
+
+  function interpolateProgress(fromProgress, toProgress, ratio) {
+    return normalizeProgress(
+      normalizeProgress(fromProgress) + forwardDelta(fromProgress, toProgress) * clamp01(ratio)
+    );
+  }
+
   // ----------------------------------------------------------------
   // Route geometry
   // ----------------------------------------------------------------
@@ -80,8 +111,7 @@
   function progressToPoint(progress) {
     if (!sampledPoints.length || !trackData) return null;
     var field = trackData.field;
-    var clamped = progress % 1.0;
-    if (clamped < 0) clamped += 1.0;
+    var clamped = normalizeProgress(progress);
     var idx = clamped * (sampledPoints.length - 1);
     var i = Math.floor(idx);
     var t = idx - i;
@@ -94,6 +124,23 @@
       x: a.x + t * (b.x - a.x),
       y: a.y + t * (b.y - a.y),
     });
+  }
+
+  function progressToPointWithAngle(progress) {
+    var point = progressToPoint(progress);
+    if (!point || sampledPoints.length < 2 || !trackData) return null;
+
+    var clamped = normalizeProgress(progress);
+    var idx = clamped * (sampledPoints.length - 1);
+    var i = Math.max(0, Math.min(sampledPoints.length - 2, Math.floor(idx)));
+    var a = getPoint(trackData.field, sampledPoints[i]);
+    var b = getPoint(trackData.field, sampledPoints[i + 1]);
+
+    return {
+      x: point.x,
+      y: point.y,
+      angle: Math.atan2(b.y - a.y, b.x - a.x),
+    };
   }
 
   function buildSplitProgressMap(timingMarkers) {
@@ -111,6 +158,75 @@
       }
     });
     return map;
+  }
+
+  function buildAnchorModel(timingMarkers) {
+    var startFinishProgress = 0;
+    var splits = [];
+
+    if (Array.isArray(timingMarkers)) {
+      timingMarkers.forEach(function (marker) {
+        if (
+          !marker ||
+          !marker.route_position ||
+          typeof marker.route_position.progress !== "number"
+        ) {
+          return;
+        }
+
+        if (marker.role === "start_finish") {
+          startFinishProgress = normalizeProgress(marker.route_position.progress);
+        }
+
+        if (
+          marker.role === "split" &&
+          typeof marker.split_index === "number" &&
+          !isNaN(marker.split_index)
+        ) {
+          splits.push({
+            splitIndex: marker.split_index,
+            progress: normalizeProgress(marker.route_position.progress),
+            title: marker.title || "Split " + (marker.split_index + 1),
+          });
+        }
+      });
+    }
+
+    splits.sort(function (a, b) {
+      return (
+        forwardDelta(startFinishProgress, a.progress) -
+        forwardDelta(startFinishProgress, b.progress)
+      );
+    });
+
+    return {
+      startFinishProgress: startFinishProgress,
+      orderedSplits: splits,
+    };
+  }
+
+  function getNextAnchorProgress(progress) {
+    var current = normalizeProgress(progress);
+    var splits = anchorModel.orderedSplits || [];
+    var nextSplit = null;
+    var nextDistance = 1;
+
+    splits.forEach(function (split) {
+      var distance = forwardDelta(current, split.progress);
+      if (distance > 0.0001 && distance < nextDistance) {
+        nextDistance = distance;
+        nextSplit = split;
+      }
+    });
+
+    if (nextSplit) return nextSplit.progress;
+    return anchorModel.startFinishProgress;
+  }
+
+  function getExpectedSegmentMs(pilot, fromProgress, toProgress) {
+    var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
+    var share = forwardDelta(fromProgress, toProgress);
+    return Math.max(1200, Math.round(lapMs * share));
   }
 
   // ----------------------------------------------------------------
@@ -179,7 +295,8 @@
     // Derive proportional sizes from the field diagonal so elements look
     // correct at any physical track scale (small club field or large venue).
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
-    var routeW    = fieldScale * 0.005;
+    var routeOuterW = fieldScale * 0.016;
+    var routeInnerW = fieldScale * 0.007;
     var gateR     = fieldScale * 0.009;
     var gateFontZ = fieldScale * 0.026;
     var gateSwW   = fieldScale * 0.003;
@@ -195,11 +312,18 @@
       [-padding, -padding, field.width + padding * 2, field.height + padding * 2].join(" ")
     );
 
+    var routeOutlinePath = createSvgElement("path", {
+      class: "trackdraw-map__route-outline",
+      d: getRoutePath(field, points),
+    });
+    routeOutlinePath.style.strokeWidth = String(routeOuterW);
+    svgEl.appendChild(routeOutlinePath);
+
     var routePath = createSvgElement("path", {
       class: "trackdraw-map__route",
       d: getRoutePath(field, points),
     });
-    routePath.style.strokeWidth = String(routeW);
+    routePath.style.strokeWidth = String(routeInnerW);
     svgEl.appendChild(routePath);
 
     (track.route_obstacles || []).forEach(function (obstacle) {
@@ -232,6 +356,47 @@
       var pt = getPoint(field, marker.route_position);
       var isStartFinish = marker.role === "start_finish";
       var r = isStartFinish ? timingSfR : timingR;
+      var routePoint = progressToPointWithAngle(marker.route_position.progress);
+      var angle = routePoint ? routePoint.angle : 0;
+      var normal = angle + Math.PI / 2;
+      var tickSize = isStartFinish ? r * 2.8 : r * 2.1;
+      var tick = createSvgElement("line", {
+        class: isStartFinish
+          ? "trackdraw-map__timing-tick is-start-finish"
+          : "trackdraw-map__timing-tick",
+        x1: pt.x - Math.cos(normal) * tickSize,
+        y1: pt.y - Math.sin(normal) * tickSize,
+        x2: pt.x + Math.cos(normal) * tickSize,
+        y2: pt.y + Math.sin(normal) * tickSize,
+      });
+      tick.style.strokeWidth = String(isStartFinish ? timingSwW * 2 : timingSwW);
+      svgEl.appendChild(tick);
+
+      if (isStartFinish) {
+        var badge = createSvgElement("g", {
+          class: "trackdraw-map__start-badge",
+          transform: "translate(" + pt.x + " " + (pt.y - r * 3.2) + ")",
+        });
+        var badgeRect = createSvgElement("rect", {
+          x: -r * 2.1,
+          y: -r * 0.95,
+          width: r * 4.2,
+          height: r * 1.9,
+          rx: r * 0.25,
+        });
+        var badgeText = createSvgElement("text", {
+          dy: r * 0.38,
+          class: "trackdraw-map__start-badge-text",
+        });
+        badgeText.style.fontSize = timingFontZ + "px";
+        badgeText.style.strokeWidth = String(fieldScale * 0.006) + "px";
+        badgeText.textContent = "S/F";
+        badge.appendChild(badgeRect);
+        badge.appendChild(badgeText);
+        svgEl.appendChild(badge);
+        return;
+      }
+
       var circle = createSvgElement("circle", {
         class: "trackdraw-map__timing",
         cx: pt.x,
@@ -247,7 +412,7 @@
       });
       lbl.style.fontSize = timingFontZ + "px";
       lbl.style.strokeWidth = String(fieldScale * 0.009) + "px";
-      lbl.textContent = isStartFinish ? "S/F" : marker.title;
+      lbl.textContent = marker.title || "S" + (marker.split_index + 1);
       svgEl.appendChild(lbl);
     });
 
@@ -277,6 +442,12 @@
     var g = createSvgElement("g", { id: id, class: "trackdraw-map__pilot-group" });
 
     var pilotR = fieldScale * 0.013;
+    var halo = createSvgElement("circle", {
+      class: "trackdraw-map__pilot-halo",
+      r: pilotR * 1.75,
+    });
+    halo.style.strokeWidth = String(fieldScale * 0.004);
+
     var dot = createSvgElement("circle", {
       class: "trackdraw-map__pilot",
       r: pilotR,
@@ -289,8 +460,10 @@
     });
     lbl.style.fontSize = fieldScale * 0.020 + "px";
     lbl.style.strokeWidth = String(fieldScale * 0.007) + "px";
-    lbl.textContent = (pilot.callsign || "").slice(0, 3);
+    lbl.setAttribute("y", -fieldScale * 0.022);
+    lbl.textContent = getPilotLabel(pilot);
 
+    g.appendChild(halo);
     g.appendChild(dot);
     g.appendChild(lbl);
     pilotGroupEl.appendChild(g);
@@ -301,13 +474,46 @@
     while (pilotGroupEl.firstChild) pilotGroupEl.removeChild(pilotGroupEl.firstChild);
   }
 
-  function estimateProgress(pilot) {
+  function getPilotLabel(pilot) {
+    if (pilot.position != null) return String(pilot.position);
+    return (pilot.callsign || "P" + (pilot.nodeIndex + 1)).slice(0, 3);
+  }
+
+  function setPilotAnchor(pilot, progress, options) {
+    var opts = options || {};
+    var now = window.performance.now();
+    var normalized = normalizeProgress(progress);
+
+    pilot.lastAnchorProgress = normalized;
+    pilot.nextAnchorProgress = getNextAnchorProgress(normalized);
+    pilot.expectedSegmentMs = getExpectedSegmentMs(
+      pilot,
+      pilot.lastAnchorProgress,
+      pilot.nextAnchorProgress
+    );
+    pilot.lastAnchorTime = opts.freeze ? null : now;
+    pilot.confidence = opts.confidence || "high";
+    pilot.lastSeenAt = now;
+  }
+
+  function getCurrentPilotProgress(pilot) {
     if (pilot.lastAnchorTime === null || !raceRunning) {
       return pilot.lastAnchorProgress;
     }
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
-    return (pilot.lastAnchorProgress + elapsed / lapMs) % 1.0;
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    return interpolateProgress(
+      pilot.lastAnchorProgress,
+      pilot.nextAnchorProgress,
+      elapsed / segmentMs
+    );
+  }
+
+  function estimateProgress(pilot) {
+    if (pilot.lastAnchorTime === null || !raceRunning) {
+      return pilot.lastAnchorProgress;
+    }
+    return getCurrentPilotProgress(pilot);
   }
 
   function getStaleWindowMs() {
@@ -327,8 +533,41 @@
   function isPilotStale(pilot) {
     if (pilot.lastAnchorTime === null || !raceRunning) return false;
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
-    return elapsed > lapMs + getStaleWindowMs();
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    return elapsed > segmentMs + getStaleWindowMs();
+  }
+
+  function getPilotConfidence(pilot) {
+    if (isPilotStale(pilot)) return "stale";
+    if (!raceRunning || pilot.lastAnchorTime === null) return "idle";
+    if (pilot.confidence === "low") return "low";
+
+    var elapsed = window.performance.now() - pilot.lastAnchorTime;
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    if (elapsed < CONFIDENCE_HIGH_MS) return "high";
+    if (elapsed > segmentMs * 0.85) return "low";
+    return "medium";
+  }
+
+  function updateExpectedLapMs(pilot, lapMs) {
+    if (typeof lapMs !== "number" || lapMs <= 0) return;
+    if (
+      typeof rotorhazard !== "undefined" &&
+      typeof rotorhazard.min_lap === "number" &&
+      rotorhazard.min_lap > 0 &&
+      lapMs < rotorhazard.min_lap * 1000
+    ) {
+      return;
+    }
+
+    if (pilot.expectedLapMs === DEFAULT_LAP_MS || pilot.hasLearnedPace !== true) {
+      pilot.expectedLapMs = lapMs;
+    } else {
+      pilot.expectedLapMs = Math.round(
+        EMA_ALPHA * lapMs + (1 - EMA_ALPHA) * pilot.expectedLapMs
+      );
+    }
+    pilot.hasLearnedPace = true;
   }
 
   function animationTick() {
@@ -346,21 +585,22 @@
         var pt = progressToPoint(progress);
         if (!pt) return;
 
-        var dot = g.querySelector("circle");
-        var lbl = g.querySelector("text");
-        var opacity = isPilotStale(pilot) ? "0.3" : "1";
+        var confidence = getPilotConfidence(pilot);
+        g.setAttribute("class", "trackdraw-map__pilot-group is-" + confidence);
+        g.setAttribute("transform", "translate(" + pt.x + " " + pt.y + ")");
 
+        var halo = g.querySelector(".trackdraw-map__pilot-halo");
+        var dot = g.querySelector(".trackdraw-map__pilot");
+        var lbl = g.querySelector("text");
+
+        if (halo) {
+          halo.style.stroke = pilot.color;
+        }
         if (dot) {
-          dot.setAttribute("cx", pt.x);
-          dot.setAttribute("cy", pt.y);
-          dot.setAttribute("opacity", opacity);
           dot.style.fill = pilot.color;
         }
         if (lbl) {
-          lbl.setAttribute("x", pt.x);
-          lbl.setAttribute("y", pt.y - fieldScale * 0.022);
-          lbl.setAttribute("opacity", opacity);
-          lbl.textContent = (pilot.callsign || "").slice(0, 3);
+          lbl.textContent = getPilotLabel(pilot);
         }
       });
     }
@@ -390,9 +630,15 @@
         color: toHexColor(node.activeColor),
         active: true,
         lapCount: 0,
-        lastAnchorProgress: 0,
-        lastAnchorTime: null,  // frozen until holeshot is confirmed
+        position: null,
+        lastAnchorProgress: anchorModel.startFinishProgress,
+        nextAnchorProgress: getNextAnchorProgress(anchorModel.startFinishProgress),
+        lastAnchorTime: null,
+        expectedSegmentMs: DEFAULT_LAP_MS,
         expectedLapMs: DEFAULT_LAP_MS,
+        hasLearnedPace: false,
+        confidence: "idle",
+        lastSeenAt: null,
       };
     });
   }
@@ -413,13 +659,12 @@
     }
 
     if (status === 1 && !wasRunning) {
-      // Race started: park all pilots at start/finish, frozen until holeshot.
-      // Drones launch from start pads — we don't animate until the first gate
-      // pass is confirmed, so the marker doesn't wander across the field.
+      // Race started: begin from the TrackDraw start/finish anchor using a
+      // low-confidence baseline until RotorHazard confirms a lap or split.
       Object.keys(pilots).forEach(function (nodeIdx) {
-        pilots[nodeIdx].lastAnchorProgress = 0;
-        pilots[nodeIdx].lastAnchorTime = null;
-        pilots[nodeIdx].expectedLapMs = DEFAULT_LAP_MS;
+        setPilotAnchor(pilots[nodeIdx], anchorModel.startFinishProgress, {
+          confidence: "low",
+        });
       });
       prevLapCounts = {};
       prevSplitCounts = {};
@@ -428,7 +673,9 @@
     if (status === 0 || status === 2) {
       // Race stopped or reset: freeze pilots where they are
       Object.keys(pilots).forEach(function (nodeIdx) {
+        pilots[nodeIdx].lastAnchorProgress = getCurrentPilotProgress(pilots[nodeIdx]);
         pilots[nodeIdx].lastAnchorTime = null;
+        pilots[nodeIdx].confidence = "idle";
       });
     }
   }
@@ -449,29 +696,19 @@
         var latest = laps[laps.length - 1];
 
         if (latest.lap_number === 0) {
-          // Holeshot: first gate pass after launch. The marker was frozen at
-          // start/finish — now we activate it and use the holeshot time as
-          // an initial lap-time estimate so the first lap looks believable.
-          if (typeof latest.lap_raw === "number" && latest.lap_raw > 0) {
-            pilot.expectedLapMs = latest.lap_raw;
-          }
-          pilot.lastAnchorProgress = 0;
-          pilot.lastAnchorTime = window.performance.now();
+          // Holeshot/start confirmation. Do not learn full-lap pace from this:
+          // RotorHazard lap 0 is not a completed racing lap.
+          setPilotAnchor(pilot, anchorModel.startFinishProgress, {
+            confidence: pilot.hasLearnedPace ? "high" : "low",
+          });
         } else if (latest.lap_number > 0) {
           // Racing lap completed — snap back to S/F and update expected time
           // via exponential moving average so the estimate adapts to the
           // pilot's actual pace without being thrown off by a single outlier.
-          if (typeof latest.lap_raw === "number" && latest.lap_raw > 0) {
-            if (pilot.expectedLapMs === DEFAULT_LAP_MS) {
-              pilot.expectedLapMs = latest.lap_raw;
-            } else {
-              pilot.expectedLapMs = Math.round(
-                EMA_ALPHA * latest.lap_raw + (1 - EMA_ALPHA) * pilot.expectedLapMs
-              );
-            }
-          }
-          pilot.lastAnchorProgress = 0;
-          pilot.lastAnchorTime = window.performance.now();
+          updateExpectedLapMs(pilot, latest.lap_raw);
+          setPilotAnchor(pilot, anchorModel.startFinishProgress, {
+            confidence: "high",
+          });
           pilot.lapCount = latest.lap_number;
         }
       }
@@ -488,14 +725,37 @@
           var split = splits[i];
           var splitProgress = splitProgressMap[split.split_id];
           if (typeof splitProgress === "number") {
-            pilot.lastAnchorProgress = splitProgress;
-            pilot.lastAnchorTime = window.performance.now();
+            setPilotAnchor(pilot, splitProgress, {
+              confidence: "high",
+            });
           }
         }
         prevSplitCounts[splitKey] = splits.length;
       }
 
       prevLapCounts[nodeIdx] = laps.length;
+    });
+  }
+
+  function objectValues(value) {
+    if (!value || typeof value !== "object") return [];
+    return Object.keys(value).map(function (key) {
+      return value[key];
+    });
+  }
+
+  function handleLeaderboard(msg) {
+    var race = msg && msg.current && msg.current.leaderboard;
+    var primary = race && race.meta && race.meta.primary_leaderboard;
+    var leaderboard = primary && race ? race[primary] : null;
+    var entries = Array.isArray(leaderboard) ? leaderboard : objectValues(leaderboard);
+
+    entries.forEach(function (entry) {
+      if (!entry || entry.node == null) return;
+      var pilot = pilots[String(entry.node)];
+      if (!pilot) return;
+      if (entry.position != null) pilot.position = entry.position;
+      if (entry.callsign) pilot.callsign = entry.callsign;
     });
   }
 
@@ -532,6 +792,7 @@
     socket.on("current_heat", handleHeat);
     socket.on("race_status", handleRaceStatus);
     socket.on("current_laps", handleCurrentLaps);
+    socket.on("leaderboard", handleLeaderboard);
   }
 
   function loadTrack() {
@@ -556,6 +817,7 @@
           []
         ).filter(hasPoint);
         splitProgressMap = buildSplitProgressMap(trackData.timing_markers);
+        anchorModel = buildAnchorModel(trackData.timing_markers);
 
         if (!renderTrack(trackData, payload.state)) return;
 

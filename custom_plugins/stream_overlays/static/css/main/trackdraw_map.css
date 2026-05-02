@@ -95,11 +95,19 @@ body {
 
 /* ---- Track elements (sizes set proportionally in JS) ---- */
 
+.trackdraw-map__route-outline,
 .trackdraw-map__route {
   fill: none;
-  stroke: var(--trackdraw-route, #d8e2ee);
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.trackdraw-map__route-outline {
+  stroke: var(--trackdraw-route-outline, rgb(0 0 0 / 86%));
+}
+
+.trackdraw-map__route {
+  stroke: var(--trackdraw-route, #d8e2ee);
 }
 
 .trackdraw-map__obstacle {
@@ -122,9 +130,43 @@ body {
   stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
 }
 
+.trackdraw-map__timing-tick {
+  stroke: var(--trackdraw-timing, #ffe566);
+  stroke-linecap: round;
+}
+
+.trackdraw-map__timing-tick.is-start-finish {
+  stroke: var(--trackdraw-start-finish, #ffffff);
+}
+
+.trackdraw-map__start-badge rect {
+  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
+  stroke: var(--trackdraw-start-finish, #ffffff);
+  stroke-width: 0.08px;
+}
+
+.trackdraw-map__start-badge-text {
+  fill: var(--trackdraw-start-finish, #ffffff);
+  font-weight: 900;
+  paint-order: stroke;
+  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
+  stroke-linejoin: round;
+  text-anchor: middle;
+}
+
 /* ---- Pilot dots ---- */
 
+.trackdraw-map__pilot-group {
+  transition: opacity 150ms ease;
+}
+
+.trackdraw-map__pilot-halo {
+  fill: transparent;
+  opacity: 0.85;
+}
+
 .trackdraw-map__pilot {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 55%));
   stroke: rgb(255 255 255 / 80%);
 }
 
@@ -138,6 +180,31 @@ body {
   stroke-linejoin: round;
   text-anchor: middle;
   text-transform: uppercase;
+}
+
+.trackdraw-map__pilot-group.is-high .trackdraw-map__pilot-halo {
+  opacity: 0.95;
+}
+
+.trackdraw-map__pilot-group.is-medium .trackdraw-map__pilot-halo {
+  opacity: 0.55;
+}
+
+.trackdraw-map__pilot-group.is-low .trackdraw-map__pilot-halo {
+  stroke-dasharray: 0.8 0.7;
+  opacity: 0.45;
+}
+
+.trackdraw-map__pilot-group.is-stale {
+  opacity: 0.34;
+}
+
+.trackdraw-map__pilot-group.is-stale .trackdraw-map__pilot-halo {
+  stroke-dasharray: 0.7 0.8;
+}
+
+.trackdraw-map__pilot-group.is-idle {
+  opacity: 0.74;
 }
 
 /* ---- Setup / error message overlay ---- */

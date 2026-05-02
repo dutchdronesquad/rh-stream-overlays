@@ -11,6 +11,9 @@
   --trackdraw-panel-bg: rgb(2 8 14 / 84%);
   --trackdraw-panel-border: rgb(32 227 178 / 36%);
   --trackdraw-route: #f7fffb;
+  --trackdraw-route-outline: rgb(0 7 13 / 92%);
+  --trackdraw-start-finish: #ffffff;
+  --trackdraw-start-finish-bg: rgb(2 8 14 / 92%);
   --trackdraw-text: #ffffff;
   --trackdraw-timing: #ffe66d;
 }

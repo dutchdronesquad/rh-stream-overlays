@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/trackdraw_map.css') }}">
 <script>
     window.trackdrawOverlayTheme = '{{ theme_name }}';
-    var data_dependencies = ["current_heat", "race_status", "current_laps"];
+    var data_dependencies = ["current_heat", "race_status", "current_laps", "leaderboard"];
 </script>
 <script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/trackdraw_map.js') }}"></script>
 {% endblock %}
