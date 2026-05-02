@@ -211,7 +211,7 @@ body {
   stroke-linejoin: round;
 }
 
-/* Popup-style label: colored callsign box + dark position box */
+/* Pilot callsign badge — single box, shape and fill vary per theme */
 
 .trackdraw-map__pilot-callsign-bg {
   opacity: 0.95;
@@ -222,17 +222,6 @@ body {
   font-weight: var(--trackdraw-badge-weight, 900);
   letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
   text-transform: uppercase;
-}
-
-.trackdraw-map__pilot-pos-bg {
-  fill: var(--trackdraw-pilot-label-bg, rgb(0 0 0 / 88%));
-  opacity: 0.95;
-}
-
-.trackdraw-map__pilot-pos {
-  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
-  font-weight: var(--trackdraw-badge-weight, 900);
-  letter-spacing: 0.02em;
 }
 
 .trackdraw-map__pilot-group.is-high .trackdraw-map__pilot-halo {
@@ -273,9 +262,13 @@ body {
 
 
 .trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign-bg,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-pos-bg,
-.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-pos {
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign {
+  display: none;
+}
+
+/* ?labels=0 query param hides all pilot badges globally */
+.trackdraw-map.is-labels-off .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map.is-labels-off .trackdraw-map__pilot-callsign {
   display: none;
 }
 
@@ -292,11 +285,7 @@ body {
 }
 
 .trackdraw-map.is-crowded .trackdraw-map__pilot-callsign-bg {
-  opacity: 0.80;
-}
-
-.trackdraw-map.is-crowded .trackdraw-map__pilot-pos-bg {
-  fill: var(--trackdraw-pilot-label-bg-crowded, rgb(0 0 0 / 78%));
+  opacity: 0.72;
 }
 
 .trackdraw-map.is-packed .trackdraw-map__pilot-group:not(.is-leader) .trackdraw-map__pilot-halo {
@@ -317,9 +306,7 @@ body {
 }
 
 .trackdraw-map.is-tiny .trackdraw-map__pilot-callsign-bg,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-pos-bg,
-.trackdraw-map.is-tiny .trackdraw-map__pilot-pos {
+.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign {
   display: none;
 }
 
