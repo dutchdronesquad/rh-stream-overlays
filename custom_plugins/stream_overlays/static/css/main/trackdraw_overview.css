@@ -222,6 +222,7 @@
   font-size: clamp(12px, 1.2vw, 21px);
   font-weight: 900;
   letter-spacing: 0.02em;
+  line-height: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: uppercase;
