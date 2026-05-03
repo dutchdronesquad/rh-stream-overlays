@@ -33,3 +33,23 @@
   --trackdraw-text: #ffffff;
   --trackdraw-timing: #ff7c5c;
 }
+
+/* ---- LCDR overview overrides ---- */
+
+.trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-header {
+  border-bottom-color: var(--trackdraw-panel-border, rgb(245 212 105 / 20%));
+}
+
+.trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-card {
+  background: var(--trackdraw-panel-bg, rgb(6 6 6 / 84%));
+  border-left-color: var(--trackdraw-accent, #f5d469);
+  border-top: 1px solid var(--trackdraw-panel-border, rgb(245 212 105 / 18%));
+}
+
+.trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-leader-pos {
+  color: #050505;
+}
+
+.trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
+  color: #050505;
+}

@@ -17,13 +17,13 @@
     <section class="trackdraw-map__panel trackdraw-map__overview-panel">
         <div class="trackdraw-map__overview-shell">
             <header class="trackdraw-map__overview-header">
-                <div>
+                <div class="trackdraw-map__overview-title-group">
                     <span class="trackdraw-map__overview-brand">TrackDraw</span>
                     <h1 id="trackdraw-overview-title" class="trackdraw-map__overview-title">Overview</h1>
                 </div>
                 <div class="trackdraw-map__overview-status">
-                    <span id="trackdraw-cache-status" class="trackdraw-map__status">Loading</span>
-                    <span id="trackdraw-overview-race-status" class="trackdraw-map__overview-state">Idle</span>
+                    <span id="trackdraw-cache-status" class="trackdraw-map__overview-cache-status"></span>
+                    <span id="trackdraw-overview-race-status" class="trackdraw-map__overview-state" data-status="idle">Idle</span>
                 </div>
             </header>
             <div class="trackdraw-map__overview-body">
@@ -40,11 +40,14 @@
                     </div>
                 </div>
                 <aside class="trackdraw-map__overview-sidebar">
-                    <section class="trackdraw-map__overview-card">
+                    <section class="trackdraw-map__overview-card trackdraw-map__overview-card--leader">
                         <span class="trackdraw-map__overview-kicker">Leader</span>
-                        <strong id="trackdraw-overview-leader" class="trackdraw-map__overview-leader">--</strong>
+                        <div class="trackdraw-map__overview-leader-wrap">
+                            <span class="trackdraw-map__overview-leader-pos" aria-hidden="true">P1</span>
+                            <strong id="trackdraw-overview-leader" class="trackdraw-map__overview-leader">--</strong>
+                        </div>
                     </section>
-                    <section class="trackdraw-map__overview-card">
+                    <section class="trackdraw-map__overview-card trackdraw-map__overview-card--pilots">
                         <span class="trackdraw-map__overview-kicker">Pilots</span>
                         <ol id="trackdraw-overview-leaderboard" class="trackdraw-map__overview-leaderboard"></ol>
                     </section>

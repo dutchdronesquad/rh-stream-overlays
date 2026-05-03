@@ -4,6 +4,8 @@
   var pilots = {};
   var raceRunning = false;
   var socketConnected = true;
+  var prevPositions = {};  // nodeIdx → display position (1-based)
+  var deltaTimers = {};    // nodeIdx → timeout id
 
   function toHexColor(colorval) {
     if (!colorval) return "#ffffff";
@@ -45,8 +47,11 @@
       });
   }
 
-  function updateRaceStatus(label) {
-    setText("trackdraw-overview-race-status", label);
+  function setRaceStatus(label, statusKey) {
+    var el = document.getElementById("trackdraw-overview-race-status");
+    if (!el) return;
+    el.textContent = label;
+    el.dataset.status = statusKey || "idle";
   }
 
   function getConfidence(pilot) {
@@ -60,12 +65,8 @@
 
   function getSortedPilots() {
     return Object.keys(pilots)
-      .map(function (nodeIdx) {
-        return pilots[nodeIdx];
-      })
-      .filter(function (pilot) {
-        return pilot && pilot.active;
-      })
+      .map(function (nodeIdx) { return pilots[nodeIdx]; })
+      .filter(function (pilot) { return pilot && pilot.active; })
       .sort(function (a, b) {
         var posA = Number(a.position);
         var posB = Number(b.position);
@@ -77,11 +78,59 @@
       });
   }
 
-  function makeText(className, text) {
-    var el = document.createElement("span");
-    el.className = className;
-    el.textContent = text;
-    return el;
+  // Record top positions of existing rows before a DOM rebuild (for FLIP).
+  function recordBeforePositions(listEl) {
+    var before = {};
+    if (!listEl) return before;
+    Array.prototype.forEach.call(listEl.children, function (row) {
+      var nodeIdx = row.dataset.nodeIdx;
+      if (nodeIdx !== undefined) {
+        before[nodeIdx] = row.getBoundingClientRect().top;
+      }
+    });
+    return before;
+  }
+
+  // FLIP: animate rows from their old screen positions to their new ones.
+  function animateFlip(listEl, beforePositions) {
+    Array.prototype.forEach.call(listEl.children, function (row) {
+      var nodeIdx = row.dataset.nodeIdx;
+      if (nodeIdx === undefined || beforePositions[nodeIdx] === undefined) return;
+
+      var delta = beforePositions[nodeIdx] - row.getBoundingClientRect().top;
+      if (Math.abs(delta) < 2) return;
+
+      row.style.transition = "none";
+      row.style.transform = "translateY(" + delta + "px)";
+      row.getBoundingClientRect(); // force reflow
+      row.style.transition = "transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+      row.style.transform = "";
+    });
+  }
+
+  // Compare current sorted order to prevPositions to find movers.
+  function computeDeltas(sortedPilots) {
+    var deltas = {};
+    sortedPilots.forEach(function (pilot, index) {
+      var nodeIdx = String(pilot.nodeIndex);
+      var newPos = index + 1;
+      var oldPos = prevPositions[nodeIdx];
+      if (oldPos !== undefined && oldPos !== newPos) {
+        deltas[nodeIdx] = oldPos > newPos ? "up" : "down";
+      }
+    });
+    return deltas;
+  }
+
+  function clearDeltaOnRow(listEl, nodeIdx) {
+    if (!listEl) return;
+    var row = listEl.querySelector('[data-node-idx="' + nodeIdx + '"]');
+    if (!row) return;
+    var el = row.querySelector(".trackdraw-map__overview-delta");
+    if (el) {
+      el.className = "trackdraw-map__overview-delta";
+      el.textContent = "";
+    }
   }
 
   function render() {
@@ -90,43 +139,88 @@
     var sortedPilots = getSortedPilots();
     var leader = sortedPilots[0];
 
+    // Animate leader name when it changes.
     if (leaderEl) {
-      leaderEl.textContent = leader ? getPilotLabel(leader) : "--";
+      var newLabel = leader ? getPilotLabel(leader) : "--";
+      if (leaderEl.textContent !== newLabel) {
+        leaderEl.textContent = newLabel;
+        leaderEl.classList.remove("is-changing");
+        leaderEl.getBoundingClientRect(); // force reflow to restart animation
+        leaderEl.classList.add("is-changing");
+      }
     }
+
     if (!listEl) return;
+
+    var deltas = computeDeltas(sortedPilots);
+    var beforePositions = recordBeforePositions(listEl);
 
     while (listEl.firstChild) listEl.removeChild(listEl.firstChild);
 
     sortedPilots.slice(0, 8).forEach(function (pilot, index) {
+      var nodeIdx = String(pilot.nodeIndex);
       var position = Number(pilot.position);
-      var positionLabel = !isNaN(position) && position > 0 ? position : index + 1;
+      var posLabel = !isNaN(position) && position > 0 ? position : index + 1;
+      var isP1 = posLabel === 1;
+      var confidence = getConfidence(pilot);
+      var delta = deltas[nodeIdx];
+
       var row = document.createElement("li");
-      var color = document.createElement("span");
+      row.className = "trackdraw-map__overview-row is-" + confidence +
+        (isP1 ? " trackdraw-map__overview-row--p1" : "");
+      row.dataset.nodeIdx = nodeIdx;
 
-      row.className =
-        "trackdraw-map__overview-leaderboard-row is-" + getConfidence(pilot);
-      color.className = "trackdraw-map__overview-color";
-      color.style.background = pilot.color;
+      var pos = document.createElement("span");
+      pos.className = "trackdraw-map__overview-pos";
+      pos.textContent = posLabel;
 
-      row.appendChild(makeText("trackdraw-map__overview-rank", positionLabel));
-      row.appendChild(color);
-      row.appendChild(makeText("trackdraw-map__overview-name", getPilotLabel(pilot)));
-      row.appendChild(
-        makeText("trackdraw-map__overview-node", "N" + (pilot.nodeIndex + 1))
-      );
+      var swatch = document.createElement("span");
+      swatch.className = "trackdraw-map__overview-swatch";
+      swatch.style.background = pilot.color;
+
+      var callsign = document.createElement("span");
+      callsign.className = "trackdraw-map__overview-callsign";
+      callsign.textContent = getPilotLabel(pilot);
+
+      var deltaEl = document.createElement("span");
+      deltaEl.className = "trackdraw-map__overview-delta";
+      if (delta) {
+        if (deltaTimers[nodeIdx]) {
+          clearTimeout(deltaTimers[nodeIdx]);
+          delete deltaTimers[nodeIdx];
+        }
+        deltaEl.classList.add("is-" + delta);
+        deltaEl.textContent = delta === "up" ? "▲" : "▼";
+        deltaTimers[nodeIdx] = setTimeout(function () {
+          clearDeltaOnRow(listEl, nodeIdx);
+          delete deltaTimers[nodeIdx];
+        }, 3000);
+      }
+
+      row.appendChild(pos);
+      row.appendChild(swatch);
+      row.appendChild(callsign);
+      row.appendChild(deltaEl);
       listEl.appendChild(row);
+    });
+
+    animateFlip(listEl, beforePositions);
+
+    // Persist positions for next render cycle.
+    sortedPilots.forEach(function (pilot, index) {
+      prevPositions[String(pilot.nodeIndex)] = index + 1;
     });
   }
 
   function handleHeat(msg) {
     if (!msg || !msg.heatNodes) return;
     pilots = {};
+    prevPositions = {};
 
     Object.keys(msg.heatNodes).forEach(function (key) {
       var index = parseInt(key, 10);
       var node = msg.heatNodes[key];
       if (!node || !node.callsign) return;
-
       pilots[String(index)] = {
         nodeIndex: index,
         callsign: node.callsign,
@@ -142,26 +236,31 @@
   function handleRaceStatus(msg) {
     var status = msg && msg.race_status;
     raceRunning = status === 1;
-    updateRaceStatus(raceRunning ? "Live" : status === 2 ? "Ended" : "Idle");
+    if (raceRunning) {
+      setRaceStatus("Live", "live");
+    } else if (status === 2) {
+      setRaceStatus("Ended", "ended");
+    } else {
+      setRaceStatus("Idle", "idle");
+    }
     render();
   }
 
   function handleSocketConnect() {
     socketConnected = true;
-    updateRaceStatus(raceRunning ? "Live" : "Idle");
+    setRaceStatus(raceRunning ? "Live" : "Idle", raceRunning ? "live" : "idle");
     render();
   }
 
   function handleSocketDisconnect() {
     socketConnected = false;
-    updateRaceStatus("Disconnected");
+    setRaceStatus("Disconnected", "disconnected");
     render();
   }
 
   function handleCurrentLaps(msg) {
     var nodeIndex = msg && msg.current && msg.current.node_index;
     if (!nodeIndex) return;
-
     Object.keys(nodeIndex).forEach(function (nodeIdx) {
       var nodeData = nodeIndex[nodeIdx];
       var pilot = pilots[nodeIdx];

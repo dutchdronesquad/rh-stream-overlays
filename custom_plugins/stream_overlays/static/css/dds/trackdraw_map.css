@@ -33,3 +33,19 @@
   --trackdraw-text: #ffffff;
   --trackdraw-timing: #ffe66d;
 }
+
+/* ---- DDS overview overrides ---- */
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-header {
+  border-bottom-color: var(--trackdraw-panel-border, rgb(32 227 178 / 20%));
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-card {
+  background: var(--trackdraw-panel-bg, rgb(2 8 14 / 84%));
+  border-left-color: var(--trackdraw-accent, #20e3b2);
+  border-top: 1px solid var(--trackdraw-panel-border, rgb(32 227 178 / 18%));
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
+  letter-spacing: 0.04em;
+}
