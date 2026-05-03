@@ -846,16 +846,22 @@
     );
     var progressFromAnchor = forwardDelta(normalized, currentProgress);
 
-    if (
-      opts.rollover === true &&
-      segmentShare > 0 &&
-      progressFromAnchor > 0 &&
-      progressFromAnchor < Math.min(LAP_ROLLOVER_CONTINUITY_PROGRESS, segmentShare * 0.6)
-    ) {
-      carriedElapsedMs = Math.round(segmentMs * (progressFromAnchor / segmentShare));
+    if (opts.rollover === true && segmentShare > 0) {
+      var continuityThreshold = Math.min(LAP_ROLLOVER_CONTINUITY_PROGRESS, segmentShare * 0.6);
+      var progressPastAnchor;
+      if (progressFromAnchor > 0 && progressFromAnchor <= continuityThreshold) {
+        // Estimated slightly ahead of S/F — normal case
+        progressPastAnchor = progressFromAnchor;
+      } else if (progressFromAnchor >= 1 - continuityThreshold) {
+        // Estimated just before S/F (approaching) — mirror into new-lap distance
+        progressPastAnchor = 1 - progressFromAnchor;
+      }
+      if (progressPastAnchor !== undefined) {
+        carriedElapsedMs = Math.round(segmentMs * (progressPastAnchor / segmentShare));
+      }
     }
 
-    var pilotIsApproaching = forwardDelta(normalized, currentProgress) > 0.85;
+    var pilotIsApproaching = progressFromAnchor >= 1 - LAP_ROLLOVER_CONTINUITY_PROGRESS;
     var shouldFadeCorrection =
       !pilotIsApproaching &&
       carriedElapsedMs === null &&
