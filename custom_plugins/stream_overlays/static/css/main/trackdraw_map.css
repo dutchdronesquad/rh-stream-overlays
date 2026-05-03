@@ -13,7 +13,7 @@ html {
 
 body {
   background: var(--trackdraw-key-bg, grey);
-  font-family: "Barlow", sans-serif;
+  font-family: Barlow, sans-serif;
   font-variant-numeric: tabular-nums;
   height: 100%;
   margin: 0;
@@ -153,7 +153,7 @@ body {
 }
 
 .trackdraw-map__pilot-callsign {
-  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-family: var(--trackdraw-badge-font, Barlow, sans-serif);
   font-weight: var(--trackdraw-badge-weight, 900);
   letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
   text-transform: uppercase;

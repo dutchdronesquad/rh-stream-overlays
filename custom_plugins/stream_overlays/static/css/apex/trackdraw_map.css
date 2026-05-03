@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap");
+@import "https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap";
 
 .trackdraw-map[data-theme="apex"] {
   --trackdraw-accent: #ff4f9a;

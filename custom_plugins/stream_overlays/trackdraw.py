@@ -56,7 +56,8 @@ def _to_iso(value: datetime) -> str:
 def _parse_iso(value: str) -> datetime | None:
     """Parse an ISO timestamp; return None on any parse failure."""
     try:
-        return datetime.fromisoformat(value)
+        dt = datetime.fromisoformat(value)
+        return dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
     except (TypeError, ValueError):
         return None
 
