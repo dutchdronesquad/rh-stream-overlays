@@ -34,7 +34,8 @@
   --trackdraw-timing: #ffe66d;
 }
 
-/* ---- DDS overview overrides ---- */
+/* ---- DDS overview overrides ----
+   Diagonal rounding: top-left + bottom-right, matching the DDS callsign badge. */
 
 .trackdraw-map[data-theme="dds"] .trackdraw-map__overview-header {
   border-bottom-color: var(--trackdraw-panel-border, rgb(32 227 178 / 20%));
@@ -42,10 +43,14 @@
 
 .trackdraw-map[data-theme="dds"] .trackdraw-map__overview-card {
   background: var(--trackdraw-panel-bg, rgb(2 8 14 / 84%));
-  border-left-color: var(--trackdraw-accent, #20e3b2);
-  border-top: 1px solid var(--trackdraw-panel-border, rgb(32 227 178 / 18%));
+  border-left: 3px solid var(--trackdraw-accent, #20e3b2);
+  border-radius: clamp(8px, 0.9vw, 14px) 0 clamp(8px, 0.9vw, 14px) 0;
 }
 
-.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
-  letter-spacing: 0.04em;
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-pos {
+  border-radius: clamp(4px, 0.45vw, 7px) 0 clamp(4px, 0.45vw, 7px) 0;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-leader-pos {
+  border-radius: clamp(4px, 0.45vw, 7px) 0 clamp(4px, 0.45vw, 7px) 0;
 }

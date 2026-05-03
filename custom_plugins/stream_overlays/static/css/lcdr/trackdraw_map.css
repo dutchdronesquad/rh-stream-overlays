@@ -34,22 +34,31 @@
   --trackdraw-timing: #ff7c5c;
 }
 
-/* ---- LCDR overview overrides ---- */
+/* ---- LCDR overview overrides ----
+   Fully angular: no border-radius anywhere, stronger left border, bottom accent line. */
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-header {
-  border-bottom-color: var(--trackdraw-panel-border, rgb(245 212 105 / 20%));
+  border-bottom-color: var(--trackdraw-panel-border, rgb(245 212 105 / 22%));
+  border-bottom-width: 2px;
 }
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-card {
-  background: var(--trackdraw-panel-bg, rgb(6 6 6 / 84%));
-  border-left-color: var(--trackdraw-accent, #f5d469);
-  border-top: 1px solid var(--trackdraw-panel-border, rgb(245 212 105 / 18%));
+  background: var(--trackdraw-panel-bg, rgb(6 6 6 / 88%));
+  border-bottom: 1px solid var(--trackdraw-panel-border, rgb(245 212 105 / 18%));
+  border-left: 4px solid var(--trackdraw-accent, #f5d469);
+  border-radius: 0;
+}
+
+.trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-pos {
+  border-radius: 0;
 }
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-leader-pos {
+  border-radius: 0;
   color: #050505;
 }
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
+  border-radius: 0;
   color: #050505;
 }

@@ -33,6 +33,7 @@
 .trackdraw-map__overview-title-group {
   min-width: 0;
   padding-left: clamp(6px, 0.6vw, 12px);
+  padding-top: clamp(6px, 0.6vw, 12px);
 }
 
 .trackdraw-map__overview-brand {
