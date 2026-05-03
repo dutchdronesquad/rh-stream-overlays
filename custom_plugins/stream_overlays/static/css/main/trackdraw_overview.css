@@ -26,16 +26,13 @@
 /* ---- Header ---- */
 
 .trackdraw-map__overview-header {
-  align-items: flex-end;
   border-bottom: 1px solid rgb(255 255 255 / 10%);
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
   padding-bottom: clamp(8px, 0.9vw, 14px);
 }
 
 .trackdraw-map__overview-title-group {
   min-width: 0;
+  padding-left: clamp(6px, 0.6vw, 12px);
 }
 
 .trackdraw-map__overview-brand {
@@ -62,70 +59,6 @@
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
-}
-
-/* ---- Status area ---- */
-
-.trackdraw-map__overview-status {
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  gap: 12px;
-  padding-bottom: 3px;
-}
-
-.trackdraw-map__overview-cache-status {
-  color: var(--trackdraw-muted, rgb(255 255 255 / 45%));
-  font-size: clamp(9px, 0.7vw, 12px);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.trackdraw-map__overview-state {
-  align-items: center;
-  border: 1.5px solid currentcolor;
-  color: var(--trackdraw-muted, rgb(255 255 255 / 50%));
-  display: inline-flex;
-  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
-  font-size: clamp(12px, 1.1vw, 20px);
-  font-weight: 900;
-  gap: 7px;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  padding: 6px 12px 5px;
-  text-transform: uppercase;
-}
-
-.trackdraw-map__overview-state::before {
-  background: currentcolor;
-  border-radius: 50%;
-  content: "";
-  display: block;
-  flex-shrink: 0;
-  height: 7px;
-  width: 7px;
-}
-
-.trackdraw-map__overview-state[data-status="live"] {
-  color: #22c55e;
-}
-
-.trackdraw-map__overview-state[data-status="live"]::before {
-  animation: td-overview-live-pulse 1.2s ease-in-out infinite;
-}
-
-.trackdraw-map__overview-state[data-status="ended"] {
-  color: #f97316;
-}
-
-.trackdraw-map__overview-state[data-status="disconnected"] {
-  color: #ef4444;
-}
-
-@keyframes td-overview-live-pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.25; }
 }
 
 /* ---- Body ---- */
