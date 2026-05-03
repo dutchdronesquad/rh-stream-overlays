@@ -45,6 +45,7 @@
   // ---- Race state ----
   var raceRunning = false;
   var socketConnected = true;
+  var baselineLapMs = DEFAULT_LAP_MS;
 
   // ---- SVG elements ----
   var svgEl = null;
@@ -323,9 +324,42 @@
       return segmentMs;
     }
 
-    var lapMs = pilot.expectedLapMs || DEFAULT_LAP_MS;
+    var lapMs = pilot.expectedLapMs || getBaselineLapMs();
     var share = getSegmentShare(fromProgress, toProgress, fromKey, toKey);
     return Math.max(1200, Math.round(lapMs * share));
+  }
+
+  function getValidDurationEstimateMs(track) {
+    var estimate = track && track.duration_estimate;
+    var value = estimate && estimate.estimated_lap_ms;
+    if (typeof value !== "number" || !isFinite(value) || value <= 0) {
+      return null;
+    }
+    return Math.round(value);
+  }
+
+  function getBaselineLapMs() {
+    return baselineLapMs || DEFAULT_LAP_MS;
+  }
+
+  function applyBaselineToUnlearnedPilots() {
+    Object.keys(pilots).forEach(function (nodeIdx) {
+      var pilot = pilots[nodeIdx];
+      if (!pilot || pilot.hasLearnedPace === true) return;
+      pilot.expectedLapMs = getBaselineLapMs();
+      pilot.expectedSegmentMs = getExpectedSegmentMs(
+        pilot,
+        pilot.lastAnchorProgress,
+        pilot.nextAnchorProgress,
+        pilot.lastAnchorKey,
+        pilot.nextAnchorKey
+      );
+    });
+  }
+
+  function setBaselineLapMs(track) {
+    baselineLapMs = getValidDurationEstimateMs(track) || DEFAULT_LAP_MS;
+    applyBaselineToUnlearnedPilots();
   }
 
   // ----------------------------------------------------------------
@@ -871,7 +905,7 @@
       return pilot.lastAnchorProgress;
     }
     var elapsed = now - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
     var ratio = elapsed / segmentMs;
 
     if (ratio <= 1.0) {
@@ -912,7 +946,7 @@
   function isPilotStale(pilot) {
     if (pilot.lastAnchorTime === null || !raceRunning) return false;
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
     return elapsed > segmentMs + getStaleWindowMs();
   }
 
@@ -923,7 +957,7 @@
     if (pilot.confidence === "low") return "low";
 
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || DEFAULT_LAP_MS;
+    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
     if (elapsed < CONFIDENCE_HIGH_MS) return "high";
     if (elapsed > segmentMs * 0.85) return "low";
     return "medium";
@@ -963,7 +997,7 @@
       return;
     }
 
-    if (pilot.expectedLapMs === DEFAULT_LAP_MS || pilot.hasLearnedPace !== true) {
+    if (pilot.hasLearnedPace !== true) {
       pilot.expectedLapMs = lapMs;
     } else {
       pilot.expectedLapMs = Math.round(
@@ -1129,9 +1163,9 @@
         nextAnchorKey: getNextAnchor(anchorModel.startFinishProgress).key,
         lastAnchorTime: null,
         lastTimingAt: null,
-        expectedSegmentMs: DEFAULT_LAP_MS,
+        expectedSegmentMs: getBaselineLapMs(),
         expectedSegmentMsByKey: {},
-        expectedLapMs: DEFAULT_LAP_MS,
+        expectedLapMs: getBaselineLapMs(),
         hasLearnedPace: false,
         confidence: "idle",
         lastSeenAt: null,
@@ -1348,6 +1382,7 @@
         }
 
         trackData = payload.track;
+        setBaselineLapMs(trackData);
         sampledPoints = (
           (trackData.route && trackData.route.sampled_points) ||
           (trackData.route && trackData.route.waypoints) ||
