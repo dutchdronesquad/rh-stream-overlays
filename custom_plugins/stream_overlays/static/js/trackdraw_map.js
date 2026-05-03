@@ -863,6 +863,7 @@
 
     var pilotIsApproaching = progressFromAnchor >= 1 - LAP_ROLLOVER_CONTINUITY_PROGRESS;
     var shouldFadeCorrection =
+      !opts.rollover &&
       !pilotIsApproaching &&
       carriedElapsedMs === null &&
       opts.ease !== false &&
