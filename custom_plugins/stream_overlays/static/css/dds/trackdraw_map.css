@@ -1,0 +1,35 @@
+@import "https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&display=swap";
+
+.trackdraw-map[data-theme="dds"] {
+  --trackdraw-accent: #20e3b2;
+  --trackdraw-accent-bar-h: 3px;
+  --trackdraw-badge-font: "Teko", sans-serif;
+  --trackdraw-badge-label-size: 13px;
+  --trackdraw-badge-tracking: 0.28em;
+  --trackdraw-badge-weight: 600;
+  --trackdraw-field-bg: transparent;
+  --trackdraw-field-stroke: rgb(32 227 178 / 18%);
+  --trackdraw-key-bg: grey;
+  --trackdraw-label-stroke: rgb(2 8 14 / 94%);
+  --trackdraw-muted: rgb(200 255 242 / 60%);
+  --trackdraw-gate-bg: rgb(0 7 13 / 94%);
+  --trackdraw-gate-core: #20e3b2;
+  --trackdraw-gate-stroke: rgb(32 227 178 / 88%);
+  --trackdraw-obstacle: #20e3b2;
+  --trackdraw-obstacle-bg: rgb(2 8 14 / 90%);
+  --trackdraw-panel-bg: rgb(2 8 14 / 84%);
+  --trackdraw-panel-border: rgb(32 227 178 / 36%);
+  --trackdraw-pilot-label-bg: rgb(7 9 16 / 92%);
+  --trackdraw-pilot-label-bg-crowded: rgb(7 9 16 / 80%);
+  --trackdraw-pilot-position-text: #06100d;
+  --trackdraw-route: #f2f5f2;
+  --trackdraw-route-outline: rgb(0 7 13 / 88%);
+  --trackdraw-route-shadow: rgb(0 7 13 / 50%);
+  --trackdraw-leader: #ffffff;
+  --trackdraw-leader-bg: #ffffff;
+  --trackdraw-leader-text: #04100c;
+  --trackdraw-start-finish: #ffffff;
+  --trackdraw-start-finish-bg: rgb(2 8 14 / 92%);
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #ffe66d;
+}
