@@ -1,51 +1,54 @@
 @import "https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&display=swap";
 
+/* LCDR accent: #38d0ff — matches --lcdr-accent used in heat.css.
+   Timing uses #ff5db1 (--lcdr-accent-2) for visual distinction on the map. */
+
 .trackdraw-map[data-theme="lcdr"] {
-  --trackdraw-accent: #f5d469;
+  --trackdraw-accent: #38d0ff;
   --trackdraw-accent-bar-h: 3px;
   --trackdraw-badge-font: "Teko", sans-serif;
   --trackdraw-badge-label-size: 13px;
   --trackdraw-badge-tracking: 0.30em;
   --trackdraw-badge-weight: 600;
   --trackdraw-field-bg: transparent;
-  --trackdraw-field-stroke: rgb(245 212 105 / 18%);
+  --trackdraw-field-stroke: rgb(56 208 255 / 18%);
   --trackdraw-key-bg: grey;
-  --trackdraw-label-stroke: rgb(4 4 4 / 94%);
-  --trackdraw-muted: rgb(255 242 200 / 60%);
-  --trackdraw-gate-bg: rgb(0 0 0 / 94%);
-  --trackdraw-gate-core: #f5d469;
-  --trackdraw-gate-stroke: rgb(245 212 105 / 88%);
-  --trackdraw-obstacle: #f5d469;
-  --trackdraw-obstacle-bg: rgb(5 5 5 / 90%);
-  --trackdraw-panel-bg: rgb(6 6 6 / 84%);
-  --trackdraw-panel-border: rgb(245 212 105 / 36%);
+  --trackdraw-label-stroke: rgb(4 9 17 / 94%);
+  --trackdraw-muted: rgb(56 208 255 / 58%);
+  --trackdraw-gate-bg: rgb(4 9 17 / 94%);
+  --trackdraw-gate-core: #38d0ff;
+  --trackdraw-gate-stroke: rgb(56 208 255 / 88%);
+  --trackdraw-obstacle: #38d0ff;
+  --trackdraw-obstacle-bg: rgb(4 9 17 / 90%);
+  --trackdraw-panel-bg: rgb(4 9 17 / 84%);
+  --trackdraw-panel-border: rgb(56 208 255 / 32%);
   --trackdraw-pilot-label-bg: rgb(6 10 18 / 94%);
   --trackdraw-pilot-label-bg-crowded: rgb(6 10 18 / 82%);
-  --trackdraw-pilot-position-text: #050505;
+  --trackdraw-pilot-position-text: #020c14;
   --trackdraw-route: #f4f4f1;
-  --trackdraw-route-outline: rgb(0 0 0 / 88%);
-  --trackdraw-route-shadow: rgb(0 0 0 / 50%);
+  --trackdraw-route-outline: rgb(4 9 17 / 88%);
+  --trackdraw-route-shadow: rgb(4 9 17 / 50%);
   --trackdraw-leader: #ffffff;
   --trackdraw-leader-bg: #ffffff;
-  --trackdraw-leader-text: #050505;
+  --trackdraw-leader-text: #020c14;
   --trackdraw-start-finish: #ffffff;
-  --trackdraw-start-finish-bg: rgb(5 5 5 / 92%);
+  --trackdraw-start-finish-bg: rgb(4 9 17 / 92%);
   --trackdraw-text: #ffffff;
-  --trackdraw-timing: #ff7c5c;
+  --trackdraw-timing: #ff5db1;
 }
 
 /* ---- LCDR overview overrides ----
    Fully angular: no border-radius anywhere, stronger left border, bottom accent line. */
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-header {
-  border-bottom-color: var(--trackdraw-panel-border, rgb(245 212 105 / 22%));
+  border-bottom-color: var(--trackdraw-panel-border, rgb(56 208 255 / 22%));
   border-bottom-width: 2px;
 }
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-card {
-  background: var(--trackdraw-panel-bg, rgb(6 6 6 / 88%));
-  border-bottom: 1px solid var(--trackdraw-panel-border, rgb(245 212 105 / 18%));
-  border-left: 4px solid var(--trackdraw-accent, #f5d469);
+  background: var(--trackdraw-panel-bg, rgb(4 9 17 / 88%));
+  border-bottom: 1px solid var(--trackdraw-panel-border, rgb(56 208 255 / 18%));
+  border-left: 4px solid var(--trackdraw-accent, #38d0ff);
   border-radius: 0;
 }
 
@@ -55,10 +58,10 @@
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-leader-pos {
   border-radius: 0;
-  color: #050505;
+  color: #020c14;
 }
 
 .trackdraw-map[data-theme="lcdr"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
   border-radius: 0;
-  color: #050505;
+  color: #020c14;
 }
