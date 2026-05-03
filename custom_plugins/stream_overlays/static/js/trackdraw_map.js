@@ -22,7 +22,7 @@
   var fieldScale = 72;
 
   // Boosted at small viewport sizes so route lines and pilot dots remain
-  // legible when the overlay is used as a minimap browser source.
+  // legible when the overlay is used as a map browser source.
   var visualScale = 1.0;
 
   // ---- Track state ----
@@ -609,7 +609,7 @@
     fieldScale = Math.sqrt(field.width * field.width + field.height * field.height);
 
     // Scale up visual element sizes at small viewport dimensions so route
-    // lines and pilot dots remain legible when used as a minimap source.
+    // lines and pilot dots remain legible when used as a map source.
     var minDim = Math.min(window.innerWidth || 1920, window.innerHeight || 1080);
     visualScale = minDim < 300 ? 2.8
                 : minDim < 420 ? 2.2

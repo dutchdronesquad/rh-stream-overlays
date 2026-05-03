@@ -120,6 +120,6 @@ def create_trackdraw_map_markdown(overlay_name: str, base_path: str) -> str:
     map_markdown: str = "## TrackDraw / Map\n"
     map_markdown += (
         f"- <a href='{base_path}/trackdraw/map' target='_blank'>"
-        f"{overlay_name} Overlay - TrackDraw Minimap</a>\n"
+        f"{overlay_name} Overlay - TrackDraw Map</a>\n"
     )
     return map_markdown
