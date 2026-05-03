@@ -217,14 +217,14 @@
 /* Callsign */
 
 .trackdraw-map__overview-callsign {
-  align-self: center;
+  align-items: center;
+  display: flex;
   font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
   font-size: clamp(12px, 1.2vw, 21px);
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -233,7 +233,6 @@
 
 .trackdraw-map__overview-delta {
   align-items: center;
-  align-self: center;
   display: flex;
   font-size: clamp(8px, 0.75vw, 12px);
   font-weight: 900;
