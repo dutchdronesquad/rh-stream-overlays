@@ -16,8 +16,7 @@ from .utils import (
     create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
-    create_trackdraw_map_markdown,
-    create_trackdraw_overview_markdown,
+    create_trackdraw_markdown,
 )
 
 overlays: dict = {
@@ -243,19 +242,11 @@ class StreamOverlays:
                 )
 
             if features.get("trackdraw_map"):
-                map_markdown = create_trackdraw_map_markdown(overlay_name, base_path)
+                trackdraw_markdown = create_trackdraw_markdown(overlay_name, base_path)
                 self._rhapi.ui.register_markdown(
                     panel_id,
-                    f"{overlay_name}-TrackDraw-Map",
-                    map_markdown,
-                )
-                overview_markdown = create_trackdraw_overview_markdown(
-                    overlay_name, base_path
-                )
-                self._rhapi.ui.register_markdown(
-                    panel_id,
-                    f"{overlay_name}-TrackDraw-Overview",
-                    overview_markdown,
+                    f"{overlay_name}-TrackDraw",
+                    trackdraw_markdown,
                 )
 
 

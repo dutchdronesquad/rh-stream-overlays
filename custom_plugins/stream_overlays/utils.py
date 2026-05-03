@@ -104,8 +104,8 @@ def create_heat_markdown(overlay_name: str, base_path: str) -> str:
     return heat_markdown
 
 
-def create_trackdraw_map_markdown(overlay_name: str, base_path: str) -> str:
-    """Create markdown link for the TrackDraw map overlay.
+def create_trackdraw_markdown(overlay_name: str, base_path: str) -> str:
+    """Create markdown links for all TrackDraw overlays (map and overview).
 
     Args:
     ----
@@ -114,33 +114,16 @@ def create_trackdraw_map_markdown(overlay_name: str, base_path: str) -> str:
 
     Returns:
     -------
-        str: Markdown block containing the map overlay link.
+        str: Markdown block containing both TrackDraw overlay links.
 
     """
-    map_markdown: str = "## TrackDraw / Map\n"
-    map_markdown += (
+    markdown: str = "## TrackDraw\n"
+    markdown += (
         f"- <a href='{base_path}/trackdraw/map' target='_blank'>"
         f"{overlay_name} Overlay - TrackDraw Map</a>\n"
     )
-    return map_markdown
-
-
-def create_trackdraw_overview_markdown(overlay_name: str, base_path: str) -> str:
-    """Create markdown link for the TrackDraw overview overlay.
-
-    Args:
-    ----
-        overlay_name (str): Name of the overlay.
-        base_path (str): Base path for the overlay.
-
-    Returns:
-    -------
-        str: Markdown block containing the overview overlay link.
-
-    """
-    overview_markdown: str = "## TrackDraw / Overview\n"
-    overview_markdown += (
+    markdown += (
         f"- <a href='{base_path}/trackdraw/overview' target='_blank'>"
         f"{overlay_name} Overlay - TrackDraw Overview</a>\n"
     )
-    return overview_markdown
+    return markdown
