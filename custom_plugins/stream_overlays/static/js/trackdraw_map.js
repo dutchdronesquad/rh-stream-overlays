@@ -934,7 +934,7 @@
   }
 
   function getEffectiveSegmentMs(pilot) {
-    return getEffectiveSegmentMs(pilot);
+    return pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
   }
 
   function getConfiguredMinLapMs() {
