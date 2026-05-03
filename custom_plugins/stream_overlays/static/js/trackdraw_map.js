@@ -46,6 +46,8 @@
   var raceRunning = false;
   var socketConnected = true;
   var baselineLapMs = DEFAULT_LAP_MS;
+  var trackLoadPending = false;
+  var animationRunning = false;
 
   // ---- SVG elements ----
   var svgEl = null;
@@ -1235,8 +1237,8 @@
 
   function handleSocketConnect() {
     socketConnected = true;
-    // If track failed to load while the server was down, retry now.
-    if (trackData === null) {
+    // Retry only if track never loaded and no fetch is already in flight.
+    if (trackData === null && !trackLoadPending) {
       loadTrack();
     } else {
       // Unfreeze stale pilots — new socket data will place them correctly.
@@ -1371,6 +1373,8 @@
   }
 
   function loadTrack() {
+    if (trackLoadPending) return;
+    trackLoadPending = true;
     var url = getTrackJsonUrl();
     showMessage("Loading TrackDraw map...");
 
@@ -1380,6 +1384,7 @@
         return r.json();
       })
       .then(function (payload) {
+        trackLoadPending = false;
         if (!payload.ok || !payload.track) {
           showMessage(getReadinessMessage(payload));
           return;
@@ -1398,9 +1403,13 @@
 
         if (!renderTrack(trackData, payload.state)) return;
 
-        window.requestAnimationFrame(animationTick);
+        if (!animationRunning) {
+          animationRunning = true;
+          window.requestAnimationFrame(animationTick);
+        }
       })
       .catch(function (err) {
+        trackLoadPending = false;
         showMessage(err && err.message ? err.message : "Could not load TrackDraw cache.");
       });
   }
