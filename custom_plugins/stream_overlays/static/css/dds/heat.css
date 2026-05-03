@@ -281,10 +281,13 @@
 .theme-dds .card-body .callsign {
   margin: 0;
   font-family: "Teko", sans-serif;
-  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  font-size: clamp(1.4rem, 2.5vw, 2.4rem);
   font-weight: 600;
   letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--dds-text);
 }
 
