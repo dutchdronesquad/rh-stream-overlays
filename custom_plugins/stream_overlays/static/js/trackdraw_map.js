@@ -71,18 +71,18 @@
   // Generates a <path> d-string for a rect with per-corner radii (tl, tr, br, bl).
   function roundedRectPath(x, y, w, h, tl, tr, br, bl) {
     var cap = Math.min(w / 2, h / 2);
-    var a = Math.min(tl, cap), b = Math.min(tr, cap);
-    var c = Math.min(br, cap), d = Math.min(bl, cap);
+    var r_tl = Math.min(tl, cap), r_tr = Math.min(tr, cap);
+    var r_br = Math.min(br, cap), r_bl = Math.min(bl, cap);
     return (
-      "M " + (x + a) + " " + y +
-      " H " + (x + w - b) +
-      (b ? " Q " + (x + w) + " " + y + " " + (x + w) + " " + (y + b) : "") +
-      " V " + (y + h - c) +
-      (c ? " Q " + (x + w) + " " + (y + h) + " " + (x + w - c) + " " + (y + h) : "") +
-      " H " + (x + d) +
-      (d ? " Q " + x + " " + (y + h) + " " + x + " " + (y + h - d) : "") +
-      " V " + (y + a) +
-      (a ? " Q " + x + " " + y + " " + (x + a) + " " + y : "") +
+      "M " + (x + r_tl) + " " + y +
+      " H " + (x + w - r_tr) +
+      (r_tr ? " Q " + (x + w) + " " + y + " " + (x + w) + " " + (y + r_tr) : "") +
+      " V " + (y + h - r_br) +
+      (r_br ? " Q " + (x + w) + " " + (y + h) + " " + (x + w - r_br) + " " + (y + h) : "") +
+      " H " + (x + r_bl) +
+      (r_bl ? " Q " + x + " " + (y + h) + " " + x + " " + (y + h - r_bl) : "") +
+      " V " + (y + r_tl) +
+      (r_tl ? " Q " + x + " " + y + " " + (x + r_tl) + " " + y : "") +
       " Z"
     );
   }
@@ -112,13 +112,7 @@
   }
 
   function hasValidField(field) {
-    return (
-      field &&
-      typeof field.width === "number" &&
-      field.width > 0 &&
-      typeof field.height === "number" &&
-      field.height > 0
-    );
+    return field && field.width > 0 && field.height > 0;
   }
 
   function hasPoint(pt) {
@@ -207,7 +201,7 @@
   // (split_index → route progress, used for current_laps diffing) and the
   // anchor model (ordered splits + S/F metadata, used for interpolation).
   function buildTrackModel(timingMarkers) {
-    var splitProgressMap = {};
+    var localSplitMap = {};
     var startFinishProgress = 0;
     var splits = [];
 
@@ -229,7 +223,7 @@
         typeof marker.split_index === "number" &&
         !isNaN(marker.split_index)
       ) {
-        splitProgressMap[marker.split_index] = progress;
+        localSplitMap[marker.split_index] = progress;
         splits.push({
           key: "split:" + marker.split_index,
           splitIndex: marker.split_index,
@@ -247,7 +241,7 @@
     });
 
     return {
-      splitProgressMap: splitProgressMap,
+      splitProgressMap: localSplitMap,
       anchorModel: {
         startFinishProgress: startFinishProgress,
         startFinishKey: "sf",
@@ -624,15 +618,16 @@
                 : 1.0;
 
     var vs = visualScale;
+    var vsT = Math.min(vs, 1.5);
     var routeShadowW = fieldScale * 0.016 * vs;
     var routeOuterW = fieldScale * 0.010 * vs;
     var routeInnerW = fieldScale * 0.006 * vs;
     var gateR = fieldScale * 0.006 * vs;
     var gateCoreR = fieldScale * 0.0027 * vs;
     var gateSwW = fieldScale * 0.0017 * vs;
-    var timingSfR = fieldScale * 0.013 * vs;
-    var timingR   = fieldScale * 0.010 * vs;
-    var timingSwW = fieldScale * 0.003 * vs;
+    var timingSfR = fieldScale * 0.013 * vsT;
+    var timingR   = fieldScale * 0.010 * vsT;
+    var timingSwW = fieldScale * 0.003 * vsT;
 
     clearSvg(svgEl);
     setSafeViewBox(field, points, track);
@@ -798,20 +793,22 @@
     return (pilot.callsign || "N" + (pilot.nodeIndex + 1)).slice(0, 4).toUpperCase();
   }
 
+  var LABEL_DIRECTIONS = [
+    { x: 0, y: -1 },
+    { x: 0.68, y: -0.73 },
+    { x: -0.68, y: -0.73 },
+    { x: 0.96, y: -0.28 },
+    { x: -0.96, y: -0.28 },
+    { x: 0, y: 1 },
+  ];
+
   function getLabelSlot(pilot) {
     var index = Number(pilot.nodeIndex);
-    return isNaN(index) ? 0 : Math.abs(index) % 6;
+    return isNaN(index) ? 0 : Math.abs(index) % LABEL_DIRECTIONS.length;
   }
 
   function getLabelOffset(slot) {
-    var directions = [
-      { x: 0, y: -1 },
-      { x: 0.68, y: -0.73 },
-      { x: -0.68, y: -0.73 },
-      { x: 0.96, y: -0.28 },
-      { x: -0.96, y: -0.28 },
-      { x: 0, y: 1 },
-    ];
+    var directions = LABEL_DIRECTIONS;
     var direction = directions[slot] || directions[0];
     var length = Math.sqrt(direction.x * direction.x + direction.y * direction.y) || 1;
     var radius = fieldScale * 0.044 * visualScale;
@@ -848,7 +845,7 @@
 
     if (opts.rollover === true && segmentShare > 0) {
       var continuityThreshold = Math.min(LAP_ROLLOVER_CONTINUITY_PROGRESS, segmentShare * 0.6);
-      var progressPastAnchor;
+      var progressPastAnchor = null;
       if (progressFromAnchor > 0 && progressFromAnchor <= continuityThreshold) {
         // Estimated slightly ahead of S/F — normal case
         progressPastAnchor = progressFromAnchor;
@@ -856,7 +853,7 @@
         // Estimated just before S/F (approaching) — mirror into new-lap distance
         progressPastAnchor = 1 - progressFromAnchor;
       }
-      if (progressPastAnchor !== undefined) {
+      if (progressPastAnchor !== null) {
         carriedElapsedMs = Math.round(segmentMs * (progressPastAnchor / segmentShare));
       }
     }
@@ -912,7 +909,7 @@
       return pilot.lastAnchorProgress;
     }
     var elapsed = now - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
+    var segmentMs = getEffectiveSegmentMs(pilot);
     var ratio = elapsed / segmentMs;
 
     if (ratio <= 1.0) {
@@ -936,10 +933,11 @@
     return getCurrentPilotProgress(pilot);
   }
 
-  function getStaleWindowMs() {
-    // Use the operator-configured minimum lap time when available; it is the
-    // right tolerance: if a pilot hasn't been seen for expectedLap + minLap,
-    // something is genuinely wrong. rotorhazard.min_lap is in seconds.
+  function getEffectiveSegmentMs(pilot) {
+    return getEffectiveSegmentMs(pilot);
+  }
+
+  function getConfiguredMinLapMs() {
     if (
       typeof rotorhazard !== "undefined" &&
       typeof rotorhazard.min_lap === "number" &&
@@ -947,13 +945,17 @@
     ) {
       return rotorhazard.min_lap * 1000;
     }
-    return STALE_WINDOW_MS;
+    return null;
+  }
+
+  function getStaleWindowMs() {
+    return getConfiguredMinLapMs() || STALE_WINDOW_MS;
   }
 
   function isPilotStale(pilot) {
     if (pilot.lastAnchorTime === null || !raceRunning) return false;
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
+    var segmentMs = getEffectiveSegmentMs(pilot);
     return elapsed > segmentMs + getStaleWindowMs();
   }
 
@@ -964,7 +966,7 @@
     if (pilot.confidence === "low") return "low";
 
     var elapsed = window.performance.now() - pilot.lastAnchorTime;
-    var segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || getBaselineLapMs();
+    var segmentMs = getEffectiveSegmentMs(pilot);
     if (elapsed < CONFIDENCE_HIGH_MS) return "high";
     if (elapsed > segmentMs * 0.85) return "low";
     return "medium";
@@ -995,14 +997,8 @@
 
   function updateExpectedLapMs(pilot, lapMs) {
     if (typeof lapMs !== "number" || lapMs <= 0) return;
-    if (
-      typeof rotorhazard !== "undefined" &&
-      typeof rotorhazard.min_lap === "number" &&
-      rotorhazard.min_lap > 0 &&
-      lapMs < rotorhazard.min_lap * 1000
-    ) {
-      return;
-    }
+    var minLapMs = getConfiguredMinLapMs();
+    if (minLapMs !== null && lapMs < minLapMs) return;
 
     if (pilot.hasLearnedPace !== true) {
       pilot.expectedLapMs = lapMs;
@@ -1157,6 +1153,7 @@
       var node = msg.heatNodes[key];
       if (!node || !node.callsign) return;
 
+      var startNext = getNextAnchor(anchorModel.startFinishProgress);
       pilots[String(index)] = {
         nodeIndex: index,
         callsign: node.callsign,
@@ -1166,8 +1163,8 @@
         position: null,
         lastAnchorProgress: anchorModel.startFinishProgress,
         lastAnchorKey: anchorModel.startFinishKey,
-        nextAnchorProgress: getNextAnchor(anchorModel.startFinishProgress).progress,
-        nextAnchorKey: getNextAnchor(anchorModel.startFinishProgress).key,
+        nextAnchorProgress: startNext.progress,
+        nextAnchorKey: startNext.key,
         lastAnchorTime: null,
         lastTimingAt: null,
         expectedSegmentMs: getBaselineLapMs(),
