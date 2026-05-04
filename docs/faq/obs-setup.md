@@ -7,85 +7,74 @@ description: Common questions about configuring overlays in OBS Studio.
 
 Common questions about adding overlays to OBS and optimizing performance.
 
-## What browser source settings should I use?
+??? question "What browser source settings should I use?"
 
-| Setting | Recommended Value |
-|---------|------------------|
-| Width | 1920 (match canvas) |
-| Height | 1080 (match canvas) |
-| FPS | 30-60 |
-| Custom CSS | Leave empty |
+    | Setting | Recommended Value |
+    |---------|------------------|
+    | Width | 1920 for 1080p canvas |
+    | Height | 100 for topbars, 1080 for full-screen overlays |
+    | FPS | 30-60 |
+    | Custom CSS | Keep the OBS default transparent background CSS |
 
-Enable these options:
+??? question "The overlay doesn't load in OBS"
 
-- ✓ Shutdown source when not visible
-- ✓ Refresh browser when scene becomes active
+    Check these issues:
 
-## The overlay doesn't load in OBS
+    - Verify the URL uses your correct RotorHazard IP
+    - Ensure port `:5000` is included
+    - Test the URL in a web browser first
+    - Check network connectivity to RotorHazard
 
-Check these issues:
+??? question "Why is the overlay laggy?"
 
-- Verify the URL uses your correct RotorHazard IP
-- Ensure port `:5000` is included
-- Test the URL in a web browser first
-- Check network connectivity to RotorHazard
+    Try these optimizations:
 
-## Why is the overlay laggy?
+    - Lower browser source FPS to 30
+    - Enable GPU acceleration (Settings → Advanced → Video Renderer)
+    - Limit to 2-3 active browser sources per scene
+    - Check CPU/GPU usage in OBS Stats
 
-Try these optimizations:
+??? question "How do I resize overlays for different resolutions?"
 
-- Lower browser source FPS to 30
-- Enable GPU acceleration (Settings → Advanced → Video Renderer)
-- Limit to 2-3 active browser sources per scene
-- Check CPU/GPU usage in OBS Stats
+    Match full-screen browser source dimensions to your OBS canvas:
 
-## How do I resize overlays for different resolutions?
+    - 1080p: 1920×1080
+    - 720p: 1280×720
+    - 4K: 3840×2160
 
-Match your browser source dimensions to your OBS canvas:
+    Topbars are the exception. Use a wide, low source such as 1920×100.
 
-- 1080p: 1920×1080
-- 720p: 1280×720
-- 4K: 3840×2160
+??? question "Black screen or transparency issues?"
 
-Overlays scale proportionally.
+    **Use the default OBS Custom CSS.** It includes a transparent body background, which keeps overlay sources transparent.
 
-## Black screen or transparency issues?
+    Also check: Settings → Advanced → Color Space is set to **sRGB**.
 
-**Ensure Custom CSS is empty.** Overlays handle transparency internally.
+??? question "Can I use multiple overlays in one scene?"
 
-Also check: Settings → Advanced → Color Space is set to **sRGB**.
+    Yes, but limit to 2-3 active browser sources to avoid performance issues. Use separate scenes for different overlay combinations.
 
-## Can I use multiple overlays in one scene?
+??? question "Overlay shows old data after scene switch?"
 
-Yes, but limit to 2-3 active browser sources to avoid performance issues. Use separate scenes for different overlay combinations.
+    Refresh the browser source manually: right-click source → **Refresh cache of current page**.
 
-## Overlay shows old data after scene switch?
+??? question "Can I project overlays to an external display?"
 
-Enable **Refresh browser when scene becomes active** in browser source properties.
+    Yes, two methods:
 
-Manual fix: Right-click source → **Refresh cache of current page**.
+    **Browser fullscreen:**
 
-## Can I project overlays to an external display?
+    1. Open overlay URL in Chrome
+    2. Press F11 for fullscreen
+    3. Drag to target display
 
-Yes, two methods:
+    **OBS Projector:** right-click scene → **Fullscreen Projector** → choose display.
 
-**Browser fullscreen:**
+??? question "How do I cache overlays for faster loading?"
 
-1. Open overlay URL in Chrome
-2. Press F11 for fullscreen
-3. Drag to target display
+    OBS can reuse browser sources between scene switches. Manual refresh can fix stale data without forcing every scene switch to reload the source.
 
-**OBS Projector:**
-Right-click scene → **Fullscreen Projector** → Choose display
+??? question "What's the difference between 30 and 60 FPS?"
 
-## How do I cache overlays for faster loading?
-
-The recommended browser source settings handle caching:
-
-- **Shutdown source when not visible** — Keeps overlay in memory
-- **Refresh browser when scene becomes active** — Loads fresh data
-
-## What's the difference between 30 and 60 FPS?
-
-- **60 FPS:** Smoother animations, higher CPU usage (good for topbars with timers)
-- **30 FPS:** Adequate for most overlays, lower CPU usage (good for node views)
+    - **60 FPS:** smoother animations, higher CPU usage. Good for topbars with timers.
+    - **30 FPS:** adequate for most overlays, lower CPU usage. Good for node views.

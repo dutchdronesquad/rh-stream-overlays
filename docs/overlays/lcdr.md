@@ -57,3 +57,42 @@ RH-IP:5000/stream/overlay/lcdr/node/[NUMBER]
 ```
 
 ![LCDR node overlay preview](../assets/img/overlays/lcdr/lcdr-node.gif)
+
+## TrackDraw integration
+
+LCDR can style the TrackDraw map and overview overlays. Pilot badges use the LCDR angular style with square corners and the pilot's team color.
+
+### Live Race Map
+
+Use the TrackDraw map when you want a dedicated track view or a compact map overlay styled with LCDR pilot badges.
+
+```bash
+RH-IP:5000/stream/overlay/lcdr/trackdraw/map
+```
+
+#### Query parameters
+
+Use query parameters to adjust map-only behavior for compact OBS sources.
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `labels` | `0` | Hides pilot callsign badges when the map is used as a small corner source. |
+
+![LCDR TrackDraw map overlay preview](../assets/img/overlays/lcdr/lcdr-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
+
+### Overview
+
+Use the TrackDraw overview for commentator scenes with a map, leader callout, and pilot list.
+
+```bash
+RH-IP:5000/stream/overlay/lcdr/trackdraw/overview
+```
+
+Use this as a full 16:9 browser source when you want the map, race status, current leader, and active pilot list in one scene.
+
+![LCDR TrackDraw overview overlay preview](../assets/img/overlays/lcdr/lcdr-trackdraw-overview.gif)
+
+See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

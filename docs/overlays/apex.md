@@ -15,7 +15,7 @@ Apex is a high-contrast, glassy theme inspired by esports broadcasts. It focuses
 - **Minimal setup**: With only two overlay URLs (topbar + node), Apex is a quick drop-in for events that need a cohesive look without configuring leaderboards or extra scenes.
 
 !!! note "Available overlays"
-    Apex currently ships with a **node overlay**, **topbar**, and a matching **upcoming heat** board. Leaderboard layouts are still on the backlog.
+    Apex currently ships with a **node overlay**, **topbar**, and a matching **upcoming heat** board. It also supports the TrackDraw map and overview through the [TrackDraw integration](../integrations/trackdraw/index.md). Leaderboard layouts are still on the backlog.
 
 ## Topbar
 
@@ -60,3 +60,42 @@ RH-IP:5000/stream/overlay/apex/node/[NUMBER]
 ```
 
 ![Apex node overlay preview](../assets/img/overlays/apex/apex-node.gif)
+
+## TrackDraw integration
+
+Apex can style the TrackDraw map and overview overlays. Pilot badges use the APEX glassmorphism style with a dark card and full pilot-color border stroke.
+
+### Live Race Map
+
+Use the TrackDraw map when you want a dedicated track view or a compact map overlay styled with Apex pilot badges.
+
+```bash
+RH-IP:5000/stream/overlay/apex/trackdraw/map
+```
+
+#### Query parameters
+
+Use query parameters to adjust map-only behavior for compact OBS sources.
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `labels` | `0` | Hides pilot callsign badges when the map is used as a small corner source. |
+
+![Apex TrackDraw map overlay preview](../assets/img/overlays/apex/apex-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
+
+### Overview
+
+Use the TrackDraw overview for commentator scenes with a map, leader callout, and pilot list.
+
+```bash
+RH-IP:5000/stream/overlay/apex/trackdraw/overview
+```
+
+Use this as a full 16:9 browser source when you want the map, race status, current leader, and active pilot list in one scene.
+
+![Apex TrackDraw overview overlay preview](../assets/img/overlays/apex/apex-trackdraw-overview.gif)
+
+See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

@@ -70,13 +70,31 @@ nav:
     - getting-started/index.md
     - Installation: getting-started/installation.md
     - OBS Setup: getting-started/obs-setup.md
-  - Advanced:
-    - Development: installation/development.md
   - Overlays:
     - overlays/index.md
-    - Apex: overlays/apex.md
-    - Dutch Drone Squad: overlays/dds.md
-    - Liga Colombiana Drone Racing: overlays/lcdr.md
+    - Theme Packages:
+      - Apex: overlays/apex.md
+      - Dutch Drone Squad: overlays/dds.md
+      - Liga Colombiana Drone Racing: overlays/lcdr.md
+    - Overlay Types:
+      - overlays/types/index.md
+      - Node Overlays: overlays/types/nodes.md
+      - Topbars: overlays/types/topbars.md
+      - Upcoming Heat: overlays/types/upcoming-heat.md
+      - Leaderboards: overlays/types/leaderboards.md
+  - Integrations:
+    - integrations/index.md
+    - TrackDraw:
+      - integrations/trackdraw/index.md
+      - Setup: integrations/trackdraw/setup.md
+      - Live Race Map: integrations/trackdraw/live-race-map.md
+      - Overview: integrations/trackdraw/overview.md
+  - Advanced:
+    - advanced/index.md
+    - OBS Scene Layouts: production/obs-scene-layouts.md
+    - Race Day Checklist: production/race-day-checklist.md
+    - Performance Tips: production/performance.md
+    - Local Development: installation/development.md
   - FAQ:
     - faq/index.md
     - Installation: faq/installation.md
