@@ -283,6 +283,10 @@
         ? Object.keys(leaderboard).map(function (key) { return leaderboard[key]; })
         : [];
 
+    Object.keys(pilots).forEach(function (nodeIdx) {
+      if (pilots[nodeIdx]) pilots[nodeIdx].position = null;
+    });
+
     entries.forEach(function (entry) {
       if (!entry || entry.node == null) return;
       var pilot = pilots[String(entry.node)];
