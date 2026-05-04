@@ -1,35 +1,86 @@
 @import "https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&display=swap";
 
+/* DDS accent: #ff7a18 — matches --dds-accent used in node.css and heat.css.
+   The teal (#20e3b2) was the DDS club colour but is not used in any other DDS overlay.
+   Timing uses #ffe66d (warm yellow) for contrast on the dark orange-tinted map. */
+
 .trackdraw-map[data-theme="dds"] {
-  --trackdraw-accent: #20e3b2;
+  --trackdraw-accent: #ff7a18;
   --trackdraw-accent-bar-h: 3px;
   --trackdraw-badge-font: "Teko", sans-serif;
   --trackdraw-badge-label-size: 13px;
   --trackdraw-badge-tracking: 0.28em;
   --trackdraw-badge-weight: 600;
   --trackdraw-field-bg: transparent;
-  --trackdraw-field-stroke: rgb(32 227 178 / 18%);
+  --trackdraw-field-stroke: rgb(255 122 24 / 18%);
   --trackdraw-key-bg: grey;
-  --trackdraw-label-stroke: rgb(2 8 14 / 94%);
-  --trackdraw-muted: rgb(200 255 242 / 60%);
-  --trackdraw-gate-bg: rgb(0 7 13 / 94%);
-  --trackdraw-gate-core: #20e3b2;
-  --trackdraw-gate-stroke: rgb(32 227 178 / 88%);
-  --trackdraw-obstacle: #20e3b2;
-  --trackdraw-obstacle-bg: rgb(2 8 14 / 90%);
-  --trackdraw-panel-bg: rgb(2 8 14 / 84%);
-  --trackdraw-panel-border: rgb(32 227 178 / 36%);
-  --trackdraw-pilot-label-bg: rgb(7 9 16 / 92%);
-  --trackdraw-pilot-label-bg-crowded: rgb(7 9 16 / 80%);
-  --trackdraw-pilot-position-text: #06100d;
-  --trackdraw-route: #f2f5f2;
-  --trackdraw-route-outline: rgb(0 7 13 / 88%);
-  --trackdraw-route-shadow: rgb(0 7 13 / 50%);
+  --trackdraw-label-stroke: rgb(10 6 2 / 94%);
+  --trackdraw-muted: rgb(255 210 170 / 62%);
+  --trackdraw-gate-bg: rgb(10 7 2 / 94%);
+  --trackdraw-gate-core: #ff7a18;
+  --trackdraw-gate-stroke: rgb(255 122 24 / 88%);
+  --trackdraw-obstacle: #ff7a18;
+  --trackdraw-obstacle-bg: rgb(10 7 2 / 90%);
+  --trackdraw-panel-bg: rgb(10 12 18 / 88%);
+  --trackdraw-panel-border: rgb(255 122 24 / 32%);
+  --trackdraw-pilot-label-bg: rgb(10 12 18 / 92%);
+  --trackdraw-pilot-label-bg-crowded: rgb(10 12 18 / 80%);
+  --trackdraw-pilot-position-text: #0c0600;
+  --trackdraw-route: #f5f2ee;
+  --trackdraw-route-outline: rgb(10 7 2 / 88%);
+  --trackdraw-route-shadow: rgb(10 7 2 / 50%);
   --trackdraw-leader: #ffffff;
   --trackdraw-leader-bg: #ffffff;
-  --trackdraw-leader-text: #04100c;
+  --trackdraw-leader-text: #0c0600;
   --trackdraw-start-finish: #ffffff;
-  --trackdraw-start-finish-bg: rgb(2 8 14 / 92%);
+  --trackdraw-start-finish-bg: rgb(10 7 2 / 92%);
   --trackdraw-text: #ffffff;
   --trackdraw-timing: #ffe66d;
+}
+
+/* ---- DDS overview overrides ----
+   Diagonal rounding (TL+BR) matches the DDS node popup and topbar timer shape.
+   Orange gradient accent line on the header mirrors the DDS heat shell header. */
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-header {
+  border-bottom-color: var(--trackdraw-panel-border, rgb(255 122 24 / 22%));
+  position: relative;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 40%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--trackdraw-accent, #ff7a18), transparent);
+  pointer-events: none;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-card {
+  background: var(--trackdraw-panel-bg, rgb(10 12 18 / 88%));
+  border-left: 3px solid var(--trackdraw-accent, #ff7a18);
+  border-radius: clamp(8px, 0.9vw, 14px) 0 clamp(8px, 0.9vw, 14px) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 40%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--trackdraw-accent, #ff7a18), transparent);
+  pointer-events: none;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-pos {
+  border-radius: clamp(4px, 0.45vw, 7px) 0 clamp(4px, 0.45vw, 7px) 0;
+}
+
+.trackdraw-map[data-theme="dds"] .trackdraw-map__overview-leader-pos {
+  border-radius: clamp(4px, 0.45vw, 7px) 0 clamp(4px, 0.45vw, 7px) 0;
 }

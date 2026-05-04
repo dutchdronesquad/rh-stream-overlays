@@ -1,7 +1,7 @@
 """DDS - RotorHazard Stream Overlay Plugin."""
 
 from eventmanager import Evt
-from flask import jsonify, request, templating
+from flask import jsonify, templating
 from flask.blueprints import Blueprint
 from RHUI import UIField, UIFieldType
 
@@ -16,7 +16,7 @@ from .utils import (
     create_leaderboard_markdown,
     create_nodes_markdown,
     create_topbar_markdown,
-    create_trackdraw_map_markdown,
+    create_trackdraw_markdown,
 )
 
 overlays: dict = {
@@ -242,11 +242,11 @@ class StreamOverlays:
                 )
 
             if features.get("trackdraw_map"):
-                map_markdown = create_trackdraw_map_markdown(overlay_name, base_path)
+                trackdraw_markdown = create_trackdraw_markdown(overlay_name, base_path)
                 self._rhapi.ui.register_markdown(
                     panel_id,
-                    f"{overlay_name}-TrackDraw-Map",
-                    map_markdown,
+                    f"{overlay_name}-TrackDraw",
+                    trackdraw_markdown,
                 )
 
 
@@ -343,12 +343,22 @@ def initialize(rhapi: object) -> None:
             theme_name=name,
         )
 
+    @bp.route("/stream/overlay/<string:name>/trackdraw/overview")
+    def render_trackdraw_overview(name: str) -> str:
+        """Render the TrackDraw overview overlay."""
+        return templating.render_template(
+            "stream/trackdraw/overview.html",
+            serverInfo=None,
+            getOption=rhapi.db.option,
+            getConfig=rhapi.config.get_item,
+            __=rhapi.__,
+            theme_name=name,
+        )
+
     @bp.route("/stream/overlay/<string:_name>/trackdraw/track.json")
+    @bp.route("/stream/overlay/<string:_name>/trackdraw/overview/track.json")
     def get_trackdraw_track(_name: str) -> object:
         """Return cached TrackDraw overlay data for OBS/browser clients."""
-        force_refresh = request.args.get("refresh") == "1"
-        return jsonify(
-            stream_overlays.get_trackdraw_payload(force_refresh=force_refresh)
-        )
+        return jsonify(stream_overlays.get_trackdraw_payload(force_refresh=False))
 
     rhapi.ui.blueprint_add(bp)

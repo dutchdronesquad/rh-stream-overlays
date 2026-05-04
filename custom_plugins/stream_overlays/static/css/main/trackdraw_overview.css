@@ -1,0 +1,283 @@
+/* TrackDraw Overview — F1-inspired broadcast layout.
+   Builds on the shared map renderer; only adds scene-level and sidebar layout. */
+
+/* ---- Scene shell ---- */
+
+.trackdraw-map--overview {
+  box-sizing: border-box;
+  padding: clamp(16px, 2vw, 32px);
+}
+
+.trackdraw-map__overview-panel {
+  background:
+    linear-gradient(135deg, rgb(0 0 0 / 75%), rgb(0 0 0 / 28%)),
+    var(--trackdraw-field-bg, transparent);
+}
+
+.trackdraw-map__overview-shell {
+  box-sizing: border-box;
+  display: grid;
+  gap: clamp(10px, 1.2vw, 20px);
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  width: 100%;
+}
+
+/* ---- Header ---- */
+
+.trackdraw-map__overview-header {
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  padding-bottom: clamp(8px, 0.9vw, 14px);
+}
+
+.trackdraw-map__overview-title-group {
+  min-width: 0;
+  padding-left: clamp(6px, 0.6vw, 12px);
+  padding-top: clamp(6px, 0.6vw, 12px);
+}
+
+.trackdraw-map__overview-brand {
+  color: var(--trackdraw-accent, #2de2a7);
+  display: block;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(10px, 0.8vw, 15px);
+  font-weight: 900;
+  letter-spacing: var(--trackdraw-badge-tracking, 0.18em);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.trackdraw-map__overview-title {
+  color: var(--trackdraw-text, #fff);
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(28px, 3.8vw, 68px);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 0.88;
+  margin: 4px 0 0;
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ---- Body ---- */
+
+.trackdraw-map__overview-body {
+  display: grid;
+  gap: clamp(12px, 1.4vw, 22px);
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 21vw);
+  min-height: 0;
+}
+
+.trackdraw-map__overview-stage {
+  min-height: 0;
+  position: relative;
+}
+
+/* ---- Sidebar ---- */
+
+.trackdraw-map__overview-sidebar {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+}
+
+.trackdraw-map__overview-card {
+  background: rgb(0 0 0 / 64%);
+  border-left: 3px solid var(--trackdraw-accent, #2de2a7);
+  box-sizing: border-box;
+  padding: clamp(10px, 1vw, 16px);
+}
+
+.trackdraw-map__overview-card--pilots {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.trackdraw-map__overview-kicker {
+  color: var(--trackdraw-muted, rgb(255 255 255 / 50%));
+  display: block;
+  font-size: clamp(9px, 0.7vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+/* ---- Leader card ---- */
+
+.trackdraw-map__overview-leader-wrap {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  min-width: 0;
+}
+
+.trackdraw-map__overview-leader-pos {
+  align-items: center;
+  align-self: stretch;
+  background: var(--trackdraw-accent, #2de2a7);
+  color: var(--trackdraw-leader-text, #04100c);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(12px, 1.15vw, 20px);
+  font-weight: 900;
+  justify-content: center;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  min-width: 2.6em;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.trackdraw-map__overview-leader {
+  color: var(--trackdraw-text, #fff);
+  display: block;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(20px, 2.4vw, 44px);
+  font-weight: 900;
+  line-height: 0.95;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.trackdraw-map__overview-leader.is-changing {
+  animation: td-overview-leader-slide 280ms ease-out both;
+}
+
+@keyframes td-overview-leader-slide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Leaderboard ---- */
+
+.trackdraw-map__overview-leaderboard {
+  list-style: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.trackdraw-map__overview-row {
+  align-items: stretch;
+  color: var(--trackdraw-text, #fff);
+  display: grid;
+  gap: 0 8px;
+  grid-template-columns: 2.4em 5px minmax(0, 1fr) 1.3em;
+  min-height: clamp(26px, 2.6vw, 42px);
+  opacity: 1;
+}
+
+.trackdraw-map__overview-row + .trackdraw-map__overview-row {
+  margin-top: clamp(4px, 0.5vw, 8px);
+}
+
+.trackdraw-map__overview-row.is-stale,
+.trackdraw-map__overview-row.is-idle {
+  opacity: 0.4;
+}
+
+/* Position number block */
+
+.trackdraw-map__overview-pos {
+  align-items: center;
+  background: rgb(255 255 255 / 9%);
+  color: var(--trackdraw-muted, rgb(255 255 255 / 60%));
+  display: flex;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(11px, 1.1vw, 19px);
+  font-weight: 900;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
+  background: var(--trackdraw-accent, #2de2a7);
+  color: var(--trackdraw-leader-text, #04100c);
+}
+
+/* Pilot colour swatch — full row height via grid stretch */
+
+.trackdraw-map__overview-swatch {
+  border-radius: 1px;
+  display: block;
+}
+
+/* Callsign */
+
+.trackdraw-map__overview-callsign {
+  align-items: center;
+  display: flex;
+  font-family: var(--trackdraw-badge-font, "Barlow", sans-serif);
+  font-size: clamp(12px, 1.2vw, 21px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  overflow: hidden;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Delta arrow */
+
+.trackdraw-map__overview-delta {
+  align-items: center;
+  display: flex;
+  font-size: clamp(8px, 0.75vw, 12px);
+  font-weight: 900;
+  justify-content: center;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 250ms ease;
+}
+
+.trackdraw-map__overview-delta.is-up {
+  color: #22c55e;
+  opacity: 1;
+}
+
+.trackdraw-map__overview-delta.is-down {
+  color: #ef4444;
+  opacity: 1;
+}
+
+/* ---- Hide shared map header (replaced by overview header) ---- */
+
+.trackdraw-map--overview .trackdraw-map__header {
+  display: none;
+}
+
+.trackdraw-map--overview .trackdraw-map__message {
+  background: rgb(0 0 0 / 80%);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 900px), (max-height: 560px) {
+  .trackdraw-map--overview {
+    padding: 12px;
+  }
+
+  .trackdraw-map__overview-body {
+    grid-template-columns: 1fr;
+  }
+
+  .trackdraw-map__overview-sidebar {
+    display: none;
+  }
+
+  .trackdraw-map__overview-title {
+    max-width: 84vw;
+  }
+}

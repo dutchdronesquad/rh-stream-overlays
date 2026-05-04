@@ -1278,13 +1278,9 @@
             confidence: pilot.hasLearnedPace ? "high" : "low",
           });
         } else if (lapNumber > 0) {
-          // Racing lap completed: confirm the finish-line anchor and update expected time
-          // via exponential moving average so the estimate adapts to the
-          // pilot's actual pace without being thrown off by a single outlier.
           setPilotAnchor(pilot, anchorModel.startFinishProgress, {
             anchorKey: anchorModel.startFinishKey,
             confidence: "high",
-            rollover: true,
           });
           pilot.lapCount = lapNumber;
         }

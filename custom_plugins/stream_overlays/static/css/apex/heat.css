@@ -129,7 +129,7 @@
 /* Grid - cleaner layout */
 .heat-grid.apex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
   margin-top: 0;
 }
@@ -207,12 +207,15 @@
 .theme-apex .card-body .callsign {
   margin: 0;
   font-family: "Orbitron", sans-serif;
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.8rem);
   font-weight: 800;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--apex-text-primary);
   line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--apex-text-primary);
 }
 
 .theme-apex .card-body .pilot-name {
