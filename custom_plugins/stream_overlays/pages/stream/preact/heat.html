@@ -1,0 +1,47 @@
+{% extends 'layout-basic.html' %}
+{% block title %}{{ __('Stream') }}: {{ __('Upcoming Heat') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/heat_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' + theme_name + '/heat.css') }}">
+<script>
+	window.heatOverlayConfig = {{ {
+		"eventName": getOption('eventName'),
+		"theme": theme_name,
+		"num_nodes": num_nodes,
+		"labels": {
+			"upNext": __('Up Next'),
+			"practiceMode": __('Practice Mode'),
+			"practiceNotice": __('Profile layout - frequencies only'),
+			"emptySlot": __('Awaiting Assignment'),
+			"classFallback": __('Unclassified'),
+			"formatFallback": __('Format TBD'),
+			"pilotTBD": __('TBD'),
+			"noHeat": __('Waiting for heat...'),
+			"rankLabel": __('Rank'),
+			"roundLabel": __('Round'),
+			"seatLabel": __('Seat'),
+			"noSeats": __('Waiting for pilots')
+		}
+	} | tojson }};
+	var data_dependencies = [
+		"all_languages",
+		"language",
+		"current_heat",
+		"heat_data",
+		"pilot_data",
+		"class_data",
+		"format_data",
+		"frequency_data"
+	];
+</script>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/heat.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div
+	id="overlay-root"
+	data-theme="{{ theme_name }}"
+	data-page="heat"
+></div>
+{% endblock %}

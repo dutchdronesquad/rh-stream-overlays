@@ -3,6 +3,7 @@
 
 # Ignore folders
 node_modules
+custom_plugins/stream_overlays/static/dist
 site
 .venv
 .cache

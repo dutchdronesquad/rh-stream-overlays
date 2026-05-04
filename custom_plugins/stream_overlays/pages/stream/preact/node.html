@@ -1,0 +1,25 @@
+{% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Seat') }} {{ node_id + 1 }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' + theme_name + '/node.css') }}">
+<script>
+    var data_dependencies = [
+        "all_languages",
+        "language",
+        "race_status",
+        "leaderboard",
+        "current_laps",
+        "current_heat"
+    ];
+</script>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/node.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div
+    id="overlay-root"
+    data-theme="{{ theme_name }}"
+    data-node="{{ node_id }}"
+    data-page="node"
+></div>
+{% endblock %}

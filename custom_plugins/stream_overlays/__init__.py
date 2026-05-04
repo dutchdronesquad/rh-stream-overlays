@@ -1,7 +1,7 @@
 """DDS - RotorHazard Stream Overlay Plugin."""
 
 from eventmanager import Evt
-from flask import jsonify, templating
+from flask import abort, jsonify, templating
 from flask.blueprints import Blueprint
 from RHUI import UIField, UIFieldType
 
@@ -250,6 +250,49 @@ class StreamOverlays:
                 )
 
 
+def render_overlay_template(
+    rhapi: object,
+    template_name: str,
+    **context: object,
+) -> str:
+    """Render an overlay template with RotorHazard globals."""
+    return templating.render_template(
+        template_name,
+        serverInfo=None,
+        getOption=rhapi.db.option,
+        getConfig=rhapi.config.get_item,
+        __=rhapi.__,
+        **context,
+    )
+
+
+def get_topbar_event_name(rhapi: object, theme_name: str) -> str:
+    """Return the event label used by a topbar theme."""
+    if theme_name == "lcdr":
+        return "LIGA COLOMBIANA DRONE RACING"
+
+    return rhapi.db.option("eventName")
+
+
+def require_dds_leaderboard(theme_name: str) -> None:
+    """Reject leaderboard URLs for themes that do not support leaderboards."""
+    if theme_name != "dds":
+        abort(404)
+
+
+def register_preact_routes(bp: Blueprint, rhapi: object) -> None:
+    """Register isolated Preact development routes."""
+
+    @bp.route("/stream/overlay/<string:name>/preact/test")
+    def render_preact_test_overlay(name: str) -> str:
+        """Render the Preact test overlay."""
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/test.html",
+            theme_name=name,
+        )
+
+
 def initialize(rhapi: object) -> None:
     """Initialize the plugin.
 
@@ -275,85 +318,74 @@ def initialize(rhapi: object) -> None:
     @bp.route("/stream/overlay/<string:name>/node/<int:node_id>")
     def render_node_overlay(name: str, node_id: int) -> str:
         """Render the node overlay."""
-        return templating.render_template(
-            f"stream/nodes/node_{name}.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/node.html",
             node_id=node_id - 1,
+            theme_name=name,
         )
 
     @bp.route("/stream/overlay/<string:name>/topbar")
     def render_topbar_overlay(name: str) -> str:
         """Render the topbar overlay."""
-        return templating.render_template(
-            f"stream/topbars/topbar_{name}.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/topbar.html",
+            event_name=get_topbar_event_name(rhapi, name),
+            theme_name=name,
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/overall")
     def render_overall_class_overlay(name: str, class_id: int) -> str:
         """Render the overall class leaderboard overlay."""
-        return templating.render_template(
-            f"stream/leaderboard/{name}/overall.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        require_dds_leaderboard(name)
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/leaderboard_overall.html",
             class_id=class_id,
+            theme_name="dds",
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/class")
     def render_class_leaderboard_overlay(name: str, class_id: int) -> str:
         """Render the class leaderboard overlay."""
-        return templating.render_template(
-            f"stream/leaderboard/{name}/class.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        require_dds_leaderboard(name)
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/leaderboard_class.html",
             class_id=class_id,
+            theme_name="dds",
         )
 
     @bp.route("/stream/overlay/<string:name>/heat/upcoming")
     def render_heat_overlay(name: str) -> str:
         """Render the upcoming heat overlay."""
-        return templating.render_template(
-            f"stream/heat/heat_{name}.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/heat.html",
             num_nodes=len(rhapi.interface.seats),
+            theme_name=name,
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/map")
     def render_trackdraw_map(name: str) -> str:
         """Render the TrackDraw map overlay."""
-        return templating.render_template(
-            "stream/trackdraw/map.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/trackdraw_map.html",
             theme_name=name,
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/overview")
     def render_trackdraw_overview(name: str) -> str:
         """Render the TrackDraw overview overlay."""
-        return templating.render_template(
-            "stream/trackdraw/overview.html",
-            serverInfo=None,
-            getOption=rhapi.db.option,
-            getConfig=rhapi.config.get_item,
-            __=rhapi.__,
+        return render_overlay_template(
+            rhapi,
+            "stream/preact/trackdraw_overview.html",
             theme_name=name,
         )
+
+    register_preact_routes(bp, rhapi)
 
     @bp.route("/stream/overlay/<string:_name>/trackdraw/track.json")
     @bp.route("/stream/overlay/<string:_name>/trackdraw/overview/track.json")

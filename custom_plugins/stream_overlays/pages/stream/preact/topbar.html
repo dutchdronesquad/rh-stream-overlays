@@ -1,0 +1,23 @@
+{% extends 'layout-basic.html' %} {% block title %}{{ __('Stream') }}: {{ __('Topbar') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' + theme_name + '/topbar.css') }}">
+<script>
+    window.topbarOverlayConfig = {{ {
+        "eventName": event_name
+    } | tojson }};
+    var data_dependencies = [
+        "leaderboard",
+        "race_status",
+        "result_data"
+    ];
+</script>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/topbar.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div
+    id="overlay-root"
+    data-theme="{{ theme_name }}"
+    data-page="topbar"
+></div>
+{% endblock %}
