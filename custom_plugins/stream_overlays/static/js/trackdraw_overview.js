@@ -138,10 +138,13 @@
     var listEl = document.getElementById("trackdraw-overview-leaderboard");
     var sortedPilots = getSortedPilots();
     var leader = sortedPilots[0];
+    var leaderHasPosition = leader != null &&
+      leader.position != null &&
+      Number(leader.position) > 0;
 
     // Animate leader name when it changes.
     if (leaderEl) {
-      var newLabel = leader ? getPilotLabel(leader) : "--";
+      var newLabel = leaderHasPosition ? getPilotLabel(leader) : "--";
       if (leaderEl.textContent !== newLabel) {
         leaderEl.textContent = newLabel;
         leaderEl.classList.remove("is-changing");
