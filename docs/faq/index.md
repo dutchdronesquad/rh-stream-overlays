@@ -36,17 +36,17 @@ Find answers to common questions about installing, configuring, and using Stream
 
 ## Quick Answers
 
-## What is Stream Overlays?
+??? question "What is Stream Overlays?"
 
-Stream Overlays is a RotorHazard plugin that provides browser-based overlay graphics for OBS Studio. It includes node overlays, topbars, and heat boards.
+    Stream Overlays is a RotorHazard plugin that provides browser-based overlay graphics for OBS Studio. It includes node overlays, topbars, and heat boards.
 
-## Which RotorHazard versions are supported?
+??? question "Which RotorHazard versions are supported?"
 
-Stream Overlays works with RotorHazard 4.0.x and newer. Some features require 4.2.x or later.
+    Stream Overlays works with RotorHazard 4.0.x and newer. Some features require 4.2.x or later.
 
-## Can I use this with vMix or Wirecast?
+??? question "Can I use this with vMix or Wirecast?"
 
-Yes. Any streaming software that supports browser sources can display Stream Overlays.
+    Yes. Any streaming software that supports browser sources can display Stream Overlays.
 
 ---
 

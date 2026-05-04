@@ -57,3 +57,29 @@ RH-IP:5000/stream/overlay/lcdr/node/[NUMBER]
 ```
 
 ![LCDR node overlay preview](../assets/img/overlays/lcdr/lcdr-node.gif)
+
+## TrackDraw integration
+
+LCDR can style the TrackDraw map and overview overlays. Pilot badges use the LCDR angular style with square corners and the pilot's team color.
+
+### Live Race Map
+
+Use the TrackDraw map when you want a dedicated track view or a compact map overlay styled with LCDR pilot badges.
+
+```bash
+RH-IP:5000/stream/overlay/lcdr/trackdraw/map
+```
+
+<!-- TODO: Add LCDR TrackDraw map GIF preview: ../assets/img/overlays/lcdr/lcdr-trackdraw-map.gif -->
+
+### Overview
+
+Use the TrackDraw overview for commentator scenes with a map, leader callout, and pilot list.
+
+```bash
+RH-IP:5000/stream/overlay/lcdr/trackdraw/overview
+```
+
+<!-- TODO: Add LCDR TrackDraw overview GIF preview: ../assets/img/overlays/lcdr/lcdr-trackdraw-overview.gif -->
+
+See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

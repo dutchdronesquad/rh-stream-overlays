@@ -91,3 +91,29 @@ RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/overall
 ```
 
 ![DDS overall leaderboard overlay preview](../assets/img/overlays/dds/dds-leaderboard-overall.gif)
+
+## TrackDraw integration
+
+DDS can style the TrackDraw map and overview overlays. Pilot badges use the DDS diagonal pill shape with the top-left and bottom-right corners rounded and filled with the pilot's team color.
+
+### Live Race Map
+
+Use the TrackDraw map when you want a dedicated track view or a compact map overlay styled with DDS pilot badges.
+
+```bash
+RH-IP:5000/stream/overlay/dds/trackdraw/map
+```
+
+<!-- TODO: Add DDS TrackDraw map GIF preview: ../assets/img/overlays/dds/dds-trackdraw-map.gif -->
+
+### Overview
+
+Use the TrackDraw overview for commentator scenes with a map, leader callout, and pilot list.
+
+```bash
+RH-IP:5000/stream/overlay/dds/trackdraw/overview
+```
+
+<!-- TODO: Add DDS TrackDraw overview GIF preview: ../assets/img/overlays/dds/dds-trackdraw-overview.gif -->
+
+See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

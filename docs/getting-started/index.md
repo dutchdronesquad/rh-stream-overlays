@@ -47,7 +47,7 @@ http://[RH-IP]:5000/stream/overlay/[theme]/[type]/[node]
 - `http://192.168.1.100:5000/stream/overlay/apex/node/1`
 - `http://192.168.1.100:5000/stream/overlay/dds/topbar`
 
-📖 **[View all overlay URLs →](../overlays/index.md)**
+📖 **[View overlay types and URLs →](../overlays/index.md)**
 
 ---
 
@@ -80,13 +80,18 @@ http://[RH-IP]:5000/stream/overlay/[theme]/[type]/[node]
 <div class="next-steps-grid">
   <div class="next-step-card">
     <span class="next-step-icon">🎨</span>
-    <strong>Explore Themes</strong>
-    <p>Browse Apex, DDS, and LCDR overlay collections in the <a href="/overlays">Overlay Catalog</a>.</p>
+    <strong>Explore Overlays</strong>
+    <p>Browse theme packages, overlay types, and integration-based overlays in the <a href="/overlays">Overlay Overview</a>.</p>
   </div>
   <div class="next-step-card">
     <span class="next-step-icon">⚙️</span>
-    <strong>Optimize Performance</strong>
-    <p>Learn advanced OBS settings in the <a href="/getting-started/obs-setup">OBS Setup Guide</a>.</p>
+    <strong>Build Scenes</strong>
+    <p>Use production recipes in <a href="/production/obs-scene-layouts">OBS Scene Layouts</a>.</p>
+  </div>
+  <div class="next-step-card">
+    <span class="next-step-icon">🗺️</span>
+    <strong>Add TrackDraw</strong>
+    <p>Configure map and overview overlays in the <a href="/integrations/trackdraw">TrackDraw Integration</a>.</p>
   </div>
   <div class="next-step-card">
     <span class="next-step-icon">❓</span>
