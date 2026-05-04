@@ -39,7 +39,7 @@ Enter these settings in the browser source properties:
 | **Width** | `1920` | Match your OBS canvas width |
 | **Height** | `1080` | Use `100` for topbars, or match canvas height for full-screen overlays |
 | **FPS** | `30` or `60` | Higher = smoother, but more CPU usage |
-| **Custom CSS** | Leave empty | Overlays have built-in transparency |
+| **Custom CSS** | Keep the OBS default CSS | The default transparent background CSS keeps overlay sources transparent |
 
 ![Browser source settings](../assets/img/obs_settings-source.png){ style="border-radius: 8px; border: 1px solid var(--border-color);" }
 

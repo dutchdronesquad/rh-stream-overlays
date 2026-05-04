@@ -15,23 +15,61 @@ TrackDraw is an integration, not a theme. You still choose a theme in the overla
 
 Use the [Live Race Map](live-race-map.md) for fullscreen race maps or compact map overlays.
 
-<!-- TODO: Add TrackDraw map GIF preview: ../../assets/img/integrations/trackdraw/trackdraw-map.gif -->
+![TrackDraw map overlay preview](../../assets/img/overlays/apex/apex-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
 
 ```text
 /stream/overlay/[theme]/trackdraw/map
+```
+
+#### Path placeholders
+
+Use the path placeholder to choose which overlay theme should render the map and pilot badges.
+
+| Placeholder | Values | Description |
+|-------------|--------|-------------|
+| `[theme]` | `apex`, `dds`, `lcdr` | Selects the visual theme for pilot badges and map styling. |
+
+#### Query parameters
+
+Use query parameters to adjust map-only behavior for the OBS source size.
+
+| Parameter | Values | Default | Description |
+|-----------|--------|---------|-------------|
+| `labels` | `0` | Labels shown | Hides pilot callsign badges. Useful for compact map sources. |
+
+Examples:
+
+```bash
+http://[RH-IP]:5000/stream/overlay/apex/trackdraw/map
+http://[RH-IP]:5000/stream/overlay/dds/trackdraw/map?labels=0
 ```
 
 ### Overview
 
 Use the [Overview](overview.md) for commentator scenes with a map, leader callout, and pilot list.
 
-<!-- TODO: Add TrackDraw overview GIF preview: ../../assets/img/integrations/trackdraw/trackdraw-overview.gif -->
+![TrackDraw overview overlay preview](../../assets/img/overlays/apex/apex-trackdraw-overview.gif)
 
 ```text
 /stream/overlay/[theme]/trackdraw/overview
 ```
 
-Replace `[theme]` with `apex`, `dds`, or `lcdr`.
+#### Path placeholders
+
+Use the path placeholder to choose which overlay theme should render the overview.
+
+| Placeholder | Values | Description |
+|-------------|--------|-------------|
+| `[theme]` | `apex`, `dds`, `lcdr` | Selects the visual theme for the map, leader card, and pilot list. |
+
+Example:
+
+```bash
+http://[RH-IP]:5000/stream/overlay/apex/trackdraw/overview
+```
 
 ## How the data flow works
 

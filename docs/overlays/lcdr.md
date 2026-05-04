@@ -70,7 +70,18 @@ Use the TrackDraw map when you want a dedicated track view or a compact map over
 RH-IP:5000/stream/overlay/lcdr/trackdraw/map
 ```
 
-<!-- TODO: Add LCDR TrackDraw map GIF preview: ../assets/img/overlays/lcdr/lcdr-trackdraw-map.gif -->
+#### Query parameters
+
+Use query parameters to adjust map-only behavior for compact OBS sources.
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `labels` | `0` | Hides pilot callsign badges when the map is used as a small corner source. |
+
+![LCDR TrackDraw map overlay preview](../assets/img/overlays/lcdr/lcdr-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
 
 ### Overview
 
@@ -80,6 +91,8 @@ Use the TrackDraw overview for commentator scenes with a map, leader callout, an
 RH-IP:5000/stream/overlay/lcdr/trackdraw/overview
 ```
 
-<!-- TODO: Add LCDR TrackDraw overview GIF preview: ../assets/img/overlays/lcdr/lcdr-trackdraw-overview.gif -->
+Use this as a full 16:9 browser source when you want the map, race status, current leader, and active pilot list in one scene.
+
+![LCDR TrackDraw overview overlay preview](../assets/img/overlays/lcdr/lcdr-trackdraw-overview.gif)
 
 See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

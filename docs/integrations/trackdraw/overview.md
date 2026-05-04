@@ -10,7 +10,7 @@ The Overview combines the TrackDraw map with a live leader callout and pilot lis
 !!! note "Requires TrackDraw"
     Configure the [TrackDraw integration](setup.md) before adding this overlay to OBS.
 
-<!-- TODO: Add TrackDraw Overview GIF preview: ../../assets/img/integrations/trackdraw/trackdraw-overview.gif -->
+![TrackDraw overview overlay preview](../../assets/img/overlays/apex/apex-trackdraw-overview.gif)
 
 ## URL
 
@@ -45,7 +45,7 @@ http://192.168.1.100:5000/stream/overlay/lcdr/trackdraw/overview
 | Width | `1920` |
 | Height | `1080` |
 | FPS | `60` |
-| Custom CSS | Leave empty |
+| Custom CSS | Keep the OBS default: `body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }` |
 | Shutdown source when not visible | Enabled |
 | Refresh browser when scene becomes active | Enabled |
 

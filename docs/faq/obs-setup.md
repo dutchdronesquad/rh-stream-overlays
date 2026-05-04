@@ -14,7 +14,7 @@ Common questions about adding overlays to OBS and optimizing performance.
     | Width | 1920 for 1080p canvas |
     | Height | 100 for topbars, 1080 for full-screen overlays |
     | FPS | 30-60 |
-    | Custom CSS | Leave empty |
+    | Custom CSS | Keep the OBS default transparent background CSS |
 
     Enable these options:
 
@@ -51,7 +51,7 @@ Common questions about adding overlays to OBS and optimizing performance.
 
 ??? question "Black screen or transparency issues?"
 
-    **Ensure Custom CSS is empty.** Overlays handle transparency internally.
+    **Use the default OBS Custom CSS.** It includes a transparent body background, which keeps overlay sources transparent.
 
     Also check: Settings → Advanced → Color Space is set to **sRGB**.
 

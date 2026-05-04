@@ -10,7 +10,10 @@ The Live Race Map is a real-time FPV race track overlay. It fetches the cached t
 !!! note "Requires TrackDraw"
     Configure the [TrackDraw integration](setup.md) before adding this overlay to OBS.
 
-<!-- TODO: Add Live Race Map GIF preview: ../../assets/img/integrations/trackdraw/trackdraw-map.gif -->
+![TrackDraw map overlay preview](../../assets/img/overlays/apex/apex-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
 
 ## How it works
 
@@ -38,15 +41,28 @@ http://192.168.1.100:5000/stream/overlay/lcdr/trackdraw/map
 
 ## Query parameters
 
-| Parameter | Values | Description |
-|-----------|--------|-------------|
-| `labels` | `0` | Hides pilot callsign badges. Useful for compact map overlays. |
+Use query parameters to adjust map-only behavior for the OBS source size.
 
-Example without labels:
+| Parameter | Values | Default | Description |
+|-----------|--------|---------|-------------|
+| `labels` | `0` | Labels shown | Hides pilot callsign badges. Useful for compact map overlays. |
+
+By default, pilot labels are shown. Leave the query parameter off for fullscreen maps or larger side-by-side layouts where callsigns remain readable.
+
+Example with labels hidden:
 
 ```bash
 http://[RH-IP]:5000/stream/overlay/dds/trackdraw/map?labels=0
 ```
+
+## What it shows
+
+| Area | Data |
+|------|------|
+| Track | TrackDraw route, gates, split markers, and start/finish marker |
+| Pilot markers | Live pilot position, direction of travel, and pilot color |
+| Labels | Pilot callsigns when labels are enabled |
+| Message | Loading, missing-cache, or TrackDraw readiness errors when the map cannot render |
 
 ## OBS browser source settings
 
@@ -55,7 +71,7 @@ http://[RH-IP]:5000/stream/overlay/dds/trackdraw/map?labels=0
 | Width | Match your OBS canvas for fullscreen, or use a fixed map-overlay size |
 | Height | Match your OBS canvas for fullscreen, or use a fixed map-overlay size |
 | FPS | `60` for smooth pilot movement |
-| Custom CSS | Leave empty |
+| Custom CSS | Keep the OBS default: `body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }` |
 | Shutdown source when not visible | Enabled |
 | Refresh browser when scene becomes active | Enabled |
 
@@ -77,3 +93,9 @@ See [OBS Scene Layouts](../../production/obs-scene-layouts.md) for complete scen
 - Crop empty track margins in OBS with **Edit Transform**.
 - Keep the source at 60 FPS; map motion is the main visual.
 - Refresh the TrackDraw cache after editing the route or timing markers.
+
+## Data behavior
+
+The map listens to RotorHazard heat, race status, lap, and split updates. It uses race status internally to park, start, and freeze pilot markers, but it does not show a visible race-state label. Pilot markers hold at start/finish until timing data is available, then interpolate between TrackDraw markers so the motion stays continuous between gate passes.
+
+For commentator scenes that also need rankings and leader context, use the [Overview](overview.md).
