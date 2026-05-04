@@ -43,12 +43,16 @@ Enter these settings in the browser source properties:
 
 ![Browser source settings](../assets/img/obs_settings-source.png){ style="border-radius: 8px; border: 1px solid var(--border-color);" }
 
-### 4. Enable Recommended Options
+### 4. Review Browser Source Behavior
 
-Check these boxes for optimal performance:
+Keep live race overlays loaded while switching scenes so timers, websocket data, and animations stay continuous.
 
-- [x] **Shutdown source when not visible** — Saves CPU when overlay is hidden
-- [x] **Refresh browser when scene becomes active** — Ensures fresh data on scene switch
+Leave these OBS browser source options disabled:
+
+| Option | Why |
+|--------|-----|
+| **Shutdown source when not visible** | Stops the browser source while hidden, so it has to reconnect when shown again. |
+| **Refresh browser when scene becomes active** | Reloads the overlay on scene switches, which can interrupt timers, animations, and live websocket state. |
 
 !!! tip "Canvas Resolution"
     Match full-screen overlay sources to your OBS **Base Canvas** resolution:

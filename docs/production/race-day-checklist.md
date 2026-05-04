@@ -26,8 +26,8 @@ Run this checklist before opening the stream.
 
 - Browser source URLs point to the correct RotorHazard IP address.
 - Browser source dimensions match the intended layout.
-- **Shutdown source when not visible** is enabled where practical.
-- **Refresh browser when scene becomes active** is enabled for live-data scenes.
+- Live race overlays stay loaded across scene switches.
+- Browser sources can be manually refreshed without forcing reloads on every scene switch.
 - Topbar, node, heat, leaderboard, map, and overview scenes all refresh cleanly.
 
 ## Stream output

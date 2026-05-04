@@ -16,11 +16,6 @@ Common questions about adding overlays to OBS and optimizing performance.
     | FPS | 30-60 |
     | Custom CSS | Keep the OBS default transparent background CSS |
 
-    Enable these options:
-
-    - Shutdown source when not visible
-    - Refresh browser when scene becomes active
-
 ??? question "The overlay doesn't load in OBS"
 
     Check these issues:
@@ -61,9 +56,7 @@ Common questions about adding overlays to OBS and optimizing performance.
 
 ??? question "Overlay shows old data after scene switch?"
 
-    Enable **Refresh browser when scene becomes active** in browser source properties.
-
-    Manual fix: right-click source → **Refresh cache of current page**.
+    Refresh the browser source manually: right-click source → **Refresh cache of current page**.
 
 ??? question "Can I project overlays to an external display?"
 
@@ -79,10 +72,7 @@ Common questions about adding overlays to OBS and optimizing performance.
 
 ??? question "How do I cache overlays for faster loading?"
 
-    The recommended browser source settings handle caching:
-
-    - **Shutdown source when not visible** keeps overlay in memory.
-    - **Refresh browser when scene becomes active** loads fresh data.
+    OBS can reuse browser sources between scene switches. Manual refresh can fix stale data without forcing every scene switch to reload the source.
 
 ??? question "What's the difference between 30 and 60 FPS?"
 

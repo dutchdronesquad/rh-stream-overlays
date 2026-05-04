@@ -56,10 +56,7 @@ http://[RH-IP]:5000/stream/overlay/[theme]/[type]/[node]
 1. In OBS, click **+** in Sources → **Browser**
 2. Enter your overlay URL
 3. Set **Width** and **Height** to match your canvas (e.g., 1920×1080)
-4. Enable these options:
-    - [x] **Shutdown source when not visible**
-    - [x] **Refresh browser when scene becomes active**
-5. Click **OK**
+4. Click **OK**
 
 📖 **[Detailed OBS setup guide →](obs-setup.md)**
 

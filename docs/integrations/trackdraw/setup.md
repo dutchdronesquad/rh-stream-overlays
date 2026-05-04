@@ -67,7 +67,7 @@ Use this checklist before race day:
     The overlay works in a normal browser but not in OBS.
 
     - **Cause:** OBS may be using stale browser source cache, or the stream PC cannot reach the RotorHazard URL.
-    - **Fix:** refresh the OBS browser source, enable **Refresh browser when scene becomes active**, and confirm the overlay URL opens from the stream PC.
+    - **Fix:** refresh the OBS browser source manually and confirm the overlay URL opens from the stream PC.
 
 ## Cache behavior
 

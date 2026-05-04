@@ -21,18 +21,13 @@ Stream Overlays uses browser sources, so performance depends on OBS settings, br
 ## Reduce active browser sources
 
 - Build separate scenes instead of stacking every overlay into one scene.
-- Enable **Shutdown source when not visible** for sources that do not need to keep running.
+- Keep only the browser sources you need in each scene.
 - Use nested scenes carefully; hidden nested browser sources can still cost resources.
 - Prefer one full-screen overview source over many small browser sources for venue screens.
 
 ## Refresh behavior
 
-Enable **Refresh browser when scene becomes active** for overlays that depend on current RotorHazard state. This is especially useful for:
-
-- Upcoming heat boards.
-- Leaderboards.
-- TrackDraw map and overview scenes.
-- Browser sources that are only shown between races.
+Avoid automatic browser-source refresh on scene switches. It can interrupt animations, timers, and websocket state. If a source shows stale data, refresh it manually from OBS instead.
 
 ## Hardware acceleration
 

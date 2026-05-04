@@ -43,7 +43,7 @@ Solutions to common problems and error messages.
     - Low-end hardware on RotorHazard server
     - Browser source not cached properly
 
-    Enable **Shutdown source when not visible** to keep overlays in memory.
+    Keep live race overlays loaded across scene switches so they stay connected during a race.
 
 ??? question "Overlay freezes during race"
 

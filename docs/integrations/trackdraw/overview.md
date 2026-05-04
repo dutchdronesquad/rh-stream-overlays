@@ -46,8 +46,6 @@ http://192.168.1.100:5000/stream/overlay/lcdr/trackdraw/overview
 | Height | `1080` |
 | FPS | `60` |
 | Custom CSS | Keep the OBS default: `body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }` |
-| Shutdown source when not visible | Enabled |
-| Refresh browser when scene becomes active | Enabled |
 
 ## Best uses
 

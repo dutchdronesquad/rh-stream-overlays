@@ -72,8 +72,6 @@ http://[RH-IP]:5000/stream/overlay/dds/trackdraw/map?labels=0
 | Height | Match your OBS canvas for fullscreen, or use a fixed map-overlay size |
 | FPS | `60` for smooth pilot movement |
 | Custom CSS | Keep the OBS default: `body { background-color: rgba(0, 0, 0, 0); margin: 0px auto; overflow: hidden; }` |
-| Shutdown source when not visible | Enabled |
-| Refresh browser when scene becomes active | Enabled |
 
 ## Production uses
 
