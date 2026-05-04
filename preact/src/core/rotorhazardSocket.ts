@@ -25,6 +25,8 @@ type RotorHazardSocketOptions = {
   socket?: SocketLike;
 };
 
+const SOCKET_WAIT_TIMEOUT_MS = 5000;
+const SOCKET_WAIT_INTERVAL_MS = 50;
 const DEFAULT_EVENTS: RotorHazardEvent[] = [
   "language",
   "current_heat",
@@ -45,6 +47,10 @@ function asRecord(payload: unknown): RawRecord {
 
 function readSocket(): SocketLike | undefined {
   return (globalThis as SocketGlobals).socket;
+}
+
+function requestData(socket: SocketLike, events: RotorHazardEvent[]): void {
+  socket.emit?.("load_data", { load_types: events });
 }
 
 function setConnection(isConnected: boolean): void {
@@ -131,10 +137,39 @@ export function connectRotorHazardSocket(
 ): () => void {
   const socket = options.socket ?? readSocket();
   const events = options.events ?? DEFAULT_EVENTS;
+  const shouldRequestLoadData = options.requestLoadData ?? true;
 
   if (!socket) {
     setConnection(false);
-    return () => undefined;
+    if (options.socket) {
+      return () => undefined;
+    }
+
+    let isCancelled = false;
+    let cleanup: (() => void) | null = null;
+    const startedAt = Date.now();
+    const waitForSocket = window.setInterval(() => {
+      const pendingSocket = readSocket();
+      const timedOut = Date.now() - startedAt > SOCKET_WAIT_TIMEOUT_MS;
+      if (isCancelled || timedOut) {
+        window.clearInterval(waitForSocket);
+        return;
+      }
+
+      if (pendingSocket) {
+        window.clearInterval(waitForSocket);
+        cleanup = connectRotorHazardSocket({
+          ...options,
+          socket: pendingSocket
+        });
+      }
+    }, SOCKET_WAIT_INTERVAL_MS);
+
+    return () => {
+      isCancelled = true;
+      window.clearInterval(waitForSocket);
+      cleanup?.();
+    };
   }
 
   const handlers = new Map<string, (payload: unknown) => void>();
@@ -159,8 +194,8 @@ export function connectRotorHazardSocket(
     handlers.set(eventName, handler);
   });
 
-  if (options.requestLoadData && socket.emit) {
-    socket.emit("load_data", { load_types: events });
+  if (shouldRequestLoadData) {
+    requestData(socket, events);
   }
 
   setConnection(Boolean(socket.connected));
