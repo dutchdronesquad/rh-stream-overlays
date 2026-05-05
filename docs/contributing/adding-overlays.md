@@ -9,7 +9,7 @@ New overlays follow a consistent pattern: an entry file that initialises the soc
 
 ## 1. Create the entry file
 
-Add `preact/src/overlays/<name>/<name>.entry.tsx`. It connects the socket with the events the overlay needs and mounts the component.
+Add `frontend/src/overlays/<name>/<name>.entry.tsx`. It connects the socket with the events the overlay needs and mounts the component.
 
 ```tsx
 import { render } from "preact";
@@ -26,7 +26,7 @@ Available events: `language`, `current_heat`, `race_status`, `current_laps`, `le
 
 ## 2. Create the component
 
-Add `preact/src/overlays/<name>/MyOverlay.tsx`. Read state from `useRaceState()` — no direct socket calls needed.
+Add `frontend/src/overlays/<name>/MyOverlay.tsx`. Read state from `useRaceState()` — no direct socket calls needed.
 
 ```tsx
 import type { OverlayRuntimeConfig } from "../../core/overlayRuntime";
@@ -65,7 +65,7 @@ export function MyOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
 
 ## 3. Register the entry point in Vite
 
-Add the entry to `preact/vite.config.ts`:
+Add the entry to `frontend/vite.config.ts`:
 
 ```ts
 "my-overlay": fromConfig("src/overlays/<name>/<name>.entry.tsx"),
@@ -117,7 +117,7 @@ Using `_render_overlay` instead of `templating.render_template` directly returns
 ## 6. Build and test
 
 ```bash
-cd preact
+cd frontend
 npm run build
 ```
 

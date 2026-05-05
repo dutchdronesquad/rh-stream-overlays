@@ -47,12 +47,12 @@ De plugin heeft meerdere overlayfamilies:
 
 De belangrijkste technische bottleneck is niet alleen rendering, maar vooral dat iedere overlay zelf moet weten hoe RotorHazard events verwerkt worden.
 
-Dit is de beginsituatie voor de migratie: alle overlays draaien nog als vanilla JavaScript, er is geen build pipeline en geen gedeelde code. De `preact/` map bestaat en heeft `node_modules` van een eerdere setup, maar bevat geen broncode.
+Dit is de beginsituatie voor de migratie: alle overlays draaien nog als vanilla JavaScript, er is geen build pipeline en geen gedeelde code. De `frontend/` map bestaat en heeft `node_modules` van een eerdere setup, maar bevat geen broncode.
 
 ## Voorgestelde architectuur
 
 ```text
-preact/
+frontend/
   package.json
   vite.config.ts
   tsconfig.json
@@ -182,12 +182,12 @@ Zo blijft het mogelijk dat Apex, DDS en LCDR anders aanvoelen, zonder dezelfde o
 
 De bestaande CSS-bestanden in `custom_plugins/stream_overlays/static/css/` blijven tijdens de migratie op hun huidige plek en worden geladen via `<link>` tags in de RotorHazard templates. Dit voorkomt dat CSS-migratie en componentmigratie door elkaar lopen.
 
-Wanneer een overlay volledig gemigreerd en stabiel is, kan de bijbehorende CSS worden verplaatst naar `preact/src/` en geïmporteerd via Vite. Op dat moment valt het CSS-bestand samen met de gebundelde JS en verdwijnt de losse `<link>` tag uit het template.
+Wanneer een overlay volledig gemigreerd en stabiel is, kan de bijbehorende CSS worden verplaatst naar `frontend/src/` en geïmporteerd via Vite. Op dat moment valt het CSS-bestand samen met de gebundelde JS en verdwijnt de losse `<link>` tag uit het template.
 
 Aanpak per stap:
 
 1. Bestaande CSS blijft in `static/css/` en werkt via `<link>` tag.
-2. Na stabiele migratie van een overlay: CSS verplaatsen naar `preact/src/overlays/<naam>/`.
+2. Na stabiele migratie van een overlay: CSS verplaatsen naar `frontend/src/overlays/<naam>/`.
 3. CSS importeren in de entry file, Vite bundelt het mee.
 4. `<link>` tag verwijderen uit het template.
 5. Losse CSS-bestanden in `static/css/` verwijderen zodra alle themes voor die overlay zijn gemigreerd.
@@ -214,11 +214,11 @@ Acceptatie:
 
 Checklist:
 
-- [ ] `preact/package.json` toevoegen met build-, dev- en check-scripts.
+- [ ] `frontend/package.json` toevoegen met build-, dev- en check-scripts.
 - [ ] Vite configureren met meerdere overlay entrypoints.
 - [ ] Preact dependency toevoegen.
 - [ ] Outputpad configureren naar `custom_plugins/stream_overlays/static/dist/`.
-- [ ] Basis `preact/src/` structuur aanmaken.
+- [ ] Basis `frontend/src/` structuur aanmaken.
 - [ ] `overlayRuntime` maken voor root element, theme, node en page config.
 - [ ] Test-entrypoint maken dat in een RotorHazard template kan laden.
 - [ ] Bestaande overlays handmatig controleren na toevoeging van de build pipeline.
@@ -459,7 +459,7 @@ De `dist/` map wordt niet in git gecommit. Bij een release bouwt de CI-workflow 
 
 Genomen besluiten (voor start):
 
-- **TypeScript verplicht**: ja, alle broncode in `preact/src/` is TypeScript.
+- **TypeScript verplicht**: ja, alle broncode in `frontend/src/` is TypeScript.
 - **`dist` assets in git**: nee, `dist/` staat in `.gitignore`. De hele plugin wordt als release asset gebundeld via een CI-workflow.
 - **Pilot overlay**: DDS overall leaderboard.
 - **State management**: eigen kleine custom store met Preact hooks, geen `@preact/signals`.
@@ -478,7 +478,7 @@ Na Fase 3:
 
 ## Aanbevolen eerste implementatiepad
 
-1. Voeg Vite, Preact en TypeScript toe in een geïsoleerde `preact/` map zonder bestaande overlays te wijzigen.
+1. Voeg Vite, Preact en TypeScript toe in een geïsoleerde `frontend/` map zonder bestaande overlays te wijzigen.
 2. Bouw een kleine socket/store proof of concept met `race_status`, `current_heat` en `leaderboard`.
 3. Migreer de DDS overall leaderboard als eerste echte overlay.
 4. Meet gedrag in browser en OBS.
