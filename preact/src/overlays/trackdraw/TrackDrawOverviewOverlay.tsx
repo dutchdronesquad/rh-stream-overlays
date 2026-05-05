@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "preact/ho
 import type { OverlayRuntimeConfig } from "../../core/overlayRuntime";
 import { asNumber, asRecord, asString } from "../../core/primitives";
 import { useRaceState } from "../../core/raceStore";
+import { createTrackDrawRenderer } from "./trackCore/renderer";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -172,6 +173,17 @@ export function TrackDrawOverviewOverlay({
 }) {
   const { connection, currentHeat, currentLaps, leaderboard, raceStatus } =
     useRaceState();
+
+  // -- SVG renderer refs --
+  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!svgRef.current || !containerRef.current) return;
+    const renderer = createTrackDrawRenderer(svgRef.current, containerRef.current, runtime.theme);
+    renderer.loadTrack();
+    return () => renderer.destroy();
+  }, []);
 
   // -- Track title --
   const [trackTitle, setTrackTitle] = useState<string>("Overview");
@@ -369,6 +381,7 @@ export function TrackDrawOverviewOverlay({
       class="trackdraw-map trackdraw-map--overview"
       data-theme={runtime.theme}
       data-variant="overview"
+      ref={containerRef}
     >
       <section class="trackdraw-map__panel trackdraw-map__overview-panel">
         <div class="trackdraw-map__overview-shell">
@@ -395,6 +408,7 @@ export function TrackDrawOverviewOverlay({
           <div class="trackdraw-map__overview-body">
             <div class="trackdraw-map__overview-stage">
               <svg
+                ref={svgRef}
                 id="trackdraw-map-svg"
                 class="trackdraw-map__svg"
                 preserveAspectRatio="xMidYMid meet"

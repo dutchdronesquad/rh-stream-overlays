@@ -4,7 +4,7 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/heat_base.css') }}">
-{% block heat_theme_css %}{% endblock %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/heat.css') }}">
 {% endblock %}
 
 {% block content %}

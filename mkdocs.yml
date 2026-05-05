@@ -95,6 +95,7 @@ nav:
     - Race Day Checklist: production/race-day-checklist.md
     - Performance Tips: production/performance.md
     - Local Development: installation/development.md
+    - Adding Overlays: contributing/adding-overlays.md
   - FAQ:
     - faq/index.md
     - Installation: faq/installation.md

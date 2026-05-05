@@ -3,16 +3,8 @@
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/trackdraw_map.css') }}">
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/trackdraw_overview.css') }}">
 <link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/trackdraw_map.css') }}">
-<script>
-    window.trackdrawOverlayTheme = '{{ theme_name }}';
-    window.trackdrawOverlayVariant = 'overview';
-</script>
-<script type="text/javascript" charset="utf-8" src="{{ url_for('stream_overlays.static', filename='js/trackdraw_map.js') }}"></script>
 {% endblock %}
 {% block content %}
-<div
-  id="overlay-root"
-  data-theme="{{ theme_name }}"
-></div>
+<div id="overlay-root" data-theme="{{ theme_name }}"></div>
 <script type="module" src="{{ url_for('stream_overlays.static', filename='dist/trackdraw-overview.js') }}"></script>
 {% endblock %}

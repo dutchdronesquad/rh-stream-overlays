@@ -1,20 +1,28 @@
+import { useEffect, useRef } from "preact/hooks";
 import { ConnectionWarning } from "../../components/ConnectionWarning";
 import type { OverlayRuntimeConfig } from "../../core/overlayRuntime";
 import { useRaceState } from "../../core/raceStore";
+import { createTrackDrawRenderer } from "./trackCore/renderer";
 
-type Props = { runtime: OverlayRuntimeConfig };
-
-// SVG content is managed imperatively by trackdraw_map.js via DOM IDs — this component only owns the shell and connection state.
-export function TrackDrawMapOverlay({ runtime }: Props) {
+export function TrackDrawMapOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
   const { connection } = useRaceState();
-  const theme = runtime.theme;
+  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!svgRef.current || !containerRef.current) return;
+    const renderer = createTrackDrawRenderer(svgRef.current, containerRef.current, runtime.theme);
+    renderer.loadTrack();
+    return () => renderer.destroy();
+  }, []);
 
   return (
     <>
       <ConnectionWarning connection={connection} />
-      <main class="trackdraw-map" data-theme={theme}>
+      <main class="trackdraw-map" data-theme={runtime.theme} ref={containerRef}>
         <section class="trackdraw-map__panel">
           <svg
+            ref={svgRef}
             id="trackdraw-map-svg"
             class="trackdraw-map__svg"
             preserveAspectRatio="xMidYMid meet"

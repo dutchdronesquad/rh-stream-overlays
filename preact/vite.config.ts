@@ -7,6 +7,11 @@ function fromConfig(relativePath: string): string {
 
 export default defineConfig({
   plugins: [preact()],
+  resolve: {
+    alias: {
+      "@": new URL("src/", import.meta.url).pathname,
+    },
+  },
   build: {
     outDir: fromConfig("../custom_plugins/stream_overlays/static/dist"),
     emptyOutDir: true,
