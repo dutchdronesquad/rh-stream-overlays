@@ -26,7 +26,6 @@ type HeatSlot = {
 
 type ThemeLayout = {
   body: string;
-  bodyLabel: string;
   container: string;
   eventBadge: string;
   foot: string;
@@ -126,21 +125,20 @@ function buildSlots(
   if (heatRaw) {
     const rawSlots = objectValues(heatRaw.slots);
     if (rawSlots.length > 0) {
-      return rawSlots.map((s) => {
+      return rawSlots.flatMap((s) => {
         const slot = asRecord(s);
         const nodeIndex = asNumber(slot.node_index) ?? 0;
         const pilotId = asNumber(slot.pilot_id);
         const pilot = pilotId ? asRecord(pilotById[String(pilotId)]) : null;
-        const hasPilot = Boolean(pilot && Object.keys(pilot).length > 0);
-        const pilotRecord = hasPilot ? asRecord(pilot) : {};
-        return {
+        if (!pilot || Object.keys(pilot).length === 0) return [];
+        return [{
           nodeIndex,
           seatLabel: `Seat ${nodeIndex + 1}`,
-          callsign: asString(pilotRecord.callsign) ?? "Pilot",
-          pilotName: asString(pilotRecord.name) ?? "",
+          callsign: asString(pilot.callsign) ?? "Pilot",
+          pilotName: asString(pilot.name) ?? "",
           frequency: null,
-          isEmpty: !hasPilot,
-        };
+          isEmpty: false,
+        }];
       });
     }
   }
@@ -152,7 +150,6 @@ function getThemeLayout(theme: string): ThemeLayout {
   if (theme === "apex") {
     return {
       body: "apex-body",
-      bodyLabel: "apex-body__label",
       container: "apex-canvas",
       eventBadge: "meta-chip",
       foot: "apex-foot",
@@ -167,7 +164,6 @@ function getThemeLayout(theme: string): ThemeLayout {
   if (theme === "lcdr") {
     return {
       body: "lcdr-body",
-      bodyLabel: "body-label",
       container: "lcdr-shell",
       eventBadge: "event-chip",
       foot: "lcdr-foot",
@@ -181,7 +177,6 @@ function getThemeLayout(theme: string): ThemeLayout {
   }
   return {
     body: "dds-body",
-    bodyLabel: "body-label",
     container: "dds-shell",
     eventBadge: "event-badge",
     foot: "dds-foot",
@@ -272,11 +267,6 @@ export function HeatOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
             </div>
           </div>
           <div class={layout.body}>
-            <div class={layout.bodyLabel}>
-              <span class="accent-bar"></span>
-              <span class="label-dot"></span>
-              Pilots
-            </div>
             <div id="heat_slots" class={layout.grid}>
               {slots.length > 0 ? (
                 slots.map((slot) => (

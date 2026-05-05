@@ -110,26 +110,10 @@
   gap: 1.25rem;
 }
 
-.apex-body__label {
-  display: inline-flex;
-  gap: 0.5rem;
-  align-items: center;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  font-size: 1rem;
-  color: var(--apex-text-secondary);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.apex-body__label .label-dot {
-  display: none;
-}
-
 /* Grid - cleaner layout */
 .heat-grid.apex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.5rem;
   margin-top: 0;
 }
@@ -285,7 +269,7 @@
   }
 
   .heat-grid.apex-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
 
@@ -306,5 +290,9 @@
   .theme-apex .channel-block {
     gap: 1.5rem;
     font-size: 0.8rem;
+  }
+
+  .heat-grid.apex-grid {
+    grid-template-columns: 1fr;
   }
 }

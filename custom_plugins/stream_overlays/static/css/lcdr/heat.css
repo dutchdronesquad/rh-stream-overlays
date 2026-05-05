@@ -224,8 +224,9 @@
 }
 
 .heat-grid.lcdr-grid {
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.25rem;
+  margin-top: 0;
 }
 
 .theme-lcdr .slot-card {
@@ -444,7 +445,7 @@
   }
 
   .heat-grid.lcdr-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -470,6 +471,10 @@
   .theme-lcdr .channel-block {
     flex-direction: column;
     gap: 0.35rem;
+  }
+
+  .heat-grid.lcdr-grid {
+    grid-template-columns: 1fr;
   }
 
   .lcdr-foot #heat_notice {

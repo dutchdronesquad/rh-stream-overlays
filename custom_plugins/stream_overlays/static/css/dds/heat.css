@@ -198,8 +198,9 @@
 }
 
 .heat-grid.dds-grid {
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.25rem;
+  margin-top: 0;
 }
 
 .theme-dds .slot-card {
@@ -411,7 +412,7 @@
   }
 
   .heat-grid.dds-grid {
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -437,6 +438,10 @@
   .theme-dds .channel-block {
     flex-direction: column;
     gap: 0.35rem;
+  }
+
+  .heat-grid.dds-grid {
+    grid-template-columns: 1fr;
   }
 
   .dds-foot #heat_notice {
