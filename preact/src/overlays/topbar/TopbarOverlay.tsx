@@ -33,20 +33,25 @@ export function TopbarOverlay({ runtime }: Props) {
   return (
     <>
       <ConnectionWarning connection={connection} />
-      <div id="info-row" class="rectangle item">
-        <div id="heat-info">
-          <div style={{ marginLeft: "250px" }}>
-            <span id="js--heat-title">{heatTitle}</span>
-            {runtime.eventName && (
-              <>
-                <span style={{ margin: "0 10px" }}>|</span>
-                <span>{runtime.eventName}</span>
-              </>
-            )}
+      <div class={`stream-topbar stream-topbar--${runtime.theme} apex-topbar`}>
+        <div id="info-row" class="topbar-container rectangle item">
+          <div
+            id="timer"
+            class={`timer-section rectangle item timing-clock${isStaging ? " staging" : ""}`}
+          >
+            <span class="time-display">--:--</span>
           </div>
-        </div>
-        <div id="timer" class={`rectangle item timing-clock${isStaging ? " staging" : ""}`}>
-          <span class="time-display">--:--</span>
+          <div id="heat-info" class="heat-section">
+            <div class="topbar-heat-content">
+              <span id="js--heat-title">{heatTitle}</span>
+              {runtime.eventName && (
+                <>
+                  <span class="separator">|</span>
+                  <span class="event-name">{runtime.eventName}</span>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>
