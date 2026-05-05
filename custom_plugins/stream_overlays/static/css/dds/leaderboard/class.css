@@ -118,8 +118,12 @@
 }
 
 .entry>.position>p {
+    font-family: "Teko", sans-serif;
+    margin: auto;
     font-size: 1.8rem;
     line-height: 2.2;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 /* Font styling for the entry */
