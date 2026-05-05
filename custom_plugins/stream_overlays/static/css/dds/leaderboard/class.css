@@ -106,6 +106,7 @@
 }
 
 .entry>.position {
+    flex: 0 0 65px;
     width: 65px;
     height: 60px;
     background-color: darkorange;
