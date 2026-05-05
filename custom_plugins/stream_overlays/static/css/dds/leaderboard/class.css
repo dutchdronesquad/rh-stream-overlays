@@ -116,6 +116,11 @@
     justify-content: center;
 }
 
+.entry>.position>p {
+    font-size: 1.8rem;
+    line-height: 2.2;
+}
+
 /* Font styling for the entry */
 .box>p,
 .entry>p {
