@@ -1,8 +1,9 @@
 """DDS - RotorHazard Stream Overlay Plugin."""
 
 from eventmanager import Evt
-from flask import jsonify, templating
+from flask import abort, jsonify, templating
 from flask.blueprints import Blueprint
+from jinja2 import TemplateNotFound
 from RHUI import UIField, UIFieldType
 
 from .const import (
@@ -250,6 +251,14 @@ class StreamOverlays:
                 )
 
 
+def _render_overlay(template: str, **kwargs: object) -> str:
+    """Render an overlay template, returning 404 if the template does not exist."""
+    try:
+        return templating.render_template(template, **kwargs)
+    except TemplateNotFound:
+        abort(404)
+
+
 def initialize(rhapi: object) -> None:
     """Initialize the plugin.
 
@@ -287,7 +296,7 @@ def initialize(rhapi: object) -> None:
     @bp.route("/stream/overlay/<string:name>/topbar")
     def render_topbar_overlay(name: str) -> str:
         """Render the topbar overlay."""
-        return templating.render_template(
+        return _render_overlay(
             f"stream/topbars/topbar_{name}.html",
             serverInfo=None,
             getOption=rhapi.db.option,
@@ -298,7 +307,7 @@ def initialize(rhapi: object) -> None:
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/overall")
     def render_overall_class_overlay(name: str, class_id: int) -> str:
         """Render the overall class leaderboard overlay."""
-        return templating.render_template(
+        return _render_overlay(
             f"stream/leaderboard/{name}/overall.html",
             serverInfo=None,
             getOption=rhapi.db.option,
@@ -310,7 +319,7 @@ def initialize(rhapi: object) -> None:
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/class")
     def render_class_leaderboard_overlay(name: str, class_id: int) -> str:
         """Render the class leaderboard overlay."""
-        return templating.render_template(
+        return _render_overlay(
             f"stream/leaderboard/{name}/class.html",
             serverInfo=None,
             getOption=rhapi.db.option,
@@ -322,7 +331,7 @@ def initialize(rhapi: object) -> None:
     @bp.route("/stream/overlay/<string:name>/heat/upcoming")
     def render_heat_overlay(name: str) -> str:
         """Render the upcoming heat overlay."""
-        return templating.render_template(
+        return _render_overlay(
             f"stream/heat/heat_{name}.html",
             serverInfo=None,
             getOption=rhapi.db.option,

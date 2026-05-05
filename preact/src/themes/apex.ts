@@ -3,6 +3,7 @@ export type OverlayThemeConfig = {
   nodeAnimation: "slide" | "zoom" | "minimal";
   showFastestLapHighlight: boolean;
   leaderboardPageSize: number;
+  lapDisplayLimit: number;
 };
 
 export const apexTheme: OverlayThemeConfig = {
@@ -10,4 +11,5 @@ export const apexTheme: OverlayThemeConfig = {
   nodeAnimation: "zoom",
   showFastestLapHighlight: true,
   leaderboardPageSize: 8,
+  lapDisplayLimit: 3,
 };

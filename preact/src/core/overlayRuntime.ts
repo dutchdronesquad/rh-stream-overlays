@@ -3,6 +3,7 @@ export type OverlayThemeName = "apex" | "dds" | "lcdr" | string;
 export type OverlayRuntimeConfig = {
   classId: number | null;
   eventName: string | null;
+  numNodes: number | null;
   root: HTMLElement;
   theme: OverlayThemeName;
   node: number | null;
@@ -25,6 +26,7 @@ export function readOverlayRuntime(
   return {
     classId: parseOptionalNumber(root.dataset.classId),
     eventName: root.dataset.eventName ?? null,
+    numNodes: parseOptionalNumber(root.dataset.numNodes),
     root,
     theme: root.dataset.theme ?? "dds",
     node: parseOptionalNumber(root.dataset.node),

@@ -5,4 +5,5 @@ export const ddsTheme: OverlayThemeConfig = {
   nodeAnimation: "slide",
   showFastestLapHighlight: true,
   leaderboardPageSize: 8,
+  lapDisplayLimit: 10,
 };

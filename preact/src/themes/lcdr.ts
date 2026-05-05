@@ -5,4 +5,5 @@ export const lcdrTheme: OverlayThemeConfig = {
   nodeAnimation: "minimal",
   showFastestLapHighlight: false,
   leaderboardPageSize: 10,
+  lapDisplayLimit: 10,
 };
