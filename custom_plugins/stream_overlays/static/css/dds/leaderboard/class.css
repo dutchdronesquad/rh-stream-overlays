@@ -166,7 +166,7 @@
     font-feature-settings: var(--dds-numeric-features);
 }
 
-#pilot_name {
+.pilot_name {
     text-align: left;
 }
 

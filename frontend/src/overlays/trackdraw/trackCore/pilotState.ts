@@ -20,6 +20,7 @@ const CONFIDENCE_HIGH_MS = 2500;
 const STALE_WINDOW_MS = 8000;
 const LAP_ROLLOVER_CONTINUITY_PROGRESS = 0.18;
 const CORRECTION_FADE_THRESHOLD_PROGRESS = 0.025;
+const MIN_SEGMENT_MS = 1;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -36,7 +37,10 @@ function getStaleWindowMs(): number {
 }
 
 function getEffectiveSegmentMs(pilot: PilotState, baselineLapMs: number): number {
-  return pilot.expectedSegmentMs || pilot.expectedLapMs || baselineLapMs;
+  const segmentMs = pilot.expectedSegmentMs || pilot.expectedLapMs || baselineLapMs;
+  return Number.isFinite(segmentMs) && segmentMs > 0
+    ? Math.max(segmentMs, MIN_SEGMENT_MS)
+    : MIN_SEGMENT_MS;
 }
 
 // ---------------------------------------------------------------------------
@@ -293,17 +297,18 @@ export function freezePilots(
 export function getLapTimeMs(lap: Record<string, unknown>): number | null {
   if (!lap) return null;
   if (lap.deleted === true) return null;
-  let value: number | null = null;
+  return parseLapTime(lap.lap_time) ?? parseLapTime(lap.lap_raw);
+}
 
-  if (typeof lap.lap_time === "number") {
-    value = lap.lap_time;
-  } else if (typeof lap.lap_raw === "number") {
-    value = lap.lap_raw;
-  } else if (typeof lap.lap_time === "string" && lap.lap_time.trim() !== "") {
-    value = Number(lap.lap_time);
+function parseLapTime(value: unknown): number | null {
+  if (typeof value === "number") {
+    return Number.isFinite(value) && value > 0 ? value : null;
   }
-
-  return typeof value === "number" && !isNaN(value) && value > 0 ? value : null;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value.trim());
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+  return null;
 }
 
 export function getActiveLaps(laps: unknown[]): Record<string, unknown>[] {

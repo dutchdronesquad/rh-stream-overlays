@@ -17,8 +17,8 @@ export function progressToPoint(
   progress: number
 ): Point | null {
   if (!sampledPoints.length) return null;
-  const clamped = normalizeProgress(progress);
-  const idx = clamped * (sampledPoints.length - 1);
+  const normalized = normalizeProgress(progress);
+  const idx = normalized * (sampledPoints.length - 1);
   const i = Math.floor(idx);
   const t = idx - i;
   if (i >= sampledPoints.length - 1) {

@@ -75,7 +75,7 @@ This produces `custom_plugins/stream_overlays/static/dist/my-overlay.js` after `
 
 ## 4. Create the Jinja2 template
 
-Add `custom_plugins/stream_overlays/pages/stream/<name>/<theme>.html`. Keep the template minimal — load CSS via `<link>` tags, mount `#overlay-root`, and load the bundle.
+Add `custom_plugins/stream_overlays/pages/overlays/<name>/<theme>.html`. Keep the template minimal — load CSS via `<link>` tags, mount `#overlay-root`, and load the bundle.
 
 ```html
 {% extends 'layout-basic.html' %}
@@ -104,7 +104,7 @@ Add a route in the `initialize` function in `custom_plugins/stream_overlays/__in
 def render_my_overlay(name: str) -> str:
     """Render my overlay."""
     return _render_overlay(
-        f"stream/<name>/<name>_{name}.html",
+        f"overlays/<name>/<name>_{name}.html",
         serverInfo=None,
         getOption=rhapi.db.option,
         getConfig=rhapi.config.get_item,

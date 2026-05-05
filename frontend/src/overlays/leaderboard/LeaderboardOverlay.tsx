@@ -55,7 +55,7 @@ function OverallEntry({ entry, animDelay }: { entry: LeaderboardEntry; animDelay
       <div class="box position" style={{ backgroundColor: positionColor(entry.position) }}>
         <p>{entry.position}</p>
       </div>
-      <p id="pilot_name">{entry.callsign ?? "—"}</p>
+      <p class="pilot_name">{entry.callsign ?? "—"}</p>
     </div>
   );
 }
@@ -171,6 +171,7 @@ function ClassView({ title, entries, displayType }: ClassResults) {
   const [pageIndex, setPageIndex] = useState(0);
   const [hiding, setHiding] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pageCount = Math.ceil(entries.length / ITEMS_PER_PAGE);
   const paged = entries.slice(pageIndex * ITEMS_PER_PAGE, (pageIndex + 1) * ITEMS_PER_PAGE);
   const paginated = entries.length > ITEMS_PER_PAGE;
@@ -183,12 +184,26 @@ function ClassView({ title, entries, displayType }: ClassResults) {
     if (!paginated) return;
     timerRef.current = setInterval(() => {
       setHiding(true);
-      setTimeout(() => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+      hideTimeoutRef.current = setTimeout(() => {
         setPageIndex((i) => (i + 1) % pageCount);
         setHiding(false);
+        hideTimeoutRef.current = null;
       }, HIDE_SETTLE_MS);
     }, PAGE_INTERVAL_MS);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+        hideTimeoutRef.current = null;
+      }
+    };
   }, [entries, paginated, pageCount]);
 
   const labels = headerLabels(displayType);

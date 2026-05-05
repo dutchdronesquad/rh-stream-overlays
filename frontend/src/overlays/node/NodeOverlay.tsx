@@ -7,7 +7,7 @@ import { useRaceState } from "../../core/raceStore";
 import { apexTheme } from "../../themes/apex";
 import { ddsTheme } from "../../themes/dds";
 import { lcdrTheme } from "../../themes/lcdr";
-import type { OverlayThemeConfig } from "../../themes/apex";
+import type { OverlayThemeConfig } from "../../themes/types";
 
 // ---------------------------------------------------------------------------
 // Types

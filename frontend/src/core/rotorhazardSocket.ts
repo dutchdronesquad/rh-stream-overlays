@@ -133,7 +133,10 @@ export function connectRotorHazardSocket(options: SocketOptions = {}): () => voi
 
   const handlers = new Map<string, (payload: unknown) => void>();
 
-  const connectHandler = () => setConnectionState(true);
+  const connectHandler = () => {
+    setConnectionState(true);
+    if (shouldRequestLoadData) requestData(socket, events);
+  };
   const disconnectHandler = () => setConnectionState(false);
   socket.on("connect", connectHandler);
   socket.on("disconnect", disconnectHandler);

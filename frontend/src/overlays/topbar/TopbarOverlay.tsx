@@ -25,6 +25,7 @@ export function TopbarOverlay({ runtime }: Props) {
     } else {
       body.classList.add("race-new");
     }
+    return () => body.classList.remove("race-running", "race-stopped", "race-new");
   }, [raceStatus?.label]);
 
   // Initialize the rotorhazard.timer socket events

@@ -8,9 +8,11 @@ type TimingGlobals = typeof globalThis & {
 
 export function serverNow(): number {
   const rh = (globalThis as TimingGlobals).rotorhazard;
-  const diff = typeof rh?.server_time_differential === "number"
-    ? rh.server_time_differential
-    : 0;
+  const serverTimeDifferential = rh?.server_time_differential;
+  const diff =
+    typeof serverTimeDifferential === "number" && Number.isFinite(serverTimeDifferential)
+      ? serverTimeDifferential
+      : 0;
   return Date.now() + diff;
 }
 

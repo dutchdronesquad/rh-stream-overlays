@@ -43,9 +43,10 @@ const THEMES: ThemeConfig[] = [
 ];
 
 function normalizeBaseUrl(value: string): string {
-  const trimmed = value.trim();
+  const trimmed = value.trim().replace(/\/+$/, "");
   if (!trimmed) return window.location.origin;
-  return trimmed.replace(/\/+$/, "");
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `${window.location.protocol}//${trimmed}`;
 }
 
 function buildLinks(theme: ThemeName, nodes: number, classId: number, leaderboard: boolean): OverlayLink[] {
@@ -88,7 +89,11 @@ function buildLinks(theme: ThemeName, nodes: number, classId: number, leaderboar
 }
 
 function absoluteUrl(baseUrl: string, path: string): string {
-  return new URL(path, `${baseUrl}/`).href;
+  try {
+    return new URL(path, `${baseUrl}/`).href;
+  } catch {
+    return new URL(path, `${window.location.origin}/`).href;
+  }
 }
 
 function groupCounts(links: OverlayLink[]): string {
@@ -118,7 +123,12 @@ function OverlayLauncher() {
   );
 
   const copyUrl = async (path: string) => {
-    await navigator.clipboard.writeText(absoluteUrl(normalizedBase, path));
+    try {
+      await navigator.clipboard.writeText(absoluteUrl(normalizedBase, path));
+    } catch (error) {
+      console.warn("Failed to copy overlay URL.", error);
+      return;
+    }
     setCopiedPath(path);
     window.setTimeout(() => {
       setCopiedPath((current) => (current === path ? null : current));

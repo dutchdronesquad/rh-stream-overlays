@@ -45,9 +45,10 @@ function getPilotLabel(pilot: Pilot): string {
 
 function getTrackJsonUrl(): string {
   const path = window.location.pathname.replace(/\/+$/, "");
-  return /\/overview$/.test(path)
-    ? path + "/track.json"
-    : path.replace(/\/map$/, "/track.json");
+  if (/\/overview(?:$|\/)/.test(path)) {
+    return path.replace(/\/overview(?:\/.*)?$/, "/overview/track.json");
+  }
+  return path.replace(/\/map(?:\/.*)?$/, "/track.json");
 }
 
 function getConfidence(

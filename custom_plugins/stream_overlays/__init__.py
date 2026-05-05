@@ -378,9 +378,10 @@ def initialize(rhapi: object) -> None:
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/map")
+    @require_theme()
     def render_trackdraw_map(name: str) -> str:
         """Render the TrackDraw map overlay."""
-        return templating.render_template(
+        return _render_overlay(
             "overlays/trackdraw-map.html",
             serverInfo=None,
             getOption=rhapi.db.option,
@@ -390,9 +391,10 @@ def initialize(rhapi: object) -> None:
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/overview")
+    @require_theme()
     def render_trackdraw_overview(name: str) -> str:
         """Render the TrackDraw overview overlay."""
-        return templating.render_template(
+        return _render_overlay(
             "overlays/trackdraw-overview.html",
             serverInfo=None,
             getOption=rhapi.db.option,

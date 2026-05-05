@@ -4,5 +4,5 @@ import { connectRotorHazardSocket } from "../../core/rotorhazardSocket";
 import { TopbarOverlay } from "./TopbarOverlay";
 
 const runtime = readOverlayRuntime();
-connectRotorHazardSocket({ events: ["leaderboard", "race_status", "result_data"] });
+connectRotorHazardSocket({ events: ["leaderboard", "race_status"] });
 render(<TopbarOverlay runtime={runtime} />, runtime.root);

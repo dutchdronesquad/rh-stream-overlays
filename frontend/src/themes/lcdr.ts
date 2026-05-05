@@ -1,4 +1,4 @@
-import type { OverlayThemeConfig } from "./apex";
+import type { OverlayThemeConfig } from "./types";
 
 export const lcdrTheme: OverlayThemeConfig = {
   name: "lcdr",

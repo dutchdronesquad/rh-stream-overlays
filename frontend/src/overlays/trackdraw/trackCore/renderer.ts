@@ -87,6 +87,14 @@ export type TrackDrawRenderer = {
   destroy(): void;
 };
 
+function stableSerialize(value: unknown): string {
+  try {
+    return JSON.stringify(value ?? null);
+  } catch {
+    return "null";
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
@@ -140,12 +148,16 @@ export function createTrackDrawRenderer(
 
   // ---- Store subscription ----
   let prevConnected: boolean | null = null;
+  let prevHeatNodes: string | null = null;
+  let prevRaceStatus: number | null = null;
+  let prevCurrentLaps: string | null = null;
+  let prevLeaderboardEntries: string | null = null;
 
   const unsubscribeStore = subscribeRaceState(() => {
     const state = getRaceState();
     const connected = state.connection.isConnected;
 
-    if (prevConnected !== null && connected !== prevConnected) {
+    if (connected !== prevConnected) {
       if (connected) {
         renderer.onConnect();
       } else {
@@ -154,25 +166,38 @@ export function createTrackDrawRenderer(
     }
     prevConnected = connected;
 
-    // Heat nodes
-    if (state.currentHeat?.heatNodes) {
-      renderer.onHeat(asRecord(state.currentHeat.heatNodes) as Record<string, HeatNode>);
+    const heatNodes = state.currentHeat?.heatNodes
+      ? (asRecord(state.currentHeat.heatNodes) as Record<string, HeatNode>)
+      : null;
+    const heatNodesKey = stableSerialize(heatNodes);
+    if (heatNodes && heatNodesKey !== prevHeatNodes) {
+      renderer.onHeat(heatNodes);
     }
+    prevHeatNodes = heatNodesKey;
 
-    // Race status
-    if (state.raceStatus?.status !== null && state.raceStatus?.status !== undefined) {
-      renderer.onRaceStatus(state.raceStatus.status as number);
+    const raceStatus = state.raceStatus?.status;
+    if (raceStatus !== null && raceStatus !== undefined && raceStatus !== prevRaceStatus) {
+      renderer.onRaceStatus(raceStatus as number);
     }
+    prevRaceStatus = raceStatus ?? null;
 
-    // Current laps
-    if (state.currentLaps?.nodeIndex) {
-      renderer.onCurrentLaps(state.currentLaps.nodeIndex as Record<string, unknown>);
+    const currentLaps = state.currentLaps?.nodeIndex
+      ? (state.currentLaps.nodeIndex as Record<string, unknown>)
+      : null;
+    const currentLapsKey = stableSerialize(currentLaps);
+    if (currentLaps && currentLapsKey !== prevCurrentLaps) {
+      renderer.onCurrentLaps(currentLaps);
     }
+    prevCurrentLaps = currentLapsKey;
 
-    // Leaderboard
-    if (state.leaderboard?.entries?.length) {
-      renderer.onLeaderboard(state.leaderboard.entries as LeaderboardEntry[]);
+    const leaderboardEntries = state.leaderboard?.entries?.length
+      ? (state.leaderboard.entries as LeaderboardEntry[])
+      : null;
+    const leaderboardEntriesKey = stableSerialize(leaderboardEntries);
+    if (leaderboardEntries && leaderboardEntriesKey !== prevLeaderboardEntries) {
+      renderer.onLeaderboard(leaderboardEntries);
     }
+    prevLeaderboardEntries = leaderboardEntriesKey;
   });
 
   // ---- Helpers ----

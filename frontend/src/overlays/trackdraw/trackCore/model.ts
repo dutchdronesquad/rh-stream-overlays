@@ -122,7 +122,7 @@ export function updateExpectedSegmentMs(
   toKey: string,
   segmentMs: number
 ): void {
-  if (!fromKey || !toKey || typeof segmentMs !== "number" || segmentMs < MIN_OBSERVED_SEGMENT_MS) {
+  if (!fromKey || !toKey || !Number.isFinite(segmentMs) || segmentMs < MIN_OBSERVED_SEGMENT_MS) {
     return;
   }
   const key = getSegmentKey(fromKey, toKey);
