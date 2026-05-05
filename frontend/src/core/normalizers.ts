@@ -85,9 +85,42 @@ export function normalizePilotData(payload: unknown): NormalizedCollection {
   return normalizeCollection(payload, "pilots", ["pilot_id", "id"]);
 }
 
+function parseRecord(value: unknown): RawRecord {
+  let parsed = value;
+  if (typeof value === "string" && value.trim() !== "") {
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return {};
+    }
+  }
+  if (Array.isArray(parsed)) {
+    return parsed.reduce<RawRecord>((acc, item, index) => {
+      acc[String(index)] = item;
+      return acc;
+    }, {});
+  }
+  if (isRecord(parsed)) return parsed;
+  return {};
+}
+
+function firstPopulatedRecord(...values: unknown[]): RawRecord {
+  for (const value of values) {
+    const record = parseRecord(value);
+    if (Object.keys(record).length > 0) return record;
+  }
+  return {};
+}
+
 export function normalizeFrequencyData(payload: unknown): NormalizedFrequencyData {
   const raw = asRecord(payload);
-  return { frequenciesByNode: asRecord(raw.fdata), raw };
+  const frequencies = firstPopulatedRecord(
+    raw.fdata,
+    raw.frequency_data,
+    raw.frequencies,
+    raw
+  );
+  return { frequenciesByNode: frequencies, raw };
 }
 
 export function normalizeLeaderboard(payload: unknown): NormalizedLeaderboard {

@@ -147,6 +147,15 @@
   text-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
 }
 
+.lcdr-header__main {
+  margin: 0 -1.7rem;
+  padding: 0.35rem 1.7rem 0.5rem;
+  background:
+    linear-gradient(90deg, rgba(56, 208, 255, 0.16), rgba(255, 93, 177, 0.08) 34%, transparent 78%),
+    rgba(3, 8, 16, 0.42);
+  border-block: 1px solid rgba(56, 208, 255, 0.16);
+}
+
 .meta-line {
   display: flex;
   flex-wrap: wrap;
@@ -430,6 +439,11 @@
 
   .lcdr-header,
   .lcdr-body {
+    padding-inline: 1.25rem;
+  }
+
+  .lcdr-header__main {
+    margin-inline: -1.25rem;
     padding-inline: 1.25rem;
   }
 

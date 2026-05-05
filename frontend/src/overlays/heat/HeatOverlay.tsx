@@ -49,10 +49,19 @@ function FrequencyBadge({
   nodeIndex: number;
   frequencyData: NormalizedFrequencyData | null;
 }) {
-  const raw = asRecord(frequencyData?.frequenciesByNode[String(nodeIndex)]);
-  const band = asString(raw.band);
-  const channel = asNumber(raw.channel);
-  const frequency = asNumber(raw.frequency);
+  const fdata = frequencyData?.frequenciesByNode ?? {};
+  const raw = {
+    ...asRecord(fdata[String(nodeIndex)]),
+    ...asRecord(fdata[String(nodeIndex + 1)]),
+  };
+  const band = firstString(raw.band, raw.b, indexedValue(fdata.b, nodeIndex));
+  const channel = firstNumber(raw.channel, raw.c, indexedValue(fdata.c, nodeIndex));
+  const frequency = firstNumber(
+    raw.frequency,
+    raw.freq,
+    raw.f,
+    indexedValue(fdata.f, nodeIndex)
+  );
 
   return (
     <div class="channel-block" data-node={nodeIndex}>
@@ -60,6 +69,27 @@ function FrequencyBadge({
       <span class="fr">{frequency !== null ? frequency : ""}</span>
     </div>
   );
+}
+
+function indexedValue(value: unknown, index: number): unknown {
+  if (Array.isArray(value)) return value[index];
+  return asRecord(value)[String(index)];
+}
+
+function firstString(...values: unknown[]): string | null {
+  for (const value of values) {
+    const parsed = asString(value);
+    if (parsed !== null) return parsed;
+  }
+  return null;
+}
+
+function firstNumber(...values: unknown[]): number | null {
+  for (const value of values) {
+    const parsed = asNumber(value);
+    if (parsed !== null) return parsed;
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
