@@ -153,7 +153,7 @@ export function createTrackDrawRenderer(
   let prevCurrentLaps: string | null = null;
   let prevLeaderboardEntries: string | null = null;
 
-  const unsubscribeStore = subscribeRaceState(() => {
+  function syncFromStore(): void {
     const state = getRaceState();
     const connected = state.connection.isConnected;
 
@@ -198,7 +198,10 @@ export function createTrackDrawRenderer(
       renderer.onLeaderboard(leaderboardEntries);
     }
     prevLeaderboardEntries = leaderboardEntriesKey;
-  });
+  }
+
+  const unsubscribeStore = subscribeRaceState(syncFromStore);
+  syncFromStore();
 
   // ---- Helpers ----
 

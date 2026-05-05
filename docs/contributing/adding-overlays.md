@@ -5,7 +5,7 @@ description: How to add a new overlay to the Preact frontend.
 
 # Adding overlays
 
-New overlays follow a consistent pattern: an entry file that initialises the socket and renders a Preact component into an `#overlay-root` element, a component that reads from the shared race store, a Jinja2 template that loads the built bundle, and a route registered in `__init__.py`.
+New overlays follow a consistent pattern: an entry file that initializes the socket and renders a Preact component into an `#overlay-root` element, a component that reads from the shared race store, a Jinja2 template that loads the built bundle, and a route registered in `__init__.py`.
 
 ## 1. Create the entry file
 
@@ -100,11 +100,11 @@ If the overlay needs extra data from the server (node index, class ID, number of
 Add a route in the `initialize` function in `custom_plugins/stream_overlays/__init__.py`:
 
 ```python
-@bp.route("/stream/overlay/<string:name>/my-overlay")
-def render_my_overlay(name: str) -> str:
+@bp.route("/stream/overlay/<string:theme>/my-overlay")
+def render_my_overlay(theme: str) -> str:
     """Render my overlay."""
     return _render_overlay(
-        f"overlays/<name>/<name>_{name}.html",
+        f"overlays/my-overlay/{theme}.html",
         serverInfo=None,
         getOption=rhapi.db.option,
         getConfig=rhapi.config.get_item,

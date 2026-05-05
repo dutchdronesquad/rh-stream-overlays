@@ -57,6 +57,7 @@
 
 .lcdr-shell {
   width: min(1500px, 96vw);
+  padding: 0;
   background: linear-gradient(150deg, rgba(8, 14, 24, 0.95), rgba(6, 8, 12, 0.9));
   border: 1px solid var(--lcdr-border);
   border-radius: 14px;
@@ -145,15 +146,6 @@
   letter-spacing: 0.06em;
   color: var(--lcdr-text);
   text-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
-}
-
-.lcdr-header__main {
-  margin: 0 -1.7rem;
-  padding: 0.35rem 1.7rem 0.5rem;
-  background:
-    linear-gradient(90deg, rgba(56, 208, 255, 0.16), rgba(255, 93, 177, 0.08) 34%, transparent 78%),
-    rgba(3, 8, 16, 0.42);
-  border-block: 1px solid rgba(56, 208, 255, 0.16);
 }
 
 .meta-line {
@@ -297,7 +289,7 @@
   background: linear-gradient(180deg, rgba(56, 208, 255, 0.3), rgba(255, 93, 177, 0.12));
   color: var(--lcdr-text);
   border-right: 1px solid rgba(56, 208, 255, 0.32);
-  border-radius: 10px 0 0 10px;
+  border-radius: 0 10px 10px 0;
   font-variant-numeric: tabular-nums;
 }
 
@@ -439,11 +431,6 @@
 
   .lcdr-header,
   .lcdr-body {
-    padding-inline: 1.25rem;
-  }
-
-  .lcdr-header__main {
-    margin-inline: -1.25rem;
     padding-inline: 1.25rem;
   }
 

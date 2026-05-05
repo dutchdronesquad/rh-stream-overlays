@@ -112,9 +112,10 @@ type PilotRowProps = {
   isP1: boolean;
   confidence: string;
   delta: "up" | "down" | null;
+  onClearDelta: (nodeIndex: number) => void;
 };
 
-function PilotRow({ pilot, displayPosition, isP1, confidence, delta }: PilotRowProps) {
+function PilotRow({ pilot, displayPosition, isP1, confidence, delta, onClearDelta }: PilotRowProps) {
   const [activeDelta, setActiveDelta] = useState<"up" | "down" | null>(delta);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -124,16 +125,20 @@ function PilotRow({ pilot, displayPosition, isP1, confidence, delta }: PilotRowP
       if (timerRef.current !== null) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => {
         setActiveDelta(null);
+        onClearDelta(pilot.nodeIndex);
         timerRef.current = null;
       }, 3000);
     }
+  }, [delta, pilot.nodeIndex]);
+
+  useEffect(() => {
     return () => {
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
     };
-  }, [delta]);
+  }, []);
 
   const rowClass = [
     "trackdraw-map__overview-row",
@@ -269,14 +274,26 @@ export function TrackDrawOverviewOverlay({
     });
   }, [leaderboard]);
 
+  const prevLapCountsRef = useRef<Record<string, number>>({});
+
   // Update lastLapAt from currentLaps
   useEffect(() => {
     if (!currentLaps?.nodeIndex) return;
     const nodeIndex = currentLaps.nodeIndex;
+    const changedNodes: number[] = [];
+    for (const nodeIdx of Object.keys(nodeIndex)) {
+      const nodeData = asRecord(nodeIndex[nodeIdx]);
+      const laps = Array.isArray(nodeData.laps) ? nodeData.laps : [];
+      const prevCount = prevLapCountsRef.current[nodeIdx] ?? 0;
+      if (laps.length > prevCount) {
+        changedNodes.push(parseInt(nodeIdx, 10));
+      }
+      prevLapCountsRef.current[nodeIdx] = laps.length;
+    }
+    if (changedNodes.length === 0) return;
     setPilots((prev) => {
       const next = new Map(prev);
-      for (const nodeIdx of Object.keys(nodeIndex)) {
-        const idx = parseInt(nodeIdx, 10);
+      for (const idx of changedNodes) {
         const existing = next.get(idx);
         if (!existing) continue;
         next.set(idx, { ...existing, lastLapAt: performance.now() });
@@ -341,7 +358,15 @@ export function TrackDrawOverviewOverlay({
     }
   });
   // Merge persistent deltas (cleared by PilotRow after 3 s)
-  deltas.forEach((dir, nodeIdx) => deltasRef.current.set(nodeIdx, dir));
+  deltas.forEach((dir, nodeIdx) => {
+    if (deltasRef.current.get(nodeIdx) !== dir) {
+      deltasRef.current.set(nodeIdx, dir);
+    }
+  });
+
+  const clearDelta = (nodeIdx: number) => {
+    deltasRef.current.delete(nodeIdx);
+  };
 
   // Update prevOrder after render
   useEffect(() => {
@@ -440,7 +465,10 @@ export function TrackDrawOverviewOverlay({
                         : index + 1;
                     const isP1 = displayPosition === 1;
                     const confidence = getConfidence(pilot, raceRunning, connected);
-                    const delta = deltas.get(pilot.nodeIndex) ?? null;
+                    const delta =
+                      deltas.get(pilot.nodeIndex) ??
+                      deltasRef.current.get(pilot.nodeIndex) ??
+                      null;
                     return (
                       <PilotRow
                         key={pilot.nodeIndex}
@@ -449,6 +477,7 @@ export function TrackDrawOverviewOverlay({
                         isP1={isP1}
                         confidence={confidence}
                         delta={delta}
+                        onClearDelta={clearDelta}
                       />
                     );
                   })}

@@ -109,7 +109,7 @@
     font-feature-settings: var(--dds-numeric-features);
 }
 
-.pilot_name {
+.entry > p.pilot_name {
     height: 100%;
     margin: 0 0 0 16px;
     padding-left: 0;

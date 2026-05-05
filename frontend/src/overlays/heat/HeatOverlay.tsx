@@ -126,20 +126,21 @@ function buildSlots(
   if (heatRaw) {
     const rawSlots = objectValues(heatRaw.slots);
     if (rawSlots.length > 0) {
-      return rawSlots.flatMap((s) => {
+      return rawSlots.map((s) => {
         const slot = asRecord(s);
         const nodeIndex = asNumber(slot.node_index) ?? 0;
         const pilotId = asNumber(slot.pilot_id);
         const pilot = pilotId ? asRecord(pilotById[String(pilotId)]) : null;
-        if (!pilot || Object.keys(pilot).length === 0) return [];
-        return [{
+        const hasPilot = Boolean(pilot && Object.keys(pilot).length > 0);
+        const pilotRecord = hasPilot ? asRecord(pilot) : {};
+        return {
           nodeIndex,
           seatLabel: `Seat ${nodeIndex + 1}`,
-          callsign: asString(pilot.callsign) ?? "Pilot",
-          pilotName: asString(pilot.name) ?? "",
+          callsign: asString(pilotRecord.callsign) ?? "Pilot",
+          pilotName: asString(pilotRecord.name) ?? "",
           frequency: null,
-          isEmpty: false,
-        }];
+          isEmpty: !hasPilot,
+        };
       });
     }
   }

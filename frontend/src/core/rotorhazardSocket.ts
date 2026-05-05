@@ -149,7 +149,7 @@ export function connectRotorHazardSocket(options: SocketOptions = {}): () => voi
     handlers.set(eventName, handler);
   }
 
-  if (shouldRequestLoadData) requestData(socket, events);
+  if (shouldRequestLoadData && socket.connected) requestData(socket, events);
   setConnectionState(Boolean(socket.connected));
 
   return () => {

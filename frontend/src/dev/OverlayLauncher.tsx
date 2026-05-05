@@ -1,4 +1,4 @@
-import { render } from "preact";
+import { Fragment, render } from "preact";
 import { useMemo, useState } from "preact/hooks";
 import "./overlayLauncher.css";
 
@@ -216,9 +216,9 @@ function OverlayLauncher() {
                   const href = absoluteUrl(normalizedBase, link.path);
                   const copyLabel = copiedPath === link.path ? "Copied" : "Copy";
                   return (
-                    <>
+                    <Fragment key={`${theme.name}-${link.path}`}>
                       {showGroup && <h3>{link.group}</h3>}
-                      <div class="launcher__row" key={`${theme.name}-${link.path}`}>
+                      <div class="launcher__row">
                         <div>
                           <strong>{link.label}</strong>
                           <code>{link.path}</code>
@@ -232,7 +232,7 @@ function OverlayLauncher() {
                           </a>
                         </div>
                       </div>
-                    </>
+                    </Fragment>
                   );
                 })}
               </div>

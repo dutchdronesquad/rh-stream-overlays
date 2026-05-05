@@ -277,7 +277,9 @@ def require_theme(
     def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(f)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            if kwargs.get("name") not in themes:
+            normalized = str(kwargs.get("name", "")).lower()
+            kwargs["name"] = normalized
+            if normalized not in themes:
                 abort(404)
             return f(*args, **kwargs)
 
