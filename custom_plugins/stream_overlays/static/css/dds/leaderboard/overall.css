@@ -65,6 +65,8 @@
 
 /* Entry styling */
 .entry {
+    display: flex;
+    align-items: center;
     background-color: rgba(0, 0, 0, 1);
     color: white;
     border-radius: 15px 0;
@@ -84,16 +86,16 @@
     transform: translateY(0);
 }
 
-.box {
-    position: absolute;
-}
-
 .entry>.position {
+    flex: 0 0 65px;
     width: 65px;
     height: 60px;
     background-color: darkorange;
     z-index: 2;
     border-radius: 15px 0 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Font styling for the entry */
@@ -102,15 +104,18 @@
     font-family: "Teko", sans-serif;
     margin: auto;
     font-size: 2.4rem;
-    line-height: 1.7;
+    line-height: 1.2;
     font-variant-numeric: tabular-nums;
     font-feature-settings: var(--dds-numeric-features);
 }
 
 .pilot_name {
-    padding-left: 80px;
+    height: 100%;
+    margin: 0 0 0 16px;
+    padding-left: 0;
     text-align: left;
-
-    font-size: 1.8rem;
-    line-height: 2.2;
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    line-height: 1.2;
 }

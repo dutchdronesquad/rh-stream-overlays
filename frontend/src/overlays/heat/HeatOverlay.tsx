@@ -24,6 +24,20 @@ type HeatSlot = {
   isEmpty: boolean;
 };
 
+type ThemeLayout = {
+  body: string;
+  bodyLabel: string;
+  container: string;
+  eventBadge: string;
+  foot: string;
+  grid: string;
+  header: string;
+  headerMain: string;
+  headerTop: string;
+  lead: string;
+  meta: string;
+};
+
 // ---------------------------------------------------------------------------
 // FrequencyBadge
 // ---------------------------------------------------------------------------
@@ -77,39 +91,76 @@ function SlotCard({
 
 function buildSlots(
   heatRaw: RawRecord | null,
-  pilotById: Record<string, RawRecord>,
-  numNodes: number
+  pilotById: Record<string, RawRecord>
 ): HeatSlot[] {
   if (heatRaw) {
     const rawSlots = objectValues(heatRaw.slots);
     if (rawSlots.length > 0) {
-      return rawSlots.map((s) => {
+      return rawSlots.flatMap((s) => {
         const slot = asRecord(s);
         const nodeIndex = asNumber(slot.node_index) ?? 0;
         const pilotId = asNumber(slot.pilot_id);
         const pilot = pilotId ? asRecord(pilotById[String(pilotId)]) : null;
-        const hasPilot = pilot && Object.keys(pilot).length > 0;
-        return {
+        if (!pilot || Object.keys(pilot).length === 0) return [];
+        return [{
           nodeIndex,
           seatLabel: `Seat ${nodeIndex + 1}`,
-          callsign: hasPilot ? (asString(pilot.callsign) ?? "Awaiting Assignment") : "Awaiting Assignment",
-          pilotName: hasPilot ? (asString(pilot.name) ?? "") : "",
+          callsign: asString(pilot.callsign) ?? "Pilot",
+          pilotName: asString(pilot.name) ?? "",
           frequency: null,
-          isEmpty: !hasPilot,
-        };
+          isEmpty: false,
+        }];
       });
     }
   }
 
-  // Practice mode / no slots — build numNodes empty slots
-  return Array.from({ length: numNodes }, (_, i) => ({
-    nodeIndex: i,
-    seatLabel: `Seat ${i + 1}`,
-    callsign: "",
-    pilotName: "",
-    frequency: null,
-    isEmpty: true,
-  }));
+  return [];
+}
+
+function getThemeLayout(theme: string): ThemeLayout {
+  if (theme === "apex") {
+    return {
+      body: "apex-body",
+      bodyLabel: "apex-body__label",
+      container: "apex-canvas",
+      eventBadge: "meta-chip",
+      foot: "apex-foot",
+      grid: "heat-grid apex-grid",
+      header: "apex-header",
+      headerMain: "apex-header__primary",
+      headerTop: "apex-header__primary",
+      lead: "lead-label",
+      meta: "apex-header__meta",
+    };
+  }
+  if (theme === "lcdr") {
+    return {
+      body: "lcdr-body",
+      bodyLabel: "body-label",
+      container: "lcdr-shell",
+      eventBadge: "event-chip",
+      foot: "lcdr-foot",
+      grid: "heat-grid lcdr-grid",
+      header: "lcdr-header",
+      headerMain: "lcdr-header__main",
+      headerTop: "lcdr-header__top",
+      lead: "lead",
+      meta: "meta-line",
+    };
+  }
+  return {
+    body: "dds-body",
+    bodyLabel: "body-label",
+    container: "dds-shell",
+    eventBadge: "event-badge",
+    foot: "dds-foot",
+    grid: "heat-grid dds-grid",
+    header: "dds-header",
+    headerMain: "dds-header__main",
+    headerTop: "dds-header__top",
+    lead: "lead",
+    meta: "meta-line",
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -128,8 +179,8 @@ export function HeatOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
     frequencyData,
   } = state;
 
-  const numNodes = runtime.numNodes ?? 8;
   const theme = runtime.theme;
+  const layout = getThemeLayout(theme);
 
   // Theme class on <html>
   useEffect(() => {
@@ -166,7 +217,7 @@ export function HeatOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
     : "";
 
   const pilotById = pilotData?.byId ?? {};
-  const slots = buildSlots(heatHasData ? heatRaw : null, pilotById, numNodes);
+  const slots = buildSlots(heatHasData ? heatRaw : null, pilotById);
 
   const notice = isPractice ? "Practice Mode" : "";
 
@@ -174,26 +225,44 @@ export function HeatOverlay({ runtime }: { runtime: OverlayRuntimeConfig }) {
     <>
       <ConnectionWarning connection={connection} />
       <main class={`page-streamheat theme-${theme}`}>
-        <div class="heat-wrapper">
-          <div class="heat-header">
-            <p class="label" id="heat_lead">Up Next</p>
-            <h1 id="heat_name">{heatName}</h1>
-            <div class="heat-meta">
-              <span id="class_name">{className}</span>
-              <span id="round_info">{roundInfo}</span>
-              <span id="format_name">{formatName}</span>
+        <div class={`heat-wrapper ${layout.container}`}>
+          <div class={`heat-header ${layout.header}`}>
+            <div class={layout.headerTop}>
+              <p class={`label ${layout.lead}`} id="heat_lead">Up Next</p>
+              {runtime.eventName ? <span class={layout.eventBadge}>{runtime.eventName}</span> : null}
+            </div>
+            <div class={layout.headerMain}>
+              <h1 id="heat_name">{heatName}</h1>
+              <div class={`heat-meta ${layout.meta}`}>
+                <span id="class_name">{className}</span>
+                <span id="round_info">{roundInfo}</span>
+                <span id="format_name">{formatName}</span>
+              </div>
             </div>
           </div>
-          <div id="heat_slots" class="heat-grid">
-            {slots.map((slot) => (
-              <SlotCard
-                key={slot.nodeIndex}
-                slot={slot}
-                frequencyData={frequencyData}
-              />
-            ))}
+          <div class={layout.body}>
+            <div class={layout.bodyLabel}>
+              <span class="accent-bar"></span>
+              <span class="label-dot"></span>
+              Pilots
+            </div>
+            <div id="heat_slots" class={layout.grid}>
+              {slots.length > 0 ? (
+                slots.map((slot) => (
+                  <SlotCard
+                    key={slot.nodeIndex}
+                    slot={slot}
+                    frequencyData={frequencyData}
+                  />
+                ))
+              ) : (
+                <div class="heat-empty">No assigned pilots</div>
+              )}
+            </div>
           </div>
-          <div class="heat-footnote" id="heat_notice">{notice}</div>
+          <div class={layout.foot}>
+            <div class="heat-footnote" id="heat_notice">{notice}</div>
+          </div>
         </div>
       </main>
     </>
