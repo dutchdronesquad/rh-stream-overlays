@@ -152,6 +152,7 @@ export function createTrackDrawRenderer(
   let prevRaceStatus: number | null = null;
   let prevCurrentLaps: string | null = null;
   let prevLeaderboardEntries: string | null = null;
+  let unsubscribeStore: () => void = () => undefined;
 
   function syncFromStore(): void {
     const state = getRaceState();
@@ -199,9 +200,6 @@ export function createTrackDrawRenderer(
     }
     prevLeaderboardEntries = leaderboardEntriesKey;
   }
-
-  const unsubscribeStore = subscribeRaceState(syncFromStore);
-  syncFromStore();
 
   // ---- Helpers ----
 
@@ -950,6 +948,9 @@ export function createTrackDrawRenderer(
     onResize,
     destroy,
   };
+
+  unsubscribeStore = subscribeRaceState(syncFromStore);
+  syncFromStore();
 
   return renderer;
 }
