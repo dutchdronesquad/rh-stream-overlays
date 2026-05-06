@@ -106,6 +106,7 @@
 }
 
 .entry>.position {
+    flex: 0 0 65px;
     width: 65px;
     height: 60px;
     background-color: darkorange;
@@ -114,6 +115,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.entry>.position>p {
+    font-family: "Teko", sans-serif;
+    margin: auto;
+    font-size: 1.8rem;
+    line-height: 2.2;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: var(--dds-numeric-features);
 }
 
 /* Font styling for the entry */
@@ -136,7 +146,7 @@
     display: flex;
     justify-content: space-between; /* Space between left and right containers */
     align-items: center; /* Center items vertically */
-    padding-left: 80px;
+    padding-left: 16px;
     padding-right: 20px;
     width: 100%;
 }
@@ -166,7 +176,7 @@
     font-feature-settings: var(--dds-numeric-features);
 }
 
-#pilot_name {
+.pilot_name {
     text-align: left;
 }
 

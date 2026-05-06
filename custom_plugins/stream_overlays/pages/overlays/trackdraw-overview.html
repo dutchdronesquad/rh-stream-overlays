@@ -1,0 +1,10 @@
+{% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('TrackDraw Overview') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/trackdraw_map.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/trackdraw_overview.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/trackdraw_map.css') }}">
+{% endblock %}
+{% block content %}
+<div id="overlay-root" data-theme="{{ theme_name }}"></div>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/trackdraw-overview.js') }}"></script>
+{% endblock %}

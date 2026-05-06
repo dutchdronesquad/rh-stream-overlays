@@ -1,0 +1,15 @@
+{% extends "layout-basic.html" %}{% block title %}{{ __('Stream Leaderboard') }}: {{ __('Class') }}: {{ class_id or __('Current') }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/leaderboard/class.css') }}">
+{% endblock %}
+
+{% block content %}
+<div
+  id="overlay-root"
+  data-theme="{{ theme_name }}"
+  data-class-id="{{ class_id }}"
+></div>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/leaderboard-class.js') }}"></script>
+{% endblock %}

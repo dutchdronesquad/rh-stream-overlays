@@ -1,8 +1,13 @@
 """DDS - RotorHazard Stream Overlay Plugin."""
 
+import functools
+from collections.abc import Callable
+from typing import Any
+
 from eventmanager import Evt
-from flask import jsonify, templating
+from flask import abort, jsonify, templating
 from flask.blueprints import Blueprint
+from jinja2 import TemplateNotFound
 from RHUI import UIField, UIFieldType
 
 from .const import (
@@ -250,6 +255,39 @@ class StreamOverlays:
                 )
 
 
+_OVERLAY_THEMES = frozenset(key.lower() for key in overlays)
+_LEADERBOARD_THEMES = frozenset(
+    key.lower() for key, features in overlays.items() if features.get("leaderboard")
+)
+
+
+def _render_overlay(template: str, **kwargs: object) -> str:
+    """Render an overlay template, returning 404 if the template does not exist."""
+    try:
+        return templating.render_template(template, **kwargs)
+    except TemplateNotFound:
+        abort(404)
+
+
+def require_theme(
+    themes: frozenset[str] = _OVERLAY_THEMES,
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Abort 404 when the `name` route parameter is not a supported theme."""
+
+    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
+        @functools.wraps(f)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            normalized = str(kwargs.get("name", "")).lower()
+            kwargs["name"] = normalized
+            if normalized not in themes:
+                abort(404)
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 def initialize(rhapi: object) -> None:
     """Initialize the plugin.
 
@@ -273,69 +311,80 @@ def initialize(rhapi: object) -> None:
     )
 
     @bp.route("/stream/overlay/<string:name>/node/<int:node_id>")
+    @require_theme()
     def render_node_overlay(name: str, node_id: int) -> str:
         """Render the node overlay."""
-        return templating.render_template(
-            f"stream/nodes/node_{name}.html",
+        return _render_overlay(
+            "overlays/node.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
+            theme_name=name,
             node_id=node_id - 1,
         )
 
     @bp.route("/stream/overlay/<string:name>/topbar")
+    @require_theme()
     def render_topbar_overlay(name: str) -> str:
         """Render the topbar overlay."""
-        return templating.render_template(
-            f"stream/topbars/topbar_{name}.html",
+        return _render_overlay(
+            "overlays/topbar.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
+            theme_name=name,
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/overall")
+    @require_theme(_LEADERBOARD_THEMES)
     def render_overall_class_overlay(name: str, class_id: int) -> str:
         """Render the overall class leaderboard overlay."""
-        return templating.render_template(
-            f"stream/leaderboard/{name}/overall.html",
+        return _render_overlay(
+            "overlays/leaderboard-overall.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
+            theme_name=name,
             class_id=class_id,
         )
 
     @bp.route("/stream/overlay/<string:name>/leaderboard/<int:class_id>/class")
+    @require_theme(_LEADERBOARD_THEMES)
     def render_class_leaderboard_overlay(name: str, class_id: int) -> str:
         """Render the class leaderboard overlay."""
-        return templating.render_template(
-            f"stream/leaderboard/{name}/class.html",
+        return _render_overlay(
+            "overlays/leaderboard-class.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
+            theme_name=name,
             class_id=class_id,
         )
 
     @bp.route("/stream/overlay/<string:name>/heat/upcoming")
+    @require_theme()
     def render_heat_overlay(name: str) -> str:
         """Render the upcoming heat overlay."""
-        return templating.render_template(
-            f"stream/heat/heat_{name}.html",
+        return _render_overlay(
+            "overlays/heat.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
             __=rhapi.__,
+            theme_name=name,
             num_nodes=len(rhapi.interface.seats),
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/map")
+    @require_theme()
     def render_trackdraw_map(name: str) -> str:
         """Render the TrackDraw map overlay."""
-        return templating.render_template(
-            "stream/trackdraw/map.html",
+        return _render_overlay(
+            "overlays/trackdraw-map.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
@@ -344,10 +393,11 @@ def initialize(rhapi: object) -> None:
         )
 
     @bp.route("/stream/overlay/<string:name>/trackdraw/overview")
+    @require_theme()
     def render_trackdraw_overview(name: str) -> str:
         """Render the TrackDraw overview overlay."""
-        return templating.render_template(
-            "stream/trackdraw/overview.html",
+        return _render_overlay(
+            "overlays/trackdraw-overview.html",
             serverInfo=None,
             getOption=rhapi.db.option,
             getConfig=rhapi.config.get_item,
