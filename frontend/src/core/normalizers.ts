@@ -52,11 +52,12 @@ function normalizeLeaderboardEntry(value: unknown): LeaderboardEntry | null {
 
 export function normalizeCurrentHeat(payload: unknown): NormalizedCurrentHeat {
   const raw = asRecord(payload);
+  const heatNodes = parseRecord(raw.heatNodes);
   return {
     currentHeatId: asNumber(raw.current_heat),
     heatClassId: asNumber(raw.heat_class),
     heatFormatId: asNumber(raw.heat_format),
-    heatNodes: raw.heatNodes ?? null,
+    heatNodes: Object.keys(heatNodes).length > 0 ? heatNodes : raw.heatNodes ?? null,
     nextRound: asNumber(raw.next_round),
     raw,
   };
@@ -65,8 +66,8 @@ export function normalizeCurrentHeat(payload: unknown): NormalizedCurrentHeat {
 export function normalizeCurrentLaps(payload: unknown): NormalizedCurrentLaps {
   const raw = asRecord(payload);
   const current = asRecord(raw.current);
-  const nodeIndex = isRecord(current.node_index) ? current.node_index : null;
-  return { nodeIndex, raw };
+  const nodeIndex = parseRecord(current.node_index);
+  return { nodeIndex: Object.keys(nodeIndex).length > 0 ? nodeIndex : null, raw };
 }
 
 export function normalizeClassData(payload: unknown): NormalizedCollection {
