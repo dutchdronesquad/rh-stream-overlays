@@ -201,6 +201,14 @@ export function createTrackDrawRenderer(
     prevLeaderboardEntries = leaderboardEntriesKey;
   }
 
+  function resyncRaceSlicesFromStore(): void {
+    prevHeatNodes = null;
+    prevRaceStatus = null;
+    prevCurrentLaps = null;
+    prevLeaderboardEntries = null;
+    syncFromStore();
+  }
+
   // ---- Helpers ----
 
   function getRoot(): Element {
@@ -896,6 +904,8 @@ export function createTrackDrawRenderer(
         anchorModel = model.anchorModel;
 
         if (!renderTrack(trackData)) return;
+
+        resyncRaceSlicesFromStore();
 
         if (!animationRunning) {
           animationRunning = true;
