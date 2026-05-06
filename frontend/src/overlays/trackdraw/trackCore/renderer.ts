@@ -150,9 +150,12 @@ export function createTrackDrawRenderer(
   let prevConnected: boolean | null = null;
   let prevHeatNodes: string | null = null;
   let prevRaceStatus: number | null = null;
-  let prevCurrentLaps: string | null = null;
   let prevLeaderboardEntries: string | null = null;
   let unsubscribeStore: () => void = () => undefined;
+
+  function isTrackRendered(): boolean {
+    return trackData !== null && pilotGroupEl !== null && sampledPoints.length > 0;
+  }
 
   function syncFromStore(): void {
     const state = getRaceState();
@@ -160,43 +163,45 @@ export function createTrackDrawRenderer(
 
     if (connected !== prevConnected) {
       if (connected) {
-        renderer.onConnect();
+        onConnect();
       } else {
-        renderer.onDisconnect();
+        onDisconnect();
       }
     }
     prevConnected = connected;
+
+    if (!isTrackRendered()) {
+      return;
+    }
 
     const heatNodes = state.currentHeat?.heatNodes
       ? (asRecord(state.currentHeat.heatNodes) as Record<string, HeatNode>)
       : null;
     const heatNodesKey = stableSerialize(heatNodes);
     if (heatNodes && heatNodesKey !== prevHeatNodes) {
-      renderer.onHeat(heatNodes);
+      onHeat(heatNodes);
     }
     prevHeatNodes = heatNodesKey;
 
     const raceStatus = state.raceStatus?.status;
     if (raceStatus !== null && raceStatus !== undefined && raceStatus !== prevRaceStatus) {
-      renderer.onRaceStatus(raceStatus as number);
+      onRaceStatus(raceStatus as number);
     }
     prevRaceStatus = raceStatus ?? null;
 
     const currentLaps = state.currentLaps?.nodeIndex
       ? (state.currentLaps.nodeIndex as Record<string, unknown>)
       : null;
-    const currentLapsKey = stableSerialize(currentLaps);
-    if (currentLaps && currentLapsKey !== prevCurrentLaps) {
-      renderer.onCurrentLaps(currentLaps);
+    if (currentLaps) {
+      onCurrentLaps(currentLaps);
     }
-    prevCurrentLaps = currentLapsKey;
 
     const leaderboardEntries = state.leaderboard?.entries?.length
       ? (state.leaderboard.entries as LeaderboardEntry[])
       : null;
     const leaderboardEntriesKey = stableSerialize(leaderboardEntries);
     if (leaderboardEntries && leaderboardEntriesKey !== prevLeaderboardEntries) {
-      renderer.onLeaderboard(leaderboardEntries);
+      onLeaderboard(leaderboardEntries);
     }
     prevLeaderboardEntries = leaderboardEntriesKey;
   }
@@ -204,7 +209,6 @@ export function createTrackDrawRenderer(
   function resyncRaceSlicesFromStore(): void {
     prevHeatNodes = null;
     prevRaceStatus = null;
-    prevCurrentLaps = null;
     prevLeaderboardEntries = null;
     syncFromStore();
   }
@@ -755,7 +759,7 @@ export function createTrackDrawRenderer(
   function onConnect(): void {
     socketConnected = true;
     if (trackData === null && !trackLoadPending) {
-      renderer.loadTrack();
+      loadTrack();
     } else {
       for (const k of Object.keys(pilots)) {
         pilots[k].confidence = "idle";
