@@ -102,3 +102,28 @@ def create_heat_markdown(overlay_name: str, base_path: str) -> str:
         f"{overlay_name} Overlay - Upcoming Heat</a>\n"
     )
     return heat_markdown
+
+
+def create_trackdraw_markdown(overlay_name: str, base_path: str) -> str:
+    """Create markdown links for all TrackDraw overlays (map and overview).
+
+    Args:
+    ----
+        overlay_name (str): Name of the overlay.
+        base_path (str): Base path for the overlay.
+
+    Returns:
+    -------
+        str: Markdown block containing both TrackDraw overlay links.
+
+    """
+    markdown: str = "## TrackDraw\n"
+    markdown += (
+        f"- <a href='{base_path}/trackdraw/map' target='_blank'>"
+        f"{overlay_name} Overlay - TrackDraw Map</a>\n"
+    )
+    markdown += (
+        f"- <a href='{base_path}/trackdraw/overview' target='_blank'>"
+        f"{overlay_name} Overlay - TrackDraw Overview</a>\n"
+    )
+    return markdown

@@ -1,0 +1,17 @@
+{% extends 'layout-basic.html' %}
+{% set theme_name = theme_name | default('dds') %}
+{% block title %}{{ __('Stream') }}: {{ __('Upcoming Heat') }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/main/heat_base.css') }}">
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/heat.css') }}">
+{% endblock %}
+
+{% block content %}
+<div
+  id="overlay-root"
+  data-theme="{{ theme_name }}"
+  data-num-nodes="{{ num_nodes }}"
+></div>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/heat.js') }}"></script>
+{% endblock %}

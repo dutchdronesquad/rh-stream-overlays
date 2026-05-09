@@ -1,0 +1,13 @@
+{% extends 'layout-basic.html' %}{% block title %}{{ __('Stream') }}: {{ __('Topbar') }} — {{ theme_name | upper }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('stream_overlays.static', filename='css/' ~ theme_name ~ '/topbar.css') }}">
+{% endblock %}
+
+{% block content %}
+<div
+  id="overlay-root"
+  data-theme="{{ theme_name }}"
+  data-event-name="{{ getOption('eventName') }}"
+></div>
+<script type="module" src="{{ url_for('stream_overlays.static', filename='dist/topbar.js') }}"></script>
+{% endblock %}

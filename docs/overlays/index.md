@@ -3,12 +3,20 @@ title: Overlays
 description: Overview of all available overlays for the Stream Overlays plugin for RotorHazard.
 ---
 
-# Theme catalog
+# Overlay overview
 
-Choose a cohesive theme with matching node overlays, topbars, and heat boards for your stream. Each theme includes multiple overlay types styled together for a unified broadcast look—from race start to podium ceremony.
+Stream Overlays is built from three concepts:
+
+- **Theme packages** control the visual style.
+- **Overlay types** control what data a browser source shows.
+- **Integrations** add external data sources, such as TrackDraw.
+
+Start with a theme package when you want a cohesive look. Use the overlay type pages when you need exact URL patterns or OBS guidance.
 
 !!! question "Want a custom theme?"
     Start a topic in [Discussions](https://github.com/dutchdronesquad/rh-stream-overlays/discussions) with your branding and we can create a custom preset.
+
+## Theme packages
 
 <div class="overlay-theme-grid">
   <a href="./apex" class="theme-card">
@@ -41,3 +49,20 @@ Choose a cohesive theme with matching node overlays, topbars, and heat boards fo
     </div>
   </a>
 </div>
+
+## Overlay types
+
+| Type | Available themes | Best for |
+|------|------------------|----------|
+| [Node overlays](types/nodes.md) | Apex, DDS, LCDR | Pilot camera scenes and node grids |
+| [Topbars](types/topbars.md) | Apex, DDS, LCDR | Race title, event branding, and timer context |
+| [Upcoming heat](types/upcoming-heat.md) | Apex, DDS, LCDR | Pre-race lineups and intermission scenes |
+| [Leaderboards](types/leaderboards.md) | DDS | Class and overall rankings |
+
+## Integrations
+
+| Integration | Overlays | Use it when |
+|-------------|----------|-------------|
+| [TrackDraw](../integrations/trackdraw/index.md) | Live Race Map, Overview | You want live track-position visuals based on TrackDraw geometry |
+
+TrackDraw overlays are documented under Integrations because they require project setup before they can be used in OBS.

@@ -194,6 +194,24 @@
   box-shadow: var(--shadow-sm);
 }
 
+.md-typeset .trackdraw-logo {
+  width: 200px;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.trackdraw-logo--dark {
+  display: none;
+}
+
+[data-md-color-scheme="slate"] .trackdraw-logo--light {
+  display: none;
+}
+
+[data-md-color-scheme="slate"] .trackdraw-logo--dark {
+  display: block;
+}
+
 /* Code blocks */
 .md-typeset pre {
   border: 1px solid var(--border-color);

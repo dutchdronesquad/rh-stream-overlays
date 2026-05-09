@@ -1,0 +1,272 @@
+/* ============================================================
+   TrackDraw Live Race Map
+   Designed for OBS browser source. The neutral grey background follows
+   the other stream overlays and can be filtered/keyed in OBS.
+   ============================================================ */
+
+html {
+  background: transparent;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--trackdraw-key-bg, grey);
+  font-family: Barlow, sans-serif;
+  font-variant-numeric: tabular-nums;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.trackdraw-map {
+  height: 100vh;
+  position: relative;
+  width: 100vw;
+}
+
+.trackdraw-map__panel {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+
+/* ---- SVG fills the full panel ---- */
+
+.trackdraw-map__svg {
+  display: block;
+  height: 100%;
+  overflow: visible;
+  width: 100%;
+}
+
+/* ---- Track elements (sizes set proportionally in JS) ---- */
+
+.trackdraw-map__route-shadow,
+.trackdraw-map__route-outline,
+.trackdraw-map__route {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trackdraw-map__route-shadow {
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 66%));
+  stroke: var(--trackdraw-route-shadow, rgb(0 0 0 / 48%));
+}
+
+.trackdraw-map__route-outline {
+  stroke: var(--trackdraw-route-outline, rgb(0 0 0 / 86%));
+}
+
+.trackdraw-map__route {
+  stroke: var(--trackdraw-route, #d8e2ee);
+}
+
+.trackdraw-map__gate {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 68%));
+  opacity: 0.88;
+}
+
+.trackdraw-map__gate-marker {
+  fill: var(--trackdraw-gate-bg, rgb(0 0 0 / 90%));
+  stroke: var(--trackdraw-gate-stroke, var(--trackdraw-obstacle, #2de2a7));
+}
+
+.trackdraw-map__gate-marker-core {
+  fill: var(--trackdraw-gate-core, var(--trackdraw-obstacle, #2de2a7));
+}
+
+.trackdraw-map__obstacle-label,
+.trackdraw-map__timing-label {
+  fill: var(--trackdraw-text, #fff);
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
+  stroke-linejoin: round;
+  text-anchor: middle;
+}
+
+.trackdraw-map__timing {
+  fill: var(--trackdraw-timing, #ffe566);
+  stroke: var(--trackdraw-label-stroke, rgb(0 0 0 / 85%));
+}
+
+.trackdraw-map__timing-tick {
+  stroke: var(--trackdraw-timing, #ffe566);
+  stroke-linecap: round;
+}
+
+.trackdraw-map__timing-tick.is-split {
+  opacity: 0.72;
+}
+
+.trackdraw-map__timing-tick.is-start-finish {
+  opacity: 0.36;
+  stroke: var(--trackdraw-start-finish, #ffffff);
+}
+
+.trackdraw-map__finish-line {
+  filter: drop-shadow(0 1px 3px rgb(0 0 0 / 70%));
+}
+
+.trackdraw-map__finish-line-cap {
+  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
+  stroke: var(--trackdraw-start-finish, #ffffff);
+}
+
+.trackdraw-map__finish-block.is-light {
+  fill: var(--trackdraw-start-finish, #ffffff);
+}
+
+.trackdraw-map__finish-block.is-dark {
+  fill: var(--trackdraw-start-finish-bg, rgb(0 0 0 / 88%));
+}
+
+/* ---- Pilot dots ---- */
+
+.trackdraw-map__pilot-group {
+  transition: opacity 200ms ease;
+}
+
+.trackdraw-map__pilot-halo {
+  fill: transparent;
+  opacity: 0.85;
+}
+
+.trackdraw-map__pilot-marker {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 70%));
+}
+
+.trackdraw-map__pilot {
+  stroke: rgb(255 255 255 / 80%);
+  stroke-linejoin: round;
+}
+
+/* Pilot callsign badge — single box, shape and fill vary per theme */
+
+.trackdraw-map__pilot-callsign-bg {
+  opacity: 0.95;
+}
+
+.trackdraw-map__pilot-callsign {
+  font-family: var(--trackdraw-badge-font, Barlow, sans-serif);
+  font-weight: var(--trackdraw-badge-weight, 900);
+  letter-spacing: var(--trackdraw-badge-tracking, 0.02em);
+  text-transform: uppercase;
+}
+
+.trackdraw-map__pilot-group.is-high .trackdraw-map__pilot-halo {
+  opacity: 0.95;
+}
+
+.trackdraw-map__pilot-group.is-medium .trackdraw-map__pilot-halo {
+  opacity: 0.55;
+}
+
+.trackdraw-map__pilot-group.is-low .trackdraw-map__pilot-halo {
+  stroke-dasharray: 0.8 0.7;
+  opacity: 0.45;
+}
+
+.trackdraw-map__pilot-group.is-stale {
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.trackdraw-map__pilot-group.is-stale .trackdraw-map__pilot-halo {
+  stroke-dasharray: 0.7 0.8;
+}
+
+.trackdraw-map__pilot-group.is-idle {
+  opacity: 0.74;
+}
+
+.trackdraw-map__pilot-group.is-correcting {
+  animation: td-anchor-correction-fade 650ms ease-out both;
+}
+
+.trackdraw-map__pilot-group.is-leader .trackdraw-map__pilot-halo {
+  animation: td-leader-pulse 1.1s ease-in-out infinite;
+  opacity: 1;
+  stroke: var(--trackdraw-leader, #ffffff);
+}
+
+
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map__pilot-group.is-label-hidden .trackdraw-map__pilot-callsign {
+  display: none;
+}
+
+/* ?labels=0 query param hides all pilot badges globally */
+.trackdraw-map.is-labels-off .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map.is-labels-off .trackdraw-map__pilot-callsign {
+  display: none;
+}
+
+@keyframes td-leader-pulse {
+  0%,
+  100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes td-anchor-correction-fade {
+  0% { opacity: 0.18; }
+  45% { opacity: 0.52; }
+  100% { opacity: 1; }
+}
+
+.trackdraw-map.is-crowded .trackdraw-map__pilot-callsign-bg {
+  opacity: 0.72;
+}
+
+.trackdraw-map.is-packed .trackdraw-map__pilot-group:not(.is-leader) .trackdraw-map__pilot-halo {
+  opacity: 0.5;
+}
+
+.trackdraw-map.is-compact .trackdraw-map__obstacle-label,
+.trackdraw-map.is-compact .trackdraw-map__timing-label {
+  display: none;
+}
+
+.trackdraw-map.is-compact .trackdraw-map__gate {
+  opacity: 0.7;
+}
+
+.trackdraw-map.is-tiny .trackdraw-map__gate {
+  display: none;
+}
+
+.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign-bg,
+.trackdraw-map.is-tiny .trackdraw-map__pilot-callsign {
+  display: none;
+}
+
+/* ---- Setup / error message overlay ---- */
+
+.trackdraw-map__message {
+  align-items: center;
+  background: rgb(0 0 0 / 72%);
+  box-sizing: border-box;
+  color: rgb(255 255 255 / 70%);
+  display: none;
+  font-size: 11px;
+  font-weight: 700;
+  inset: 0;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  line-height: 1.65;
+  padding: 32px;
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: pre-line;
+  z-index: 20;
+}
+
+.trackdraw-map__message.is-visible {
+  display: flex;
+}

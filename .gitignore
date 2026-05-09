@@ -8,3 +8,4 @@ site
 .cache
 .ruff_cache
 __pycache__
+custom_plugins/stream_overlays/static/dist

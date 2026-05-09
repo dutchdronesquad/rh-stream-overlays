@@ -110,26 +110,10 @@
   gap: 1.25rem;
 }
 
-.apex-body__label {
-  display: inline-flex;
-  gap: 0.5rem;
-  align-items: center;
-  text-transform: uppercase;
-  letter-spacing: 0.25em;
-  font-size: 1rem;
-  color: var(--apex-text-secondary);
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.apex-body__label .label-dot {
-  display: none;
-}
-
 /* Grid - cleaner layout */
 .heat-grid.apex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.5rem;
   margin-top: 0;
 }
@@ -207,12 +191,15 @@
 .theme-apex .card-body .callsign {
   margin: 0;
   font-family: "Orbitron", sans-serif;
-  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.8rem);
   font-weight: 800;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--apex-text-primary);
   line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--apex-text-primary);
 }
 
 .theme-apex .card-body .pilot-name {
@@ -282,7 +269,7 @@
   }
 
   .heat-grid.apex-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
 
@@ -303,5 +290,9 @@
   .theme-apex .channel-block {
     gap: 1.5rem;
     font-size: 0.8rem;
+  }
+
+  .heat-grid.apex-grid {
+    grid-template-columns: 1fr;
   }
 }

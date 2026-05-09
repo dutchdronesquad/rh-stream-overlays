@@ -1,0 +1,75 @@
+@import "https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap";
+
+/* Apex accent: #00d9ff — matches --apex-accent used in node.css and heat.css. */
+
+.trackdraw-map[data-theme="apex"] {
+  --trackdraw-accent: #00d9ff;
+  --trackdraw-accent-bar-h: 3px;
+  --trackdraw-badge-font: "Rajdhani", sans-serif;
+  --trackdraw-badge-label-size: 12px;
+  --trackdraw-badge-tracking: 0.10em;
+  --trackdraw-badge-weight: 700;
+  --trackdraw-field-bg: transparent;
+  --trackdraw-field-stroke: rgb(0 217 255 / 18%);
+  --trackdraw-key-bg: grey;
+  --trackdraw-label-stroke: rgb(5 8 15 / 94%);
+  --trackdraw-muted: rgb(0 217 255 / 55%);
+  --trackdraw-gate-bg: rgb(5 8 15 / 94%);
+  --trackdraw-gate-core: #00d9ff;
+  --trackdraw-gate-stroke: rgb(0 217 255 / 88%);
+  --trackdraw-obstacle: #00d9ff;
+  --trackdraw-obstacle-bg: rgb(5 8 15 / 90%);
+  --trackdraw-panel-bg: rgb(5 8 15 / 84%);
+  --trackdraw-panel-border: rgb(0 217 255 / 28%);
+  --trackdraw-pilot-label-bg: rgb(5 8 15 / 90%);
+  --trackdraw-pilot-label-bg-crowded: rgb(5 8 15 / 80%);
+  --trackdraw-pilot-position-text: #020d14;
+  --trackdraw-route: #f2f5f5;
+  --trackdraw-route-outline: rgb(5 8 15 / 88%);
+  --trackdraw-route-shadow: rgb(5 8 15 / 50%);
+  --trackdraw-leader: #ffffff;
+  --trackdraw-leader-bg: #ffffff;
+  --trackdraw-leader-text: #020d14;
+  --trackdraw-start-finish: #ffffff;
+  --trackdraw-start-finish-bg: rgb(5 8 15 / 92%);
+  --trackdraw-text: #ffffff;
+  --trackdraw-timing: #70f0ff;
+}
+
+/* ---- Apex overview overrides ----
+   Glassmorphism: blurred panels, full rounded borders, cyan accent glow on P1. */
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-header {
+  border-bottom-color: rgb(0 217 255 / 20%);
+}
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-card {
+  backdrop-filter: blur(16px);
+  background: rgb(5 8 15 / 48%);
+  border: 1px solid rgb(0 217 255 / 22%);
+  border-left: 1px solid rgb(0 217 255 / 22%);
+  border-radius: clamp(6px, 0.7vw, 12px);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-pos {
+  background: rgb(0 217 255 / 10%);
+  border: 1px solid rgb(0 217 255 / 28%);
+  border-radius: clamp(4px, 0.45vw, 8px);
+}
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-row--p1 .trackdraw-map__overview-pos {
+  background: var(--trackdraw-accent, #00d9ff);
+  border: none;
+  box-shadow: 0 0 20px rgb(0 217 255 / 55%);
+  color: #020d14;
+}
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-leader-pos {
+  border-radius: clamp(4px, 0.45vw, 8px);
+  box-shadow: 0 0 18px rgb(0 217 255 / 50%);
+}
+
+.trackdraw-map[data-theme="apex"] .trackdraw-map__overview-kicker {
+  color: rgb(0 217 255 / 65%);
+}

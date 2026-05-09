@@ -35,27 +35,33 @@ Enter these settings in the browser source properties:
 
 | Setting | Value | Notes |
 |---------|-------|-------|
-| **URL** | `http://[RH-IP]:5000/stream/overlay/[theme]/[type]/[node]` | Get URLs from [Overlay Catalog](../overlays/index.md) |
+| **URL** | `http://[RH-IP]:5000/stream/overlay/[theme]/[type]` | Get URLs from [Overlay Overview](../overlays/index.md) |
 | **Width** | `1920` | Match your OBS canvas width |
-| **Height** | `1080` | Match your OBS canvas height |
+| **Height** | `1080` | Use `100` for topbars, or match canvas height for full-screen overlays |
 | **FPS** | `30` or `60` | Higher = smoother, but more CPU usage |
-| **Custom CSS** | Leave empty | Overlays have built-in transparency |
+| **Custom CSS** | Keep the OBS default CSS | The default transparent background CSS keeps overlay sources transparent |
 
 ![Browser source settings](../assets/img/obs_settings-source.png){ style="border-radius: 8px; border: 1px solid var(--border-color);" }
 
-### 4. Enable Recommended Options
+### 4. Review Browser Source Behavior
 
-Check these boxes for optimal performance:
+Keep live race overlays loaded while switching scenes so timers, websocket data, and animations stay continuous.
 
-- [x] **Shutdown source when not visible** — Saves CPU when overlay is hidden
-- [x] **Refresh browser when scene becomes active** — Ensures fresh data on scene switch
+Leave these OBS browser source options disabled:
+
+| Option | Why |
+|--------|-----|
+| **Shutdown source when not visible** | Stops the browser source while hidden, so it has to reconnect when shown again. |
+| **Refresh browser when scene becomes active** | Reloads the overlay on scene switches, which can interrupt timers, animations, and live websocket state. |
 
 !!! tip "Canvas Resolution"
-    Always match the browser source dimensions to your OBS **Base Canvas** resolution:
+    Match full-screen overlay sources to your OBS **Base Canvas** resolution:
 
     - 1080p → 1920×1080
     - 720p → 1280×720
     - 4K → 3840×2160
+
+    Topbars are the exception: use a wide, low browser source such as 1920×100.
 
 ---
 
@@ -81,17 +87,7 @@ Right-click the source → **Properties** → **FPS** to adjust.
 
 ### Scene Organization
 
-Create dedicated scenes for each overlay type to avoid running multiple browser sources simultaneously:
-
-```
-📁 Scenes
-├── 🎬 Intro
-├── 🏁 Race - Matrix (Multiple nodes + top bar)
-├── 🎯 Race - Node 1 (Node 1 overlay + pilot cam)
-├── 🎯 Race - Node 2 (Node 2 overlay + pilot cam)
-├── 📋 Heat Board (Heat overlay)
-└── 🏆 Podium (Ranking overlay)
-```
+Create dedicated scenes for each overlay type to avoid running multiple browser sources simultaneously. See [OBS Scene Layouts](../production/obs-scene-layouts.md) for complete production recipes, including race matrix, TrackDraw map, overview, heat board, and results scenes.
 
 ---
 
@@ -168,6 +164,7 @@ Having issues with OBS? Check the **[OBS Setup FAQ](../faq/obs-setup.md)** for t
 
 **Other resources:**
 
-- **[Overlay Catalog](../overlays/index.md)** — Browse all available themes and get URLs
+- **[Overlay Overview](../overlays/index.md)** — Browse themes, overlay types, and URL patterns
+- **[Advanced Guides](../advanced/index.md)** — Build complete OBS scene collections
 - **[Getting Started Guide](index.md)** — Complete setup walkthrough
 - **[GitHub Discussions](https://github.com/dutchdronesquad/rh-stream-overlays/discussions)** — Ask questions and get help

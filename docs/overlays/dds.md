@@ -75,9 +75,7 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/class
 ```
 
-
-[![Watch the video](../assets/img/overlays/dds/ranking_class-dds.png)](https://youtu.be/xqIuBfLjtJE)
-_Click on the image to watch a video of the overlay in action_
+![DDS class leaderboard overlay preview](../assets/img/overlays/dds/dds-leaderboard-class.gif)
 
 ### Overall ranking
 
@@ -92,5 +90,43 @@ URL to use:
 RH-IP:5000/stream/overlay/dds/leaderboard/[CLASS ID]/overall
 ```
 
-[![Watch the video](../assets/img/overlays/dds/ranking_overall-dds.png)](https://youtu.be/kTtoHACqsg0)
-_Click on the image to watch a video of the overlay in action_
+![DDS overall leaderboard overlay preview](../assets/img/overlays/dds/dds-leaderboard-overall.gif)
+
+## TrackDraw integration
+
+DDS can style the TrackDraw map and overview overlays. Pilot badges use the DDS diagonal pill shape with the top-left and bottom-right corners rounded and filled with the pilot's team color.
+
+### Live Race Map
+
+Use the TrackDraw map when you want a dedicated track view or a compact map overlay styled with DDS pilot badges.
+
+```bash
+RH-IP:5000/stream/overlay/dds/trackdraw/map
+```
+
+#### Query parameters
+
+Use query parameters to adjust map-only behavior for compact OBS sources.
+
+| Parameter | Values | Description |
+|-----------|--------|-------------|
+| `labels` | `0` | Hides pilot callsign badges when the map is used as a small corner source. |
+
+![DDS TrackDraw map overlay preview](../assets/img/overlays/dds/dds-trackdraw-map.gif)
+
+!!! note "Preview performance"
+    The live overlay runs much smoother in OBS or a browser than this GIF preview. GIF compression and frame-rate limits make the map movement look slower and less fluid.
+
+### Overview
+
+Use the TrackDraw overview for commentator scenes with a map, leader callout, and pilot list.
+
+```bash
+RH-IP:5000/stream/overlay/dds/trackdraw/overview
+```
+
+Use this as a full 16:9 browser source when you want the map, race status, current leader, and active pilot list in one scene.
+
+![DDS TrackDraw overview overlay preview](../assets/img/overlays/dds/dds-trackdraw-overview.gif)
+
+See the [TrackDraw integration](../integrations/trackdraw/index.md) docs for setup, OBS settings, and production guidance.

@@ -115,7 +115,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 25px;
   font-family: "Rajdhani", sans-serif;
   font-size: 2.6rem;
   font-weight: 700;
@@ -123,6 +122,14 @@ body {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   padding: 0 40px;
+}
+
+.topbar-heat-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  min-width: 0;
 }
 
 #js--heat-title {
@@ -215,6 +222,9 @@ body {
 
   .heat-section {
     font-size: 2.2rem;
+  }
+
+  .topbar-heat-content {
     gap: 20px;
   }
 
@@ -240,8 +250,11 @@ body {
 
   .heat-section {
     font-size: 1.8rem;
-    gap: 15px;
     padding: 0 30px;
+  }
+
+  .topbar-heat-content {
+    gap: 15px;
   }
 
   #js--heat-title {
