@@ -66,9 +66,9 @@ repos:
         types: [text]
         entry: uv run trailing-whitespace-fixer
         stages: [commit, push, manual]
+  - repo: https://github.com/RotorHazard/rhfest-action
+    rev: v3.2.2
+    hooks:
       - id: rhfest
         name: 🎉 Check RHFest
-        language: system
-        entry: docker
-        args: ["run", "--rm", "--pull=always", "-v", ".:/repo", "ghcr.io/rotorhazard/rhfest-action:latest"]
-        pass_filenames: false
+        stages: [pre-commit, pre-push, manual]
