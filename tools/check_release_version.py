@@ -1,3 +1,5 @@
+# Copyright (c) 2023-2026 Dutch Drone Squad
+
 """Validate plugin manifest version against release branch names."""
 
 from __future__ import annotations
