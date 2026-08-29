@@ -1,4 +1,5 @@
 ---
+default_install_hook_types: [pre-commit, pre-push]
 repos:
   - repo: local
     hooks:
@@ -8,14 +9,14 @@ repos:
         types: [python]
         entry: uv run ruff check --fix
         require_serial: true
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: ruff-format
         name: 🐶 Ruff Formatter
         language: system
         types: [python]
         entry: uv run ruff format
         require_serial: true
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: check-ast
         name: 🐍 Check Python AST
         language: system
@@ -51,7 +52,7 @@ repos:
         language: system
         types: [text]
         entry: uv run end-of-file-fixer
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
       - id: no-commit-to-branch
         name: 🛑 Don't commit to main branch
         language: system
@@ -65,7 +66,7 @@ repos:
         language: system
         types: [text]
         entry: uv run trailing-whitespace-fixer
-        stages: [commit, push, manual]
+        stages: [pre-commit, pre-push, manual]
   - repo: https://github.com/RotorHazard/rhfest-action
     rev: v3.2.2
     hooks:
