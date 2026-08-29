@@ -32,7 +32,7 @@ jobs:
         run: uv run ruff format --check .
 
   prek-hooks:
-    name: prek-hooks
+    name: Prek hooks
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
