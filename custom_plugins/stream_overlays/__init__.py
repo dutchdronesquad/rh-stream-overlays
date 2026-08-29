@@ -1,3 +1,5 @@
+# Copyright (c) 2023-2026 Dutch Drone Squad
+
 """DDS - RotorHazard Stream Overlay Plugin."""
 
 import functools
