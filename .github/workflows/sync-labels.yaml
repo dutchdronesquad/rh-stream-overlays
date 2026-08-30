@@ -18,7 +18,6 @@ jobs:
       issues: write
     steps:
       - name: 🚀 Run Label Blueprint
-        uses: klaasnicolaas/action-label-blueprint@v1
+        uses: klaasnicolaas/action-label-blueprint@v1.0.0
         with:
           labels-file: https://raw.githubusercontent.com/dutchdronesquad/.github/main/.github/labels.yml
-          prune: true
