@@ -30,6 +30,6 @@ jobs:
       - name: 📦 Package plugin
         run: zip -r stream_overlays.zip custom_plugins
       - name: ⬆️ Upload release asset
-        uses: softprops/action-gh-release@v3.0.2
+        uses: softprops/action-gh-release@v3.0.3
         with:
           files: stream_overlays.zip
