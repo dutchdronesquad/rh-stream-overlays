@@ -20,4 +20,4 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v7.0.1
       - name: 🚀 Run RHFest validation
-        uses: RotorHazard/rhfest-action@v3.2.2
+        uses: RotorHazard/rhfest-action@v3.2.3
