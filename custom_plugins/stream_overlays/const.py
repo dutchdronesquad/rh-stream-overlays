@@ -1,5 +1,3 @@
-# Copyright (c) 2023-2026 Dutch Drone Squad
-
 """Constants for the stream overlays plugin."""
 
 TRACKDRAW_API_ORIGIN = "https://trackdraw.app"

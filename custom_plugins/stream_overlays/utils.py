@@ -1,5 +1,3 @@
-# Copyright (c) 2023-2026 Dutch Drone Squad
-
 """Utility functions for stream overlays."""
 
 

@@ -1,5 +1,3 @@
-# Copyright (c) 2023-2026 Dutch Drone Squad
-
 """TrackDraw REST client and cache helpers for stream overlays."""
 
 import json
