@@ -22,9 +22,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
       - name: 🏗 Set up UV
-        uses: astral-sh/setup-uv@v8.1.0
+        uses: astral-sh/setup-uv@v10.1.0
       - name: 🏗 Install project dependencies
         run: uv sync --group docs
       - name: 🏗 Build documentation
@@ -48,5 +48,5 @@ jobs:
       - name: 🏗️ Setup Github Pages
         uses: actions/configure-pages@v6.0.0
       - name: 🚀 Deploy to Github Pages
-        uses: actions/deploy-pages@v5.0.0
+        uses: actions/deploy-pages@v5.0.1
         id: deployment

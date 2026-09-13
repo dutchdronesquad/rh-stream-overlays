@@ -1,0 +1,147 @@
+# AGENTS.md
+
+Guidance for AI/code agents working in this repository.
+
+## Project Overview
+
+`rh-stream-overlays` is a RotorHazard Community Plugin that adds OBS/browser stream overlays for race events. It combines a Python RotorHazard plugin, Jinja overlay entry pages, theme CSS, a Preact/Vite frontend bundle, TrackDraw integration, and MkDocs documentation.
+
+The installable plugin lives under `custom_plugins/stream_overlays/`. The repository root also contains docs, frontend source, build tooling, and release assets.
+
+## Repository Layout
+
+- `custom_plugins/stream_overlays/__init__.py`: RotorHazard plugin initialization, UI panel registration, Flask blueprint routes, and overlay page rendering.
+- `custom_plugins/stream_overlays/trackdraw.py`: TrackDraw REST client, package validation, cache handling, readiness diagnostics, and payload generation.
+- `custom_plugins/stream_overlays/const.py`: plugin constants and TrackDraw configuration keys.
+- `custom_plugins/stream_overlays/utils.py`: markdown builders for RotorHazard UI panels.
+- `custom_plugins/stream_overlays/manifest.json`: RotorHazard community plugin manifest. Keep plugin metadata and release version here.
+- `custom_plugins/stream_overlays/pages/overlays/`: Jinja templates served by RotorHazard for each overlay URL.
+- `custom_plugins/stream_overlays/static/css/`: theme-specific and shared overlay CSS.
+- `custom_plugins/stream_overlays/static/dist/`: built Vite output consumed by the Jinja templates.
+- `frontend/src/`: Preact/TypeScript source for the overlays.
+- `frontend/vite.config.ts`: builds multiple overlay entry points into `custom_plugins/stream_overlays/static/dist`.
+- `docs/`: MkDocs source. Edit this, not `site/`.
+- `site/`: generated MkDocs output. Do not hand-edit.
+- `tools/install.sh`: install helper script.
+- `assets/`: README/repository assets.
+
+## Development Environment
+
+- Python: `>=3.11`
+- Python dependency manager: `uv`
+- Frontend package manager: `npm` using `frontend/package-lock.json`
+- Python lint/format hooks: `prek` plus `ruff`
+- Documentation: MkDocs Material via the `docs` dependency group
+- CI validation: RHFest via `ghcr.io/rotorhazard/rhfest-action:v3.0.1`
+
+Set up Python dependencies from the repository root:
+
+```bash
+uv sync --all-groups
+```
+
+Set up frontend dependencies when needed:
+
+```bash
+cd frontend
+npm install
+```
+
+## Common Commands
+
+Run all configured Python/repository checks:
+
+```bash
+uv run prek run --all-files
+```
+
+Run Ruff directly:
+
+```bash
+uv run ruff check .
+uv run ruff format .
+```
+
+Build the frontend bundles:
+
+```bash
+cd frontend
+npm run build
+```
+
+Type-check the frontend without emitting files:
+
+```bash
+cd frontend
+npm run check
+```
+
+Run the Vite dev server:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Build documentation:
+
+```bash
+make build
+```
+
+Serve documentation locally:
+
+```bash
+make serve
+```
+
+Run RHFest validation locally when Docker is available:
+
+```bash
+docker run --rm --pull=always -v .:/repo ghcr.io/rotorhazard/rhfest-action:latest
+```
+
+## Coding Conventions
+
+- Follow the existing Python style: type hints, explicit docstrings, and small helper functions where they reduce route/plugin complexity.
+- Ruff is configured with `lint.select = ["ALL"]`; check `pyproject.toml` before adding ignores.
+- Keep RotorHazard imports such as `eventmanager`, `RHUI`, and RotorHazard database/interface APIs isolated to plugin runtime code. They may not be importable outside a RotorHazard environment.
+- Do not log, expose, or send the TrackDraw API key to browser clients. The API key is configured as a private RotorHazard UI field and should stay server-side.
+- Treat OBS overlay pages as browser clients: only expose data that is safe for stream output.
+- Keep Jinja route templates thin. Runtime behavior should generally live in `frontend/src/` or server-side helper modules.
+- When adding an overlay type or theme, update all related surfaces: `overlays` in `__init__.py`, route/template support, `pages/overlays/`, theme CSS, frontend entry points if needed, documentation, and screenshots/assets where applicable.
+- Preserve existing public overlay URLs unless a breaking change is explicitly intended.
+
+## Frontend Notes
+
+- The app uses Preact with TypeScript and Vite.
+- Vite entry points are listed in `frontend/vite.config.ts`; output filenames are stable names such as `topbar.js`, `node.js`, and `trackdraw-map.js`.
+- Jinja templates load built assets from `stream_overlays.static` under `static/dist/`.
+- Shared RotorHazard data normalization and socket/runtime logic belongs under `frontend/src/core/`.
+- TrackDraw rendering logic is under `frontend/src/overlays/trackdraw/trackCore/`.
+- Keep overlay UI readable in OBS: avoid layout shifts, oversized debug UI, or elements that require operator interaction inside the overlay browser source.
+
+## Documentation Notes
+
+- Edit `docs/` and `mkdocs.yml`.
+- Do not hand-edit `site/`; it is generated by MkDocs.
+- Keep docs in sync with available overlay URLs and theme names.
+- Documentation site URL is `https://overlays.dutchdronesquad.nl`.
+
+## Validation Checklist
+
+Before handing off code changes, run the narrowest relevant checks:
+
+- Python/plugin-only change: `uv run ruff check .` and `uv run ruff format .` or `uv run prek run --all-files`.
+- Frontend change: `cd frontend && npm run build`.
+- Documentation change: `make build`.
+- Manifest/community-plugin change: run RHFest validation when Docker is available.
+
+If a command cannot run because local dependencies, Docker, network access, or RotorHazard runtime are unavailable, state that explicitly in the handoff.
+
+## Git and Generated Files
+
+- This repository may have uncommitted user changes. Do not revert unrelated changes.
+- Avoid committing generated `site/` output unless the task specifically asks for it.
+- Frontend build output in `custom_plugins/stream_overlays/static/dist/` is consumed by the plugin. Update it when changing frontend source for a release/build task.
+- Keep `manifest.json` version aligned with intended plugin releases; `pyproject.toml` currently uses `0.0.0` as project metadata.
