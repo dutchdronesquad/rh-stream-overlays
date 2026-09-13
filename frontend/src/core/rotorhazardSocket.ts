@@ -97,6 +97,11 @@ function handleEvent(eventName: RotorHazardEvent, payload: unknown): void {
 }
 
 export function connectRotorHazardSocket(options: SocketOptions = {}): () => void {
+  // RotorHazard's shared layout enables alert popups by default, including
+  // a full-screen dark backdrop. Stream overlays must suppress these messages.
+  const rotorhazard = (globalThis as SocketGlobals).rotorhazard;
+  if (rotorhazard) rotorhazard.show_messages = false;
+
   const socket = options.socket ?? readSocket();
   const events = options.events ?? DEFAULT_EVENTS;
   const shouldRequestLoadData = options.requestLoadData ?? true;
